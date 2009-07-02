@@ -132,7 +132,7 @@ bool LocalDataBase::AppendSmsRecord(SmsData_ptr psms){
         smstm.wYear,smstm.wMonth,smstm.wDay,smstm.wHour,smstm.wMinute,smstm.wSecond,
         psms->SendReceiveFlag);
     if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
-		nRet = (sqlite3_step(pStmt) == SQLITE_OK);
+		nRet = (sqlite3_step(pStmt) == SQLITE_DONE);
     }
 	sqlite3_finalize(pStmt);
     return nRet;
@@ -179,7 +179,7 @@ bool LocalDataBase::updateContact(LPWSTR number,LPWSTR name,TelLabel_t label){
 	wsprintf(sqlcmdw,UPDATE_SELECT_CONTACT,TABLE_CONTACT,
         name,label,number);
     if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
-        nRet = (sqlite3_step(pStmt) == SQLITE_OK);
+        nRet = (sqlite3_step(pStmt) == SQLITE_DONE);
     }
 	sqlite3_finalize(pStmt);
     return nRet;
@@ -194,7 +194,7 @@ bool LocalDataBase::addContactRecord(LPWSTR number,LPWSTR name,TelLabel_t label)
     wsprintf(sqlcmdw,INSERT_CONTACT,TABLE_CONTACT,
         number,name,label);
     if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
-		nRet = (sqlite3_step(pStmt) == SQLITE_OK);
+		nRet = (sqlite3_step(pStmt) == SQLITE_DONE);
     }
 	sqlite3_finalize(pStmt);
 	//添加记录不成功时尝试更新记录

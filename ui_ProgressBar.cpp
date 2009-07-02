@@ -61,7 +61,7 @@ bool uiCallbackRefreshContact(ContactData_ptr pcontact,WORD nCount,WORD nSize,WO
 	SetProgressBarRange(0,nSize);
 	wchar_t infotext[256];
 	wsprintf(infotext,L"更新联系人记录...已导入:%d",nSuccess);
-	SetProgressBarTitle(infotext);
+	m_Progressdlg.SetTitle(infotext);
 	wsprintf(infotext,L"%s (%d/%d)",pcontact->Name,nCount + 1,nSize);
 	m_Progressdlg.SetInfo(infotext);
 	m_Progressdlg.SetCurValue(nCount);
@@ -78,7 +78,7 @@ bool uiCallbackRefreshSms(SmsData_ptr psms,WORD nCount,WORD nSize,WORD nSuccess)
 	SetProgressBarRange(0,nSize);
 	wchar_t infotext[256];
 	wsprintf(infotext,L"更新短信记录...已导入:%d",nSuccess);
-	SetProgressBarTitle(infotext);
+	m_Progressdlg.SetTitle(infotext);
 	wsprintf(infotext,L"%s %s (%d/%d)",psms->SendReceiveFlag == 1 ? L"[←]": L"[→]",psms->PNSort,nCount + 1,nSize);
 	m_Progressdlg.SetInfo(infotext);
 	m_Progressdlg.SetCurValue(nCount);
