@@ -26,6 +26,11 @@ using namespace std;
 #define INSERT_SMS L"INSERT INTO '%s' (PN,PhoneNumber,Content,TimeStamps,SendReceive) \
 values('%s','%s','%s','%04d-%02d-%02d %02d:%02d:%02d',%d)"
 
+#define CONTACT_EQU_CONDITION   L"where PhoneNumber='%s' and Name='%s' and Label=%d"
+#define COUNT_SELECT_CONTACT  L"select count(*) from '%s' "CONTACT_EQU_CONDITION
+#define DELETE_SELECT_CONTACT  L"delete from '%s' "CONTACT_EQU_CONDITION
+#define UPDATE_SELECT_CONTACT	L"update '%s' set Name='%s',Label=%d where PhoneNumber='%s'"
+
 #define SMS_EQU_CONDITION   L"where PhoneNumber='%s' and Content='%s' and TimeStamps='%04d-%02d-%02d %02d:%02d:%02d' and SendReceive=%d"
 #define COUNT_SELECT_SMS  L"select count(*) from '%s' "SMS_EQU_CONDITION
 #define DELETE_SELECT_SMS  L"delete from '%s' "SMS_EQU_CONDITION
@@ -206,6 +211,8 @@ public:
 	bool RemoveSmsRecord(ContactData_ptr);
 private:
     bool addContactRecord(LPWSTR number,LPWSTR name,TelLabel_t label);
+	bool isDuplicateContact(LPWSTR number,LPWSTR name,TelLabel_t label);
+	bool updateContact(LPWSTR number,LPWSTR name,TelLabel_t label);
 private:
     //sqlite operations
     sqlite3* db;

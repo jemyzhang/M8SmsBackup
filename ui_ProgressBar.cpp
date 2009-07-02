@@ -45,14 +45,14 @@ void initProgressBar(LPWSTR title = NULL, WORD rmin = 0, WORD rmax = 100){
 }
 
 void initUiCallbackRefreshContact(){
-	initProgressBar(L"更新联系人...");
+	initProgressBar(L"更新联系人记录...");
 }
 
 void initUiCallbackRefreshSms(){
-	initProgressBar(L"更新短信...");
+	initProgressBar(L"更新短信记录...");
 }
 
-bool uiCallbackRefreshContact(ContactData_ptr pcontact,WORD nCount,WORD nSize){
+bool uiCallbackRefreshContact(ContactData_ptr pcontact,WORD nCount,WORD nSize,WORD nSuccess){
 	if(nCount+1 >= nSize){
 		HideProgressBar();
 		return false;
@@ -60,14 +60,16 @@ bool uiCallbackRefreshContact(ContactData_ptr pcontact,WORD nCount,WORD nSize){
 	ShowProgressBar();
 	SetProgressBarRange(0,nSize);
 	wchar_t infotext[256];
-	wsprintf(infotext,L"%s(%d/%d)",pcontact->Name,nCount + 1,nSize);
+	wsprintf(infotext,L"更新联系人记录...已导入:%d",nSuccess);
+	SetProgressBarTitle(infotext);
+	wsprintf(infotext,L"%s (%d/%d)",pcontact->Name,nCount + 1,nSize);
 	m_Progressdlg.SetInfo(infotext);
 	m_Progressdlg.SetCurValue(nCount);
 	m_Progressdlg.UpdateProgress();
-	DateTime::waitms(1);
+	DateTime::waitms(0);
 	return true;
 }
-bool uiCallbackRefreshSms(SmsData_ptr psms,WORD nCount,WORD nSize){
+bool uiCallbackRefreshSms(SmsData_ptr psms,WORD nCount,WORD nSize,WORD nSuccess){
 	if(nCount+1 >= nSize){
 		HideProgressBar();
 		return false;
@@ -75,10 +77,12 @@ bool uiCallbackRefreshSms(SmsData_ptr psms,WORD nCount,WORD nSize){
 	ShowProgressBar();
 	SetProgressBarRange(0,nSize);
 	wchar_t infotext[256];
-	wsprintf(infotext,L"%s%s(%d/%d)",psms->SendReceiveFlag == 1 ? L"<-": L"->",psms->MobileNumber,nCount + 1,nSize);
+	wsprintf(infotext,L"更新短信记录...已导入:%d",nSuccess);
+	SetProgressBarTitle(infotext);
+	wsprintf(infotext,L"%s %s (%d/%d)",psms->SendReceiveFlag == 1 ? L"[←]": L"[→]",psms->PNSort,nCount + 1,nSize);
 	m_Progressdlg.SetInfo(infotext);
 	m_Progressdlg.SetCurValue(nCount);
 	m_Progressdlg.UpdateProgress();
-	DateTime::waitms(1);
+	DateTime::waitms(0);
 	return true;
 }

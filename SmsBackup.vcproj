@@ -151,6 +151,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,6.00"
+				AdditionalDependencies="mzfc.lib PlatformApi.lib libsqlitece_s.lib"
 				OutputFile="$(OutDir)/SmsBackup.exe"
 				LinkIncremental="1"
 				DelayLoadDLLs="$(NOINHERIT)"

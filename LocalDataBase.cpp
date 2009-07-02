@@ -132,9 +132,7 @@ bool LocalDataBase::AppendSmsRecord(SmsData_ptr psms){
         smstm.wYear,smstm.wMonth,smstm.wDay,smstm.wHour,smstm.wMinute,smstm.wSecond,
         psms->SendReceiveFlag);
     if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
-		if(sqlite3_step(pStmt) == SQLITE_OK){
-			nRet = true;
-		}
+		nRet = (sqlite3_step(pStmt) == SQLITE_OK);
     }
 	sqlite3_finalize(pStmt);
     return nRet;
@@ -159,18 +157,50 @@ bool LocalDataBase::isDuplicateSms(SmsData_ptr psms){
 }
 //////////////////////////////////////
 //contact操作
+bool LocalDataBase::isDuplicateContact(LPWSTR number,LPWSTR name,TelLabel_t label){
+    bool nRet = false;
+    if(number == NULL || name == NULL) return nRet;
+
+	wsprintf(sqlcmdw,COUNT_SELECT_CONTACT,TABLE_CONTACT,
+        number,name,label);
+    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        if (sqlite3_step(pStmt) == SQLITE_ROW){
+            nRet = (sqlite3_column_int(pStmt, 0) != 0);
+        }
+    }
+	sqlite3_finalize(pStmt);
+    return nRet;
+}
+
+bool LocalDataBase::updateContact(LPWSTR number,LPWSTR name,TelLabel_t label){
+    bool nRet = false;
+    if(number == NULL || name == NULL) return nRet;
+
+	wsprintf(sqlcmdw,UPDATE_SELECT_CONTACT,TABLE_CONTACT,
+        name,label,number);
+    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        nRet = (sqlite3_step(pStmt) == SQLITE_OK);
+    }
+	sqlite3_finalize(pStmt);
+    return nRet;
+}
+
 bool LocalDataBase::addContactRecord(LPWSTR number,LPWSTR name,TelLabel_t label){
     bool nRet = false;
     if(number == NULL || name == NULL) return nRet;
+	//检查记录是否已存在
+	if(isDuplicateContact(number,name,label)) return nRet;
 
     wsprintf(sqlcmdw,INSERT_CONTACT,TABLE_CONTACT,
         number,name,label);
     if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
-		if(sqlite3_step(pStmt) == SQLITE_OK){
-			nRet = true;
-		}
+		nRet = (sqlite3_step(pStmt) == SQLITE_OK);
     }
 	sqlite3_finalize(pStmt);
+	//添加记录不成功时尝试更新记录
+	if(nRet == false){
+		nRet = updateContact(number,name,label);
+	}
     return nRet;
 }
 
