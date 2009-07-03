@@ -1,3 +1,5 @@
+#include "ui_main.h"
+
 #define VER_STRING L"1.00"
 #ifdef MZFC_STATIC
 #define BUILD_STRING L"20090625(S)"
@@ -10,11 +12,13 @@
 #else
 #define CONFIG_INI L"\\Disk\\Programs\\M8SmsMgr\\M8SmsMgr.ini"
 #endif
+
 // Application class derived from CMzApp
 class M8SmsMgr : public CMzApp {
 public:
-    // Initialization of the application
-    virtual BOOL Init();
+	Ui_MainWnd m_MainWnd;
+	// Initialization of the application
+	virtual BOOL Init();
 	HWND isRuning(){
 		//正常启动程序
 		//检测程序是否已经运行

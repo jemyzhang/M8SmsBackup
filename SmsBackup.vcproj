@@ -234,6 +234,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ui_main.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ui_ProgressBar.cpp"
 				>
 			</File>
@@ -273,6 +277,10 @@
 			</File>
 			<File
 				RelativePath=".\refreshRecord.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ui_main.h"
 				>
 			</File>
 			<File
