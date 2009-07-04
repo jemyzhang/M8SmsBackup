@@ -199,12 +199,16 @@ public:
 	UINT GetSmsContactList(SmsViewListKey_ptr = NULL);
 	//时间列表, in = NULL时返回key数量
 	UINT GetSmsYearList(SmsViewListKey_ptr = NULL);
-	UINT GetSmsMonthList(SmsViewListKey_ptr = NULL);
-	UINT GetSmsDayList(SmsViewListKey_ptr = NULL);
+	UINT GetSmsMonthList(WORD year, SmsViewListKey_ptr = NULL);
+	UINT GetSmsDayList(WORD year, WORD month,SmsViewListKey_ptr = NULL);
     //获取短信数量
-    UINT GetSmsCount(UINT *recived = NULL, UINT *sent = NULL);
-private:
+    UINT GetSmsCount(UINT &received, UINT &sent);
+    UINT GetSmsYearCount(WORD year, UINT &received, UINT &sent);
+    UINT GetSmsMonthCount(WORD year, WORD month, UINT &received, UINT &sent);
+    UINT GetSmsDayCount(WORD year, WORD month,WORD day, UINT &received, UINT &sent);
+public:
 	bool CreateTempSmsTable();	//建立内联表格
+private:
     //插入记录前检查是否有重复sms
     bool isDuplicateSms(SmsData_ptr);
     bool bTempTableCreated;

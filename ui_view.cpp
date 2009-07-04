@@ -9,6 +9,9 @@ extern HINSTANCE LangresHandle;
 #define MZ_IDC_BUTTON_MAIN_VIEW 102
 #define MZ_IDC_BUTTON_VIEW_CONTACT 103
 #define MZ_IDC_BUTTON_VIEW_DATE 104
+#define MZ_IDC_BUTTON_VIEW_DATE_YEAR 105
+#define MZ_IDC_BUTTON_VIEW_DATE_MONTH 106
+#define MZ_IDC_BUTTON_VIEW_DATE_DAY 107
 
 #define MZ_IDC_LIST 120
 
@@ -48,6 +51,7 @@ BOOL Ui_ViewWnd::OnInitDialog() {
     AddUiWin(&m_Toolbar);
 
     SetupList();
+    ldb.CreateTempSmsTable();
     return TRUE;
 }
 
@@ -60,7 +64,7 @@ void Ui_ViewWnd::SetupList(){
 
         li.Text = L"按时间分类";
         m_List.AddItem(li);
-    }else if(viewStatus == 1){   //联系人列表
+    }else{
         if(plistkey && plistSize > 0){
             for(UINT i = 0; i < plistSize; i++){
                 plistkey[i].Reset();
@@ -70,19 +74,45 @@ void Ui_ViewWnd::SetupList(){
         }
         MzBeginWaitDlg(m_hWnd);
         DateTime::waitms(0);
-        plistSize = ldb.GetSmsContactList();
+        if(viewStatus == 1){
+            plistSize = ldb.GetSmsContactList();
+        }else if(viewStatus == 0x10){
+            plistSize = ldb.GetSmsYearList();
+        }else if(viewStatus == 0x11){
+            plistSize = ldb.GetSmsMonthList(selectedYear);
+        }else if(viewStatus == 0x12){
+            plistSize = ldb.GetSmsDayList(selectedYear,selectedMonth);
+        }else{
+            plistSize = 0;
+        }
         if(plistSize > 0){
             plistkey = new SmsViewListKey_t[plistSize];
-            plistSize = ldb.GetSmsContactList(plistkey);
+            if(viewStatus == 1){
+                plistSize = ldb.GetSmsContactList(plistkey);
+            }else if(viewStatus == 0x10){
+                plistSize = ldb.GetSmsYearList(plistkey);
+            }else if(viewStatus == 0x11){
+                plistSize = ldb.GetSmsMonthList(selectedYear,plistkey);
+            }else if(viewStatus == 0x12){
+                plistSize = ldb.GetSmsDayList(selectedYear,selectedMonth,plistkey);
+            }
             for(UINT i = 0; i < plistSize; i++){
                 wchar_t strkey[128];
-                wsprintf(strkey,L"%s (%d/%d)",plistkey[i].key,plistkey[i].nReceive,plistkey[i].nSend);
+                wsprintf(strkey,L"%s (%d+%d=%d)",
+                    plistkey[i].key,plistkey[i].nReceive,plistkey[i].nSend,
+                    plistkey[i].nReceive+plistkey[i].nSend);
                 li.Text = strkey;
+                if(viewStatus >= 0x10 && viewStatus < 0x13){
+                    WORD num;
+                    swscanf(plistkey[i].key,L"%d",&num);
+                    li.Data = (void *)num;
+                }
                 m_List.AddItem(li);
             }
         }
         MzEndWaitDlg();
     }
+    m_List.ScrollTo();
     m_List.Invalidate();
     m_List.Update();
 }
@@ -92,17 +122,47 @@ void Ui_ViewWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
     switch (id) {
         case MZ_IDC_BUTTON_MAIN_VIEW:
             {
-                m_Navibar.popUntil(MZ_IDC_BUTTON_MAIN_VIEW);
-                viewStatus = 0;
-                SetupList();
+                if(viewStatus != 0){
+                    m_Navibar.popUntil(MZ_IDC_BUTTON_MAIN_VIEW);
+                    viewStatus = 0;
+                    SetupList();
+                }
                 break;
             }
         case MZ_IDC_BUTTON_VIEW_CONTACT:
             {
+                if(viewStatus != 1){
+                    m_Navibar.popUntil(MZ_IDC_BUTTON_VIEW_CONTACT);
+                    viewStatus = 1;
+                    SetupList();
+                }
                 break;
             }
         case MZ_IDC_BUTTON_VIEW_DATE:
             {
+                if(viewStatus != 0x10){
+                    m_Navibar.popUntil(MZ_IDC_BUTTON_VIEW_DATE);
+                    viewStatus = 0x10;
+                    SetupList();
+                }
+                break;
+            }
+        case MZ_IDC_BUTTON_VIEW_DATE_YEAR:
+            {
+                if(viewStatus != 0x11){
+                    m_Navibar.popUntil(MZ_IDC_BUTTON_VIEW_DATE_YEAR);
+                    viewStatus = 0x11;
+                    SetupList();
+                }
+                break;
+            }
+        case MZ_IDC_BUTTON_VIEW_DATE_MONTH:
+            {
+                if(viewStatus != 0x12){
+                    m_Navibar.popUntil(MZ_IDC_BUTTON_VIEW_DATE_MONTH);
+                    viewStatus = 0x12;
+                    SetupList();
+                }
                 break;
             }
         case MZ_IDC_TOOLBAR_MAIN:
@@ -133,13 +193,51 @@ LRESULT Ui_ViewWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
                         if(nIndex != -1){
                             if(viewStatus == 0){
                                 UINT received, sent, total;
-                                total = ldb.GetSmsCount(&received,&sent);
+                                total = ldb.GetSmsCount(received,sent);
+                                wchar_t strcount2[128];
+                                wsprintf(strcount2,L"%d/%d",received,sent,total);
                                 wchar_t strcount[128];
-                                wsprintf(strcount,L"(%d/%d)",received,sent);
-                                m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_CONTACT + nIndex,m_List.GetItem(nIndex)->Text.C_Str(),strcount));
+                                wsprintf(strcount,L"%d",total);
+                                m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_CONTACT + nIndex,nIndex == 0 ? L"联系人":L"日期",strcount,strcount2));
                                 viewStatus = nIndex == 0 ? 1 : 0x10;
-                                SetupList();
+                            }else if(viewStatus == 0x10){
+                                UINT received, sent, total;
+                                selectedYear = (WORD)m_List.GetItem(nIndex)->Data;
+                                total = ldb.GetSmsYearCount(selectedYear,received,sent);
+                                wchar_t strcount2[128];
+                                wsprintf(strcount2,L"%d/%d",received,sent,total);
+                                wchar_t strcount[128];
+                                wsprintf(strcount,L"%d",total);
+                                wchar_t strLabel[16];
+                                wsprintf(strLabel,L"%04d",selectedYear);
+                                m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_DATE_YEAR,strLabel,strcount,strcount2));
+                                viewStatus += 1;
+                            }else if(viewStatus == 0x11){
+                                UINT received, sent, total;
+                                selectedMonth = (WORD)m_List.GetItem(nIndex)->Data;
+                                total = ldb.GetSmsMonthCount(selectedYear,selectedMonth,received,sent);
+                                wchar_t strcount2[128];
+                                wsprintf(strcount2,L"%d/%d",received,sent,total);
+                                wchar_t strcount[128];
+                                wsprintf(strcount,L"%d",total);
+                                wchar_t strLabel[16];
+                                wsprintf(strLabel,L"%02d",selectedMonth);
+                                m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_DATE_MONTH,strLabel,strcount,strcount2));
+                                viewStatus += 1;
+                            }else if(viewStatus == 0x12){
+                                UINT received, sent, total;
+                                selectedDay = (WORD)m_List.GetItem(nIndex)->Data;
+                                total = ldb.GetSmsDayCount(selectedYear,selectedMonth,selectedDay,received,sent);
+                                wchar_t strcount2[128];
+                                wsprintf(strcount2,L"%d/%d",received,sent,total);
+                                wchar_t strcount[128];
+                                wsprintf(strcount,L"%d",total);
+                                wchar_t strLabel[16];
+                                wsprintf(strLabel,L"%02d",selectedDay);
+                                m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_DATE_DAY,strLabel,strcount,strcount2));
+                                viewStatus += 1;
                             }
+                            SetupList();
                         }
 #if 0
                         m_List.SetSelectedIndex(nIndex);

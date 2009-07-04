@@ -98,13 +98,10 @@ public:
         UiNaviButton* mButton = (UiNaviButton *)GetChildByID(nID);
         mButton->SetState(MZCS_BUTTON_PRESSED); //…Ë÷√∞¥≈•∏ﬂ¡¡
         if(mButton == NULL) return;
-        bool bfound = false;
-        for(size_t i = 0; i < nCount; i++){
+        for(size_t i = nCount - 1; i >= 0; i--){
             UiNaviButton* mb = (UiNaviButton *)GetChild(i);
-            if(!bfound){
-                if(mb == mButton){
-                    bfound = true;
-                }
+            if(mb == mButton){
+                break;
             }else{
                 RemoveChild(mb);
                 delete mb;

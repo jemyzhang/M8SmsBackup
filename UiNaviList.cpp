@@ -32,8 +32,9 @@ void UiNaviButton::PaintWin(HDC hdcDst, RECT* prcWin, RECT* prcUpdate){
     if(m_Text1==NULL && m_Text1==NULL) ntext = 1;
     if(m_Text1 && m_Text2) ntext = 3;
 
-    LONG m_height = RECT_HEIGHT(*prcWin)/ntext;
-    RECT rcText = {prcWin->left,prcWin->top,prcWin->right,prcWin->top + m_height};
+    LONG m_heightTitle = RECT_HEIGHT(*prcWin) / (ntext > 1 ? 2 : 1);
+    LONG m_height = RECT_HEIGHT(*prcWin)/(2*(ntext > 2 ? 2 : 1));
+    RECT rcText = {prcWin->left,prcWin->top,prcWin->right,prcWin->top + m_heightTitle};
     RECT rcText1 = {prcWin->left,rcText.bottom,prcWin->right,rcText.bottom + m_height};
     RECT rcText2 = {prcWin->left,rcText1.bottom,prcWin->right,rcText1.bottom + m_height};
 
@@ -53,7 +54,7 @@ void UiNaviButton::PaintWin(HDC hdcDst, RECT* prcWin, RECT* prcUpdate){
     if(m_Text1){
         MzDrawText( hdcDst , m_Text1, &rcText1 , DT_CENTER|DT_SINGLELINE|DT_VCENTER|DT_END_ELLIPSIS );
     }
-    if(!m_Text2){
+    if(m_Text2){
         MzDrawText( hdcDst , m_Text2, &rcText2 , DT_CENTER|DT_SINGLELINE|DT_VCENTER|DT_END_ELLIPSIS );
     }
     DeleteObject(hf);

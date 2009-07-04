@@ -14,6 +14,9 @@ private:
     UINT viewStatus; 
     SmsViewListKey_ptr plistkey;
     UINT plistSize;
+    WORD selectedYear;
+    WORD selectedMonth;
+    WORD selectedDay;
 public:
 	Ui_ViewWnd();
 	~Ui_ViewWnd();
