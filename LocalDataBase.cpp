@@ -11,6 +11,7 @@ LocalDataBase::LocalDataBase() {
 	}else{
 		wsprintf(db_path,DEFAULT_DB);
 	}
+    bTempTableCreated = false;
 }
 
 LocalDataBase::~LocalDataBase() {
@@ -230,4 +231,128 @@ UINT LocalDataBase::AppendContactRecord(ContactData_ptr pcontact){
         }
     }
     return nRet;
+}
+
+UINT LocalDataBase::GetSmsCount(UINT *recived, UINT *sent){
+    UINT nSize = 0;
+    if(recived) *recived = 0;
+    if(sent) *sent = 0;
+
+    wsprintf(sqlcmdw,L"select count(*) from %s",TABLE_SMS);
+    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        if (sqlite3_step(pStmt) == SQLITE_ROW){
+            nSize = sqlite3_column_int(pStmt, 0);
+        }
+    }
+	sqlite3_finalize(pStmt);
+
+    if(nSize != 0){
+        if(recived){
+	        wsprintf(sqlcmdw,L"select count(*) from %s where SendReceive=%d",
+                TABLE_SMS,
+                SMS_RECEIVE);
+            if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+                if (sqlite3_step(pStmt) == SQLITE_ROW){
+                    *recived = sqlite3_column_int(pStmt, 0);
+                }
+            }
+	        sqlite3_finalize(pStmt);
+        }
+        if(sent){
+	        wsprintf(sqlcmdw,L"select count(*) from %s where SendReceive=%d",
+                TABLE_SMS,
+                SMS_SEND);
+            if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+                if (sqlite3_step(pStmt) == SQLITE_ROW){
+                    *sent = sqlite3_column_int(pStmt, 0);
+                }
+            }
+	        sqlite3_finalize(pStmt);
+        }
+    }
+    return nSize;
+}
+
+bool LocalDataBase::CreateTempSmsTable(){
+    if(bTempTableCreated) return bTempTableCreated;
+
+    wsprintf(sqlcmdw,L"create temp table if not exists '%s' "
+                      L"(name text,telnumber text, content text,timestamps datetime,sendreceive numeric)",TABLE_TEMP);
+    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        if (sqlite3_step(pStmt) == SQLITE_DONE){
+            bTempTableCreated = true;
+        }
+    }
+	sqlite3_finalize(pStmt);
+
+    wsprintf(sqlcmdw,L"insert into '%s' (name,telnumber,content,timestamps,sendreceive) "
+	                    L"select contacts_v1.Name as name, sms_v1.PN, sms_v1.content as content ,sms_v1.timestamps as timestamps,sms_v1.sendreceive as sendreceive "
+		                L"from contacts_v1,sms_v1 where (contacts_v1.PhoneNumber =  sms_v1.PN)",TABLE_TEMP);
+    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        sqlite3_step(pStmt);
+    }
+	sqlite3_finalize(pStmt);
+
+    wsprintf(sqlcmdw,L"insert into '%s' (name,telnumber,content,timestamps,sendreceive) "
+                        L"select PN as name,PN, content,timestamps,sendreceive "
+		                L"from sms_v1 where (select count(*) from contacts_v1 where contacts_v1.PhoneNumber ==  sms_v1.PN)=0",TABLE_TEMP);
+    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        sqlite3_step(pStmt);
+    }
+	sqlite3_finalize(pStmt);
+    return bTempTableCreated;
+}
+
+UINT LocalDataBase::GetSmsContactList(SmsViewListKey_ptr plist){
+    if(!bTempTableCreated){
+        if(!CreateTempSmsTable()){  //创建不成功
+            return 0;
+        }
+    }
+    UINT nSize = 0;
+    //GetSize
+    wsprintf(sqlcmdw,L"select count(distinct name) from '%s'",TABLE_TEMP);
+    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        if (sqlite3_step(pStmt) == SQLITE_ROW){
+            nSize = sqlite3_column_int(pStmt, 0);
+        }
+    }
+	sqlite3_finalize(pStmt);
+    if(plist == NULL || nSize == 0) return nSize;
+
+    SmsViewListKey_ptr pkey = plist;
+    wsprintf(sqlcmdw,L"select distinct name from '%s' order by name collate pinyin",TABLE_TEMP);
+    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        while (sqlite3_step(pStmt) == SQLITE_ROW){
+            C::newstrcpy(&(pkey++)->key,(LPWSTR) sqlite3_column_text16(pStmt, 0));
+        }
+    }
+	sqlite3_finalize(pStmt);
+    
+    for(UINT i = 0; i < nSize; i++){
+        plist[i].nSend = 0;
+        plist[i].nReceive = 0;
+        //获取已发送条数
+        wsprintf(sqlcmdw,
+            L"select count(*) from '%s' where name='%s' and sendreceive=%d",
+            TABLE_TEMP,plist[i].key,SMS_SEND);
+        if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+            if (sqlite3_step(pStmt) == SQLITE_ROW){
+                plist[i].nSend = sqlite3_column_int(pStmt, 0);
+            }
+        }
+	    sqlite3_finalize(pStmt);
+
+        //获取以收取条数
+        wsprintf(sqlcmdw,
+            L"select count(*) from '%s' where name='%s' and sendreceive=%d",
+            TABLE_TEMP,plist[i].key,SMS_RECEIVE);
+        if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+            if (sqlite3_step(pStmt) == SQLITE_ROW){
+                plist[i].nReceive = sqlite3_column_int(pStmt, 0);
+            }
+        }
+	    sqlite3_finalize(pStmt);
+    }
+    return nSize;
 }

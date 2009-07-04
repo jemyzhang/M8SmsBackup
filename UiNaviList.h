@@ -2,6 +2,8 @@
 // include the MZFC library header file
 #include <mzfc_inc.h>
 #include <list>
+#include "mz_commonfunc.h"
+using namespace MZ_CommonFunc;
 
 //
 class UiNaviButton :
@@ -13,13 +15,28 @@ public:
 public:
     virtual void PaintWin(HDC hdcDst, RECT* prcWin, RECT* prcUpdate);
     virtual void SetText(LPCTSTR text){
-        m_Text = text;
+        if(text == NULL){
+            if(m_Text) delete [] m_Text;
+            m_Text = NULL;
+            return;
+        }
+        C::newstrcpy(&m_Text,text);
     }
     virtual void SetText1(LPCTSTR text){
-        m_Text1 = text;
+        if(text == NULL){
+            if(m_Text1) delete [] m_Text1;
+            m_Text1 = NULL;
+            return;
+        }
+        C::newstrcpy(&m_Text1,text);
     }
     virtual void SetText2(LPCTSTR text){
-        m_Text2 = text;
+        if(text == NULL){
+            if(m_Text2) delete [] m_Text2;
+            m_Text2 = NULL;
+            return;
+        }
+        C::newstrcpy(&m_Text2,text);
     }
     virtual int OnLButtonUp(UINT fwKeys, int xPos, int yPos){
         SetState(MZCS_BUTTON_PRESSED);
@@ -28,9 +45,9 @@ public:
         return UiButton::OnLButtonUp(fwKeys,xPos,yPos);
     }
 private:
-    CMzString m_Text;
-    CMzString m_Text1;
-    CMzString m_Text2;
+    LPWSTR m_Text;
+    LPWSTR m_Text1;
+    LPWSTR m_Text2;
 };
 
 class UiNaviList :

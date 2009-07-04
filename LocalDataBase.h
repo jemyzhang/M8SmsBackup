@@ -37,14 +37,14 @@ values('%s','%s','%s','%04d-%02d-%02d %02d:%02d:%02d',%d)"
 
 /* 按照姓名检索sms时
 //创建临时关联数据库
-create temp table if not exists exec (name text,content text,timestamps datetime,sendreceive numeric)
+create temp table if not exists exec (name text,telnumber text, content text,timestamps datetime,sendreceive numeric)
 //插入临时关联数据库，以姓名替代号码，当联系人中存在该号码时
-insert into exec (name,content,timestamps,sendreceive) 
-	select contacts_v1.Name as name, sms_v1.content as content ,sms_v1.timestamps as timestamps,sms_v1.sendreceive as sendreceive 
+insert into exec (name,telnumber,content,timestamps,sendreceive) 
+	select contacts_v1.Name as name, sms_v1.PN, sms_v1.content as content ,sms_v1.timestamps as timestamps,sms_v1.sendreceive as sendreceive 
 		from contacts_v1,sms_v1 where (contacts_v1.PhoneNumber =  sms_v1.PN)
 //插入临时关联数据库，以号码作为姓名，当联系人中不存在该号码时
-insert into exec (name,content,timestamps,sendreceive)
-    select PN as name,content,timestamps,sendreceive 
+insert into exec (name,telnumber,content,timestamps,sendreceive)
+    select PN as name,PN, content,timestamps,sendreceive 
 		from sms_v1 where (select count(*) from contacts_v1 where contacts_v1.PhoneNumber ==  sms_v1.PN)=0
 //sms联系人列表
 select distinct name from exec
@@ -201,10 +201,13 @@ public:
 	UINT GetSmsYearList(SmsViewListKey_ptr = NULL);
 	UINT GetSmsMonthList(SmsViewListKey_ptr = NULL);
 	UINT GetSmsDayList(SmsViewListKey_ptr = NULL);
+    //获取短信数量
+    UINT GetSmsCount(UINT *recived = NULL, UINT *sent = NULL);
 private:
 	bool CreateTempSmsTable();	//建立内联表格
     //插入记录前检查是否有重复sms
     bool isDuplicateSms(SmsData_ptr);
+    bool bTempTableCreated;
 public:
 	//contact相关操作
 	UINT AppendContactRecord(ContactData_ptr);

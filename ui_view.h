@@ -2,6 +2,7 @@
 // include the MZFC library header file
 #include <mzfc_inc.h>
 #include "UiNaviList.h"
+#include "LocalDataBase.h"
 
 // Main window derived from CMzWndEx
 class Ui_ViewWnd : public CMzWndEx {
@@ -11,6 +12,8 @@ private:
     //1: contact list 2: phone number list 3: sms list
     //0x10: year list 0x11: month list, 0x12 day list, 0x13 sms list
     UINT viewStatus; 
+    SmsViewListKey_ptr plistkey;
+    UINT plistSize;
 public:
 	Ui_ViewWnd();
 	~Ui_ViewWnd();
@@ -30,5 +33,7 @@ protected:
 
     // override the MZFC command handler
     virtual void OnMzCommand(WPARAM wParam, LPARAM lParam);
+private:
+    LocalDataBase ldb;
 };
 
