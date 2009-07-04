@@ -241,6 +241,18 @@
 				RelativePath=".\ui_ProgressBar.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\ui_view.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UiImage.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UiNaviList.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Í·ÎÄ¼þ"
@@ -280,11 +292,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\resource.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ui_main.h"
 				>
 			</File>
 			<File
 				RelativePath=".\ui_ProgressBar.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ui_view.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UiImage.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UiNaviList.h"
 				>
 			</File>
 		</Filter>
@@ -293,6 +321,10 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+			<File
+				RelativePath=".\ui_res.rc"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

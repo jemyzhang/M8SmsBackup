@@ -2,6 +2,8 @@
 #include "ui_ProgressBar.h"
 #include "mz_commonfunc.h"
 using namespace MZ_CommonFunc;
+#include "resource.h"
+extern HINSTANCE LangresHandle;
 
 static bool brangeSet = false;
 static bool bdlgshown = false;
@@ -45,11 +47,11 @@ void initProgressBar(LPWSTR title = NULL, WORD rmin = 0, WORD rmax = 100){
 }
 
 void initUiCallbackRefreshContact(){
-	initProgressBar(L"更新联系人记录...");
+	initProgressBar(LOADSTRING(IDS_STR_UPDATE_CONTACT).C_Str());//L"更新联系人记录...");
 }
 
 void initUiCallbackRefreshSms(){
-	initProgressBar(L"更新短信记录...");
+	initProgressBar(LOADSTRING(IDS_STR_UPDATE_SMS).C_Str());//L"更新短信记录...");
 }
 
 bool uiCallbackRefreshContact(ContactData_ptr pcontact,WORD nCount,WORD nSize,WORD nSuccess){
@@ -59,9 +61,11 @@ bool uiCallbackRefreshContact(ContactData_ptr pcontact,WORD nCount,WORD nSize,WO
 	}
 	ShowProgressBar();
 	SetProgressBarRange(0,nSize);
+    CMzString sImported = LOADSTRING(IDS_STR_UPDATE_CONTACT);
 	wchar_t infotext[256];
-	wsprintf(infotext,L"更新联系人记录...已导入:%d",nSuccess);
-	m_Progressdlg.SetTitle(infotext);
+	wsprintf(infotext,LOADSTRING(IDS_STR_IMPORTED).C_Str(),nSuccess);
+    sImported = sImported + infotext;
+    m_Progressdlg.SetTitle(sImported.C_Str());
 	wsprintf(infotext,L"%s (%d/%d)",pcontact->Name,nCount + 1,nSize);
 	m_Progressdlg.SetInfo(infotext);
 	m_Progressdlg.SetCurValue(nCount);
@@ -76,9 +80,11 @@ bool uiCallbackRefreshSms(SmsData_ptr psms,WORD nCount,WORD nSize,WORD nSuccess)
 	}
 	ShowProgressBar();
 	SetProgressBarRange(0,nSize);
+    CMzString sImported = LOADSTRING(IDS_STR_UPDATE_SMS);
 	wchar_t infotext[256];
-	wsprintf(infotext,L"更新短信记录...已导入:%d",nSuccess);
-	m_Progressdlg.SetTitle(infotext);
+	wsprintf(infotext,LOADSTRING(IDS_STR_IMPORTED).C_Str(),nSuccess);
+    sImported = sImported + infotext;
+    m_Progressdlg.SetTitle(sImported.C_Str());
 	wsprintf(infotext,L"%s %s (%d/%d)",psms->SendReceiveFlag == 1 ? L"[←]": L"[→]",psms->PNSort,nCount + 1,nSize);
 	m_Progressdlg.SetInfo(infotext);
 	m_Progressdlg.SetCurValue(nCount);

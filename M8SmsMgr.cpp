@@ -4,26 +4,46 @@ using namespace MZ_CommonFunc;
 #include "M8SmsMgr.h"
 // The global variable of the application.
 M8SmsMgr theApp;
+HINSTANCE LangresHandle;
+
+void M8SmsMgr::LoadRes(){
+    //载入资源
+    LangresHandle = LoadLibrary(L"language.dll");
+    if(LangresHandle){
+        isExternLangres = true;
+    }else{
+        LangresHandle = MzGetInstanceHandle();
+        isExternLangres = false;
+    }
+}
 
 BOOL M8SmsMgr::Init() {
     // Init the COM relative library.
     CoInitializeEx(0, COINIT_MULTITHREADED);
 
-	//检测程序是否已经运行
-	HWND pWnd = isRuning();
-	if(pWnd)
-	{
-		SetForegroundWindow(pWnd);
-		PostMessage(pWnd,WM_NULL,NULL,NULL);
-		PostQuitMessage(0);
-		return true; 
-	}
+    //载入资源
+    LoadRes();
+    //检测程序是否已经运行
+    HWND pWnd = isRuning();
+    if(pWnd)
+    {
+        SetForegroundWindow(pWnd);
+        PostMessage(pWnd,WM_NULL,NULL,NULL);
+        PostQuitMessage(0);
+        return true; 
+    }
 
-	// Create the main window
-	RECT rcWork = MzGetWorkArea();
-	m_MainWnd.Create(rcWork.left, rcWork.top, RECT_WIDTH(rcWork), RECT_HEIGHT(rcWork), 0, 0, 0);
-	m_MainWnd.Show();
+    // Create the main window
+    RECT rcWork = MzGetWorkArea();
+    m_MainWnd.Create(rcWork.left, rcWork.top, RECT_WIDTH(rcWork), RECT_HEIGHT(rcWork), 0, 0, 0);
+    m_MainWnd.Show();
 
     // return TRUE means init success.
     return TRUE;
+}
+
+int M8SmsMgr::Done(){
+    FreeMzResModule();
+    if(isExternLangres) FreeLibrary(LangresHandle);
+    return CMzApp::Done();
 }

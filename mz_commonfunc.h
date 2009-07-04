@@ -10,6 +10,8 @@ typedef enum TextEncode{
 	ttcUtf8
 }TEXTENCODE_t;
 
+#define LOADIMAGE(nID)	ImagingHelper::GetImageObject(ImgresHandle,nID)
+#define LOADSTRING(uID)	MzLoadString(uID,LangresHandle)
 
 class MZ_CommonC
 {

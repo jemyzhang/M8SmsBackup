@@ -30,4 +30,10 @@ public:
 		}
 		return 0;
 	}
+	virtual int Done();
+private:
+    //ÔØÈë×ÊÔ´
+    void LoadRes();
+private:
+	bool isExternLangres;
 };
