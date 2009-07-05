@@ -253,6 +253,10 @@
 				RelativePath=".\UiNaviList.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\UiSmsList.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Í·ÎÄ¼þ"
@@ -313,6 +317,10 @@
 			</File>
 			<File
 				RelativePath=".\UiNaviList.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UiSmsList.h"
 				>
 			</File>
 		</Filter>

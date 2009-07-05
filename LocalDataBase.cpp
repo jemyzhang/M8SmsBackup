@@ -586,3 +586,147 @@ UINT LocalDataBase::GetSmsDayCount(WORD year, WORD month,WORD day, UINT &receive
     received = total - sent;
     return total;
 }
+
+UINT LocalDataBase::GetSmsContactCount(LPWSTR name,UINT &received, UINT &sent){
+    if(name == NULL) return 0;
+
+    if(!bTempTableCreated){
+        if(!CreateTempSmsTable()){  //创建不成功
+            return 0;
+        }
+    }
+    UINT total = 0;
+    received = 0;
+    sent = 0;
+    //GetSize
+    wsprintf(sqlcmdw,L"select count(*) from '%s' where name='%s'",
+        TABLE_TEMP,name);
+    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        if (sqlite3_step(pStmt) == SQLITE_ROW){
+            total = sqlite3_column_int(pStmt, 0);
+        }
+    }
+    sqlite3_finalize(pStmt);
+    if(total > 0){
+        wsprintf(sqlcmdw,L"select count(*) from '%s' where name='%s' and sendreceive=%d",
+            TABLE_TEMP,name,SMS_SEND);
+        if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+            if (sqlite3_step(pStmt) == SQLITE_ROW){
+                sent = sqlite3_column_int(pStmt, 0);
+            }
+        }
+        sqlite3_finalize(pStmt);
+    }
+    received = total - sent;
+    return total;
+}
+//////////////////////////////////////////////////////
+UINT LocalDataBase::GetSmsByDate(WORD year, WORD month, WORD day,SmsSimpleData_ptr plist){
+    if(year == 0) return 0; //年份错误
+
+    if(!bTempTableCreated){
+        if(!CreateTempSmsTable()){  //创建不成功
+            return 0;
+        }
+    }
+    CMzString strsql = L"select %s from '%s' where year='%04d'";
+    if(month != 0) strsql = strsql + L" and month='%02d'";
+    if(day != 0) strsql = strsql + L" and day='%02d'";
+
+    UINT total = 0;
+    wsprintf(sqlcmdw,strsql.C_Str(),L"count(*)",TABLE_TEMP,year,month,day);
+    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        if (sqlite3_step(pStmt) == SQLITE_ROW){
+            total = sqlite3_column_int(pStmt, 0);
+        }
+    }
+    sqlite3_finalize(pStmt);
+    if(total == 0 || plist == NULL) return total;
+
+    strsql = strsql + L" order by timestamps DESC";
+    SmsSimpleData_ptr pi = plist;
+    wsprintf(sqlcmdw,strsql.C_Str(),
+        L"name,telnumber,content,strftime('%Y-%m-%d %H:%M:%S',timestamps),sendreceive",
+        TABLE_TEMP,year,month,day);
+    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        while (sqlite3_step(pStmt) == SQLITE_ROW){
+            C::newstrcpy(&pi->ContactName,(LPWSTR) sqlite3_column_text16(pStmt, 0));
+            C::newstrcpy(&pi->MobileNumber,(LPWSTR) sqlite3_column_text16(pStmt, 1));
+            C::newstrcpy(&pi->Content,(LPWSTR) sqlite3_column_text16(pStmt, 2));
+            C::newstrcpy(&pi->TimeStamp,(LPWSTR) sqlite3_column_text16(pStmt, 3));
+            pi->SendReceiveFlag = (BOOL)sqlite3_column_int(pStmt, 4);
+            pi++;
+        }
+    }
+    return total;
+}
+
+UINT LocalDataBase::GetSmsByContact(LPWSTR pname,SmsSimpleData_ptr plist){
+    if(pname == NULL) return 0; //姓名错误
+
+    if(!bTempTableCreated){
+        if(!CreateTempSmsTable()){  //创建不成功
+            return 0;
+        }
+    }
+    UINT total = 0;
+    wsprintf(sqlcmdw,L"select count(*) from '%s' where name='%s'",TABLE_TEMP,pname);
+    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        if (sqlite3_step(pStmt) == SQLITE_ROW){
+            total = sqlite3_column_int(pStmt, 0);
+        }
+    }
+    sqlite3_finalize(pStmt);
+    if(total == 0 || plist == NULL) return total;
+
+    SmsSimpleData_ptr pi = plist;
+    wsprintf(sqlcmdw,L"select name,telnumber,content,strftime('%%Y-%%m-%%d %%H:%%M:%%S',timestamps),sendreceive from '%s' "
+                    L"where name='%s' order by timestamps DESC",
+                    TABLE_TEMP,pname);
+    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        while (sqlite3_step(pStmt) == SQLITE_ROW){
+            C::newstrcpy(&pi->ContactName,(LPWSTR) sqlite3_column_text16(pStmt, 0));
+            C::newstrcpy(&pi->MobileNumber,(LPWSTR) sqlite3_column_text16(pStmt, 1));
+            C::newstrcpy(&pi->Content,(LPWSTR) sqlite3_column_text16(pStmt, 2));
+            C::newstrcpy(&pi->TimeStamp,(LPWSTR) sqlite3_column_text16(pStmt, 3));
+            pi->SendReceiveFlag = (BOOL)sqlite3_column_int(pStmt, 4);
+            pi++;
+        }
+    }
+    return total;
+}
+
+UINT LocalDataBase::GetSmsByContent(LPWSTR pcontent,SmsSimpleData_ptr plist){
+    if(pcontent == NULL) return 0; //内容错误
+
+    if(!bTempTableCreated){
+        if(!CreateTempSmsTable()){  //创建不成功
+            return 0;
+        }
+    }
+    UINT total = 0;
+    wsprintf(sqlcmdw,L"select count(*) from '%s' where content like '%%%s%%'",TABLE_TEMP,pcontent);
+    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        if (sqlite3_step(pStmt) == SQLITE_ROW){
+            total = sqlite3_column_int(pStmt, 0);
+        }
+    }
+    sqlite3_finalize(pStmt);
+    if(total == 0 || plist == NULL) return total;
+
+    SmsSimpleData_ptr pi = plist;
+    wsprintf(sqlcmdw,L"select name,telnumber,content,strftime('%%Y-%%m-%%d %%H:%%M:%%S',timestamps),sendreceive from '%s' "
+                    L"where content like '%%%s%%' order by timestamps DESC",
+                    TABLE_TEMP,pcontent);
+    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        while (sqlite3_step(pStmt) == SQLITE_ROW){
+            C::newstrcpy(&pi->ContactName,(LPWSTR) sqlite3_column_text16(pStmt, 0));
+            C::newstrcpy(&pi->MobileNumber,(LPWSTR) sqlite3_column_text16(pStmt, 1));
+            C::newstrcpy(&pi->Content,(LPWSTR) sqlite3_column_text16(pStmt, 2));
+            C::newstrcpy(&pi->TimeStamp,(LPWSTR) sqlite3_column_text16(pStmt, 3));
+            pi->SendReceiveFlag = (BOOL)sqlite3_column_int(pStmt, 4);
+            pi++;
+        }
+    }
+    return total;
+}

@@ -163,6 +163,31 @@ typedef struct SmsData{
     }
 }SmsData_t, *SmsData_ptr;
 
+//used for sms display list
+typedef struct SmsSimpleData{
+    LPWSTR ContactName;
+	LPWSTR MobileNumber;
+	BOOL	SendReceiveFlag;
+	LPWSTR	TimeStamp;
+	LPWSTR	Content;
+    void Reset(){
+        SAFE_RELEASE_LPWSTR(ContactName);
+        SAFE_RELEASE_LPWSTR(MobileNumber);
+        SAFE_RELEASE_LPWSTR(Content);
+        SAFE_RELEASE_LPWSTR(TimeStamp);
+    }
+	SmsSimpleData(){
+        ContactName = NULL;
+		MobileNumber = NULL;
+		SendReceiveFlag = false;
+		Content = NULL;
+        TimeStamp = NULL;
+	}
+    ~SmsSimpleData(){
+        Reset();
+    }
+}SmsSimpleData_t, *SmsSimpleData_ptr;
+
 typedef struct SmsViewListKey{
 	LPWSTR key;			//列表醒目名称
 	UINT	nReceive;	//发送条数
@@ -206,6 +231,14 @@ public:
     UINT GetSmsYearCount(WORD year, UINT &received, UINT &sent);
     UINT GetSmsMonthCount(WORD year, WORD month, UINT &received, UINT &sent);
     UINT GetSmsDayCount(WORD year, WORD month,WORD day, UINT &received, UINT &sent);
+    UINT GetSmsContactCount(LPWSTR name,UINT &received, UINT &sent);
+    //获取短信条目
+    //根据日期获取短信条目，0：表示任意
+    UINT GetSmsByDate(WORD year, WORD month, WORD day,SmsSimpleData_ptr = NULL);
+    //根据联系人获取短信条目
+    UINT GetSmsByContact(LPWSTR,SmsSimpleData_ptr = NULL);
+    //根据短信内容搜索短信条目
+    UINT GetSmsByContent(LPWSTR,SmsSimpleData_ptr = NULL);
 public:
 	bool CreateTempSmsTable();	//建立内联表格
 private:

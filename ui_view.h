@@ -3,6 +3,7 @@
 #include <mzfc_inc.h>
 #include "UiNaviList.h"
 #include "LocalDataBase.h"
+#include "UiSmsList.h"
 
 // Main window derived from CMzWndEx
 class Ui_ViewWnd : public CMzWndEx {
@@ -24,6 +25,7 @@ public:
     UiToolbar_Text m_Toolbar;
     UiNaviList m_Navibar;
     UiList m_List;
+    UiSmsList m_SmsList;
 protected:
     //设置右边列表内容
     void SetupList();

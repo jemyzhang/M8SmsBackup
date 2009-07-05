@@ -12,8 +12,10 @@ extern HINSTANCE LangresHandle;
 #define MZ_IDC_BUTTON_VIEW_DATE_YEAR 105
 #define MZ_IDC_BUTTON_VIEW_DATE_MONTH 106
 #define MZ_IDC_BUTTON_VIEW_DATE_DAY 107
+#define MZ_IDC_BUTTON_VIEW_CONTACT_NAME 108
 
 #define MZ_IDC_LIST 120
+#define MZ_IDC_SMS_LIST 121
 
 MZ_IMPLEMENT_DYNAMIC(Ui_ViewWnd)
 
@@ -44,6 +46,14 @@ BOOL Ui_ViewWnd::OnInitDialog() {
     m_List.EnableNotifyMessage(true);
     AddUiWin(&m_List);
 
+    m_SmsList.SetPos(100, y, GetWidth() - 100, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR);
+    m_SmsList.SetID(MZ_IDC_SMS_LIST);
+    m_SmsList.EnableNotifyMessage(true);
+    m_SmsList.SetVisible(false);
+    m_SmsList.SetupDB(&ldb);
+    m_SmsList.SetItemHeight(80);
+    AddUiWin(&m_SmsList);
+
     m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR, GetWidth(), MZM_HEIGHT_TEXT_TOOLBAR);
     m_Toolbar.SetButton(0,true,true,LOADSTRING(IDS_STR_RETURN).C_Str());
     m_Toolbar.SetButton(2,true,true,LOADSTRING(IDS_STR_OK).C_Str());
@@ -56,6 +66,21 @@ BOOL Ui_ViewWnd::OnInitDialog() {
 }
 
 void Ui_ViewWnd::SetupList(){
+    if((viewStatus & 0x0f) == 3){    //smslist
+        m_List.SetVisible(false);
+        m_List.Invalidate();
+        m_List.Update();
+        m_SmsList.RemoveAll();
+        m_SmsList.SetVisible(true);
+        m_SmsList.ScrollTo();
+        m_SmsList.Invalidate();
+        m_SmsList.reqUpdate();
+        m_SmsList.Update();
+        return;
+    }else{
+        m_SmsList.SetVisible(false);
+        m_List.SetVisible(true);
+    }
     m_List.RemoveAll();
     ListItem li;
     if(viewStatus == 0){
@@ -200,6 +225,18 @@ LRESULT Ui_ViewWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
                                 wsprintf(strcount,L"%d",total);
                                 m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_CONTACT + nIndex,nIndex == 0 ? L"联系人":L"日期",strcount,strcount2));
                                 viewStatus = nIndex == 0 ? 1 : 0x10;
+                            }else if(viewStatus == 0x1){
+                                UINT received, sent, total;
+                                wchar_t *name = C::_wcstok(m_List.GetItem(nIndex)->Text.C_Str(),L" ");
+                                total = ldb.GetSmsContactCount(name,received,sent);
+                                wchar_t strcount2[128];
+                                wsprintf(strcount2,L"%d/%d",received,sent,total);
+                                wchar_t strcount[128];
+                                wsprintf(strcount,L"%d",total);
+                                m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_CONTACT_NAME,name,strcount,strcount2));
+                                viewStatus = 3;
+                                m_SmsList.SetupMode(1);
+                                m_SmsList.SetupListName(name);
                             }else if(viewStatus == 0x10){
                                 UINT received, sent, total;
                                 selectedYear = (WORD)m_List.GetItem(nIndex)->Data;
@@ -236,14 +273,11 @@ LRESULT Ui_ViewWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
                                 wsprintf(strLabel,L"%02d",selectedDay);
                                 m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_DATE_DAY,strLabel,strcount,strcount2));
                                 viewStatus += 1;
+                                m_SmsList.SetupMode(0);
+                                m_SmsList.SetupListDateTime(selectedYear,selectedMonth,selectedDay);
                             }
                             SetupList();
                         }
-#if 0
-                        m_List.SetSelectedIndex(nIndex);
-                        m_List.Invalidate();
-                        m_List.Update();
-#endif
                     }
                     return 0;
                 }
