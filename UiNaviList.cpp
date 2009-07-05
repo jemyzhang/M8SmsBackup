@@ -1,5 +1,6 @@
 #include "UiNaviList.h"
-
+#include "resource.h"
+extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 
 UiNaviButton::UiNaviButton(int id, LPCTSTR text, LPCTSTR text1, LPCTSTR text2)
 {
@@ -10,7 +11,7 @@ UiNaviButton::UiNaviButton(int id, LPCTSTR text, LPCTSTR text1, LPCTSTR text2)
     SetText(text);
     SetText1(text1);
     SetText2(text2);
-    SetButtonType(MZC_BUTTON_NONE);
+    SetButtonType(MZC_BUTTON_GRAY_ROUND_L);//MZC_BUTTON_NONE);
     SetButtonMode(MZC_BUTTON_MODE_HOLD);
 }
 
@@ -25,9 +26,20 @@ UiNaviButton::~UiNaviButton(void)
 }
 
 void UiNaviButton::PaintWin(HDC hdcDst, RECT* prcWin, RECT* prcUpdate){
+    UINT BottomResID;
     if(GetState() == MZCS_BUTTON_PRESSED){
-        MzDrawSelectedBg(hdcDst,prcWin);
+        RECT rcSelectbg = {prcWin->left,prcWin->top,prcWin->right-2,prcWin->bottom};
+        MzDrawSelectedBg(hdcDst,&rcSelectbg);
+        BottomResID = IDB_PNG_NAVI_BTN_BHL - IDB_PNG_BEGIN;
+    }else{
+        BottomResID = IDB_PNG_NAVI_BTN_BNR - IDB_PNG_BEGIN;
     }
+
+    //底下那条线
+    RECT rcBottomLine = {prcWin->left,prcWin->bottom-2,prcWin->right-2,prcWin->bottom};
+    pimg[BottomResID]->Draw(hdcDst,&rcBottomLine,true);
+
+    SetBkMode(hdcDst,TRANSPARENT);
     int ntext = 2;
     if(m_Text1==NULL && m_Text1==NULL) ntext = 1;
     if(m_Text1 && m_Text2) ntext = 3;
@@ -61,3 +73,8 @@ void UiNaviButton::PaintWin(HDC hdcDst, RECT* prcWin, RECT* prcUpdate){
 }
 
 /////////////////////////////////////
+
+void UiNaviList::PaintWin(HDC hdcDst, RECT* prcWin, RECT* prcUpdate){
+    pimg[IDB_PNG_NAVI_BG - IDB_PNG_BEGIN]->Draw(hdcDst,prcWin);
+    UiScrollWin::PaintWin(hdcDst,prcWin,prcUpdate);
+}

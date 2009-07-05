@@ -37,16 +37,16 @@ BOOL Ui_ViewWnd::OnInitDialog() {
 
     // Then init the controls & other things in the window
     int y = 0;
-    m_Navibar.SetPos(0, y, 100, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR);
+    m_Navibar.SetPos(0, y, 108, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR);
     m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_MAIN_VIEW,L"²é¿´"));
     AddUiWin(&m_Navibar);
 
-    m_List.SetPos(100, y, GetWidth() - 100, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR);
+    m_List.SetPos(108, y, GetWidth() - 108, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR);
     m_List.SetID(MZ_IDC_LIST);
     m_List.EnableNotifyMessage(true);
     AddUiWin(&m_List);
 
-    m_SmsList.SetPos(100, y, GetWidth() - 100, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR);
+    m_SmsList.SetPos(108, y, GetWidth() - 108, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR);
     m_SmsList.SetID(MZ_IDC_SMS_LIST);
     m_SmsList.EnableNotifyMessage(true);
     m_SmsList.SetVisible(false);
@@ -61,7 +61,10 @@ BOOL Ui_ViewWnd::OnInitDialog() {
     AddUiWin(&m_Toolbar);
 
     SetupList();
+    MzBeginWaitDlg(m_hWnd);
+    DateTime::waitms(0);
     ldb.CreateTempSmsTable();
+    MzEndWaitDlg();
     return TRUE;
 }
 

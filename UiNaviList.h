@@ -51,7 +51,7 @@ private:
 };
 
 class UiNaviList :
-    public UiCaption
+    public UiScrollWin
 {
 public:
     UiNaviList(void) {}
@@ -69,7 +69,7 @@ public:
                 UiNaviButton* mButton = (UiNaviButton *)GetChild(i);
                 mButton->SetState(MZCS_BUTTON_NORMAL);
             }
-            mButton->SetPos(0,nCount * 120,GetWidth(),120);
+            mButton->SetPos(0,nCount * 106,GetWidth(),106);
             mButton->SetState(MZCS_BUTTON_PRESSED);
             AddChild(mButton);
             Invalidate();
@@ -110,8 +110,5 @@ public:
         Invalidate();
         Update();
     }
-    virtual void PaintWin(HDC hdcDst, RECT* prcWin, RECT* prcUpdate){
-        //MzDrawGridDlgBG(hdcDst,prcWin);
-        UiCaption::PaintWin(hdcDst,prcWin,prcUpdate);
-    }
+    virtual void PaintWin(HDC hdcDst, RECT* prcWin, RECT* prcUpdate);
 };

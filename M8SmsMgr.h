@@ -33,6 +33,8 @@ public:
 	virtual int Done();
 private:
     //‘ÿ»Î◊ ‘¥
+    void loadImageRes();
+    void LoadLangRes();
     void LoadRes();
 private:
 	bool isExternLangres;

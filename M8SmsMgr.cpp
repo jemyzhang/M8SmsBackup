@@ -2,11 +2,24 @@
 using namespace MZ_CommonFunc;
 
 #include "M8SmsMgr.h"
+#include "resource.h"
 // The global variable of the application.
 M8SmsMgr theApp;
 HINSTANCE LangresHandle;
+HINSTANCE ImgresHandle;
+ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
+ImagingHelper *imgArrow;
 
-void M8SmsMgr::LoadRes(){
+void M8SmsMgr::loadImageRes(){
+	ImgresHandle = MzGetInstanceHandle();
+	for(int i = 0; i < sizeof(pimg) / sizeof(pimg[0]); i++){
+		pimg[i] = LOADIMAGE(IDB_PNG_BEGIN + i);
+	}
+	HINSTANCE MzresHandle = GetMzResModuleHandle();
+	imgArrow = ImagingHelper::GetImageObject(MzresHandle, MZRES_IDR_PNG_ARROW_RIGHT, true);
+}
+
+void M8SmsMgr::LoadLangRes(){
     //载入资源
     LangresHandle = LoadLibrary(L"language.dll");
     if(LangresHandle){
@@ -15,6 +28,13 @@ void M8SmsMgr::LoadRes(){
         LangresHandle = MzGetInstanceHandle();
         isExternLangres = false;
     }
+}
+
+void M8SmsMgr::LoadRes(){
+    //载入图像资源
+    loadImageRes();
+    //载入语言资源
+    LoadLangRes();
 }
 
 BOOL M8SmsMgr::Init() {

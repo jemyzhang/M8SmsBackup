@@ -1,4 +1,6 @@
 #include "UiSmsList.h"
+#include "resource.h"
+extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 
 void UiSmsList::SetupList() {
     if(pldb == NULL) return;
@@ -58,17 +60,15 @@ void UiSmsList::DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RE
     HFONT hf;
     COLORREF cr;
 	//收/发标记
-    hf = FontHelper::GetFont( 30 );
-    SelectObject( hdcDst , hf );
-    RECT rcSendReceive = {prcItem->left,prcItem->top,prcItem->left + 40,prcItem->top + 40};
+    UINT SmsResID;
     if(rec.SendReceiveFlag){
-        cr = RGB(42,235,235);
+        SmsResID = IDB_PNG_SMS_SEND - IDB_PNG_BEGIN;
     }else{
-        cr = RGB(235,53,51);
+        SmsResID = IDB_PNG_SMS_RECV - IDB_PNG_BEGIN;
     }
-    ::SetTextColor( hdcDst , cr );
-    MzDrawText( hdcDst , rec.SendReceiveFlag ? L"发" : L"收", &rcSendReceive , DT_CENTER|DT_SINGLELINE|DT_BOTTOM );
-	DeleteObject(hf);
+
+    RECT rcSendReceive = {prcItem->left,prcItem->top,prcItem->left + 40,prcItem->top + 40};
+    pimg[SmsResID]->Draw(hdcDst,&rcSendReceive);
     
     //姓名
     hf = FontHelper::GetFont( 25 );

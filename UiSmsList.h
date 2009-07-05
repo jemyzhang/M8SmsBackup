@@ -13,7 +13,7 @@ public:
         plist_record = NULL; plist_size = 0;
         smode = 0;
         pldb = NULL;
-        breq = true;
+        breq = false;
     }
     void DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RECT *prcUpdate);
 	void SetupMode(UINT mode) {
