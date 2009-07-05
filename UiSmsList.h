@@ -3,6 +3,7 @@
 // include the MZFC library header file
 #include <mzfc_inc.h>
 #include "LocalDataBase.h"
+#include "ui_SmsViewer.h"
 
 class UiSmsList : public UiList {
 public:
@@ -14,6 +15,10 @@ public:
         smode = 0;
         pldb = NULL;
         breq = false;
+        seletedidx = -1;
+    }
+    ~UiSmsList(){
+        ClearList();
     }
     void DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RECT *prcUpdate);
 	void SetupMode(UINT mode) {
@@ -43,6 +48,7 @@ public:
         }
         UiList::Update();
     }
+    void SetSelectedIndex(int index);
 private:
 	void SetupList();
 	void ClearList();
@@ -57,5 +63,6 @@ private:
     UINT smode; //0: datetime, 1: name, 2: content
     LocalDataBase *pldb;
     bool breq;
+    int seletedidx;
 };
 

@@ -17,16 +17,16 @@
 #define IDS_STR_UPDATE_CONTACT          113
 #define IDS_STR_UPDATE_SMS              114
 #define IDS_STR_IMPORTED                115
+#define IDS_STR_PREVIOUS                116
+#define IDS_STR_NEXT                    117
+#define IDB_PNG_NAVI_BG                 201
+#define IDB_PNG_BEGIN                   201
+#define IDB_PNG_NAVI_BTN_BHL            202
+#define IDB_PNG_NAVI_BTN_BNR            203
+#define IDB_PNG_SMS_SEND                204
+#define IDB_PNG_SMS_RECV                205
+#define IDB_PNG_END                     205
 
-
-#define IDB_PNG_NAVI_BG									201
-#define IDB_PNG_NAVI_BTN_BHL						202
-#define IDB_PNG_NAVI_BTN_BNR						203
-#define IDB_PNG_SMS_SEND								204
-#define IDB_PNG_SMS_RECV								205
-
-#define IDB_PNG_BEGIN										201
-#define IDB_PNG_END											205
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

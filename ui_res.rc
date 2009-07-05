@@ -46,16 +46,18 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // RCDATA
 //
 
-IDB_PNG_NAVI_BG            RCDATA                  "images\\NaviBar_bg.png"
-IDB_PNG_NAVI_BTN_BHL			 RCDATA                  "images\\NaviBar_Button_BottomLine_HL.png"
-IDB_PNG_NAVI_BTN_BNR			 RCDATA                  "images\\NaviBar_Button_BottomLine_Normal.png"
-IDB_PNG_SMS_SEND					 RCDATA                  "images\\SendSms.png"
-IDB_PNG_SMS_RECV			 		 RCDATA                  "images\\ReceiveSms.png"
+IDB_PNG_NAVI_BG         RCDATA                  "images\\NaviBar_bg.png"
+IDB_PNG_NAVI_BTN_BHL    RCDATA                  "images\\NaviBar_Button_BottomLine_HL.png"
+IDB_PNG_NAVI_BTN_BNR    RCDATA                  "images\\NaviBar_Button_BottomLine_Normal.png"
+IDB_PNG_SMS_SEND        RCDATA                  "images\\SendSms.png"
+IDB_PNG_SMS_RECV        RCDATA                  "images\\ReceiveSms.png"
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // String Table
@@ -82,6 +84,8 @@ BEGIN
     IDS_STR_UPDATE_CONTACT  "更新联系人记录..."
     IDS_STR_UPDATE_SMS      "更新短信记录..."
     IDS_STR_IMPORTED        "已导入：%d"
+    IDS_STR_PREVIOUS        "上一条"
+    IDS_STR_NEXT            "下一条"
 END
 
 #endif    // 中文(中华人民共和国) resources

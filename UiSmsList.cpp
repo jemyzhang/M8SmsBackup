@@ -1,6 +1,7 @@
 #include "UiSmsList.h"
 #include "resource.h"
 extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
+#include "ui_SmsViewer.h"
 
 void UiSmsList::SetupList() {
     if(pldb == NULL) return;
@@ -106,3 +107,20 @@ void UiSmsList::DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RE
 	DeleteObject(hf);
 }
 
+void UiSmsList::SetSelectedIndex(int nIndex){
+    if(nIndex != -1){
+        if(nIndex == seletedidx){   //show sms
+            Ui_SmsViewerWnd dlg;
+            dlg.SetViewRecord(plist_record,nIndex,plist_size);
+            RECT rcWork = MzGetWorkArea();
+            dlg.Create(rcWork.left, rcWork.top + RECT_HEIGHT(rcWork)/2, RECT_WIDTH(rcWork), RECT_HEIGHT(rcWork)/2,
+                GetParentWnd(), 0, WS_POPUP);
+            // set the animation of the window
+            dlg.SetAnimateType_Show(MZ_ANIMTYPE_SCROLL_BOTTOM_TO_TOP_2);
+            dlg.SetAnimateType_Hide(MZ_ANIMTYPE_SCROLL_TOP_TO_BOTTOM_1);
+            dlg.DoModal();
+        }
+    }
+    seletedidx = nIndex;
+    return UiList::SetSelectedIndex(nIndex);
+}

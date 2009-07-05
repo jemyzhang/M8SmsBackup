@@ -73,6 +73,8 @@ void Ui_ViewWnd::SetupList(){
         m_List.SetVisible(false);
         m_List.Invalidate();
         m_List.Update();
+
+        m_SmsList.SetSelectedIndex(-1);
         m_SmsList.RemoveAll();
         m_SmsList.SetVisible(true);
         m_SmsList.ScrollTo();
@@ -214,6 +216,15 @@ LRESULT Ui_ViewWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
                 int x = LOWORD(lParam);
                 int y = HIWORD(lParam);
 
+                if (nID == MZ_IDC_SMS_LIST && nNotify == MZ_MN_LBUTTONUP) {
+                    if (!m_SmsList.IsMouseDownAtScrolling() && !m_SmsList.IsMouseMoved()) {
+                        int nIndex = m_SmsList.CalcIndexOfPos(x, y);
+                        m_SmsList.SetSelectedIndex(nIndex);
+                        m_SmsList.Invalidate();
+                        m_SmsList.Update();
+                        return 0;
+                    }
+                }
                 //ап╠М
                 if (nID == MZ_IDC_LIST && nNotify == MZ_MN_LBUTTONUP) {
                     if (!m_List.IsMouseDownAtScrolling() && !m_List.IsMouseMoved()) {
@@ -282,6 +293,12 @@ LRESULT Ui_ViewWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
                             SetupList();
                         }
                     }
+                    return 0;
+                }
+                if (nID == MZ_IDC_SMS_LIST && nNotify == MZ_MN_MOUSEMOVE) {
+                    m_SmsList.SetSelectedIndex(-1);
+                    m_SmsList.Invalidate();
+                    m_SmsList.Update();
                     return 0;
                 }
                 if (nID == MZ_IDC_LIST && nNotify == MZ_MN_MOUSEMOVE) {
