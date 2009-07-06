@@ -3,7 +3,7 @@
 
 // include the MZFC library header file
 #include <mzfc_inc.h>
-
+#include "UiImage.h"
 // Main window derived from CMzWndEx
 
 class Ui_MainWnd : public CMzWndEx {
@@ -14,7 +14,7 @@ public:
 public:
     UiToolbar_Text m_Toolbar;
 
-//	UiLogo	m_Logo;
+	UiImage	m_Logo;
 	UiButtonEx m_BtnView;		//查看
 	UiButtonEx m_BtnSearch;		//查找
 	UiButtonEx m_BtnRefresh;	//刷新

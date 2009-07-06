@@ -6,9 +6,10 @@ using namespace MZ_CommonFunc;
 #include "ui_view.h"
 #include "ui_search.h"
 
+extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 extern HINSTANCE LangresHandle;
-#define MZ_IDC_TOOLBAR_MAIN 101
 
+#define MZ_IDC_TOOLBAR_MAIN 101
 #define MZ_IDC_BUTTON_VIEW 103
 #define MZ_IDC_BUTTON_REFRESH 104
 #define MZ_IDC_BUTTON_CONFIG 105
@@ -30,17 +31,9 @@ BOOL Ui_MainWnd::OnInitDialog() {
 
 	// Then init the controls & other things in the window
 	int y = 0;
-	/*left for logo
-	wchar_t name[128];
-	wsprintf(name,L"%s v%s",LOADSTRING(IDS_STR_APPNAME).C_Str(),VER_STRING);
-	m_lblTitle.SetPos(0,y,GetWidth(),MZM_HEIGHT_CAPTION/2);
-	m_lblTitle.SetText(name);
-	m_lblTitle.SetTextSize(m_lblTitle.GetTextSize()/2);
-	m_lblTitle.SetTextWeight(FW_BOLD);
-	m_lblTitle.SetID(MZ_IDC_CAPTION_TITLE);
-	m_lblTitle.EnableNotifyMessage(true);
-	AddUiWin(&m_lblTitle);
-	*/
+	m_Logo.SetPos(0,y,GetWidth(),MZM_HEIGHT_CAPTION*3);
+	m_Logo.setupImage(pimg[IDB_PNG_LOGO - IDB_PNG_BEGIN]);
+	AddUiWin(&m_Logo);
 
 	y+=MZM_HEIGHT_CAPTION*3;
 

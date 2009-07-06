@@ -58,6 +58,7 @@ IDB_PNG_NAVI_BTN_BNR    RCDATA                  "images\\NaviBar_Button_BottomLi
 IDB_PNG_SMS_SEND        RCDATA                  "images\\SendSms.png"
 IDB_PNG_SMS_RECV        RCDATA                  "images\\ReceiveSms.png"
 IDB_PNG_SEARCH          RCDATA                  "images\\Search.png"
+IDB_PNG_LOGO            RCDATA                  "images\\logo.png"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -93,6 +94,9 @@ BEGIN
     IDS_STR_MENU_SEARCH_TIP "根据内容查找短信"
     IDS_STR_MENU_UPDATE_TIP "导入机身短信至数据库"
     IDS_STR_MENU_CONFIG_TIP "修改软件设置"
+    IDS_STR_VIEW_BY_CONTACT "按联系人查看"
+    IDS_STR_VIEW_BY_DATE    "按日期查看"
+    IDS_STR_SELECT          "选择"
 END
 
 #endif    // 中文(中华人民共和国) resources
