@@ -28,6 +28,11 @@
 #define IDS_STR_VIEW_BY_CONTACT         124
 #define IDS_STR_VIEW_BY_DATE            125
 #define IDS_STR_SELECT                  126
+#define IDS_STR_FINISHED                127
+#define IDS_STR_DELETE                  128
+#define IDS_STR_DELETE_SMS              129
+#define IDS_STR_DELETE_CONFIRM          130
+#define IDS_STR_REVERSE_SELECT          131
 #define IDB_PNG_NAVI_BG                 201
 #define IDB_PNG_BEGIN                   201
 #define IDB_PNG_NAVI_BTN_BHL            202

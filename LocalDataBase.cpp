@@ -276,7 +276,7 @@ bool LocalDataBase::CreateTempSmsTable(){
     if(!bTempTableCreated) return bTempTableCreated;
 
     wsprintf(sqlcmdw,L"insert into '%s' (name,telnumber,content,timestamps,sendreceive,year,month,day) "
-        L"select contacts_v1.Name, sms_v1.PN, sms_v1.content,sms_v1.timestamps,sms_v1.sendreceive,"
+        L"select contacts_v1.Name, sms_v1.PhoneNumber, sms_v1.content,sms_v1.timestamps,sms_v1.sendreceive,"
         L"strftime('%%Y',sms_v1.timestamps),strftime('%%m',sms_v1.timestamps),strftime('%%d',sms_v1.timestamps)"
         L"from contacts_v1,sms_v1 where (contacts_v1.PhoneNumber =  sms_v1.PN)",TABLE_TEMP);
     if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
@@ -285,7 +285,7 @@ bool LocalDataBase::CreateTempSmsTable(){
     sqlite3_finalize(pStmt);
 
     wsprintf(sqlcmdw,L"insert into '%s' (name,telnumber,content,timestamps,sendreceive,year,month,day) "
-        L"select PN as name,PN, content,timestamps,sendreceive,"
+        L"select PN as name,PhoneNumber, content,timestamps,sendreceive,"
         L"strftime('%%Y',sms_v1.timestamps),strftime('%%m',sms_v1.timestamps),strftime('%%d',sms_v1.timestamps)"
         L"from sms_v1 where (select count(*) from contacts_v1 where contacts_v1.PhoneNumber ==  sms_v1.PN)=0",TABLE_TEMP);
     if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
@@ -729,4 +729,36 @@ UINT LocalDataBase::GetSmsByContent(LPWSTR pcontent,SmsSimpleData_ptr plist){
         }
     }
     return total;
+}
+
+///////////////////////////////////////
+bool LocalDataBase::RemoveSmsRecord(SmsSimpleData_ptr psms){
+	bool nRet = false;
+	if(psms == NULL) return nRet;
+    if(!bTempTableCreated){
+        if(!CreateTempSmsTable()){  //创建不成功
+            return 0;
+        }
+    }
+	//从短信表中删除
+	wsprintf(sqlcmdw,
+		L"delete from '%s' where PhoneNumber='%s' and Content='%s' and TimeStamps='%s' and SendReceive=%d",
+		TABLE_SMS,
+		psms->MobileNumber,psms->Content,psms->TimeStamp,psms->SendReceiveFlag);
+    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        if (sqlite3_step(pStmt) == SQLITE_DONE){
+            nRet = true;
+        }
+    }
+	//从#sms#中删除
+	wsprintf(sqlcmdw,
+		L"delete from '%s' where telnumber='%s' and content='%s' and timestamps='%s' and sendreceive=%d",
+		TABLE_TEMP,
+		psms->MobileNumber,psms->Content,psms->TimeStamp,psms->SendReceiveFlag);
+    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        if (sqlite3_step(pStmt) == SQLITE_DONE){
+            nRet = true;
+        }
+    }
+	return nRet;
 }

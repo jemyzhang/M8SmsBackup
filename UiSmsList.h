@@ -16,6 +16,7 @@ public:
         pldb = NULL;
         breq = false;
         seletedidx = -1;
+		bSelectionMode = false;
     }
     ~UiSmsList(){
         ClearList();
@@ -49,6 +50,30 @@ public:
         UiList::Update();
     }
     void SetSelectedIndex(int index);
+	void SetSelectionMode(){
+		bSelectionMode = !bSelectionMode;
+		for(UINT i = 0; i < plist_size; i++){
+			plist_record[i].SelectionFlag = FALSE;
+		}
+	}
+	bool GetSelectionMode(){
+		return bSelectionMode;
+	}
+
+	void ReverseSelect(){
+		for(UINT i = 0; i < plist_size; i++){
+			plist_record[i].SelectionFlag = !plist_record[i].SelectionFlag;
+		}
+	}
+	//获取已选中条目个数
+	UINT GetSelectedCount(){
+		UINT nCount = 0;
+		for(UINT i = 0; i < plist_size; i++){
+			if(plist_record[i].SelectionFlag) nCount++;
+		}
+		return nCount;
+	}
+	void DeleteSelectedItems();
 private:
 	void SetupList();
 	void ClearList();
@@ -64,5 +89,6 @@ private:
     LocalDataBase *pldb;
     bool breq;
     int seletedidx;
+	bool bSelectionMode;	//是否为选择模式
 };
 

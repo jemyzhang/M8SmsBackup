@@ -21,6 +21,7 @@ public:
 protected:
     //设置右边列表内容
     void SetupList();
+	void SetupToolbar();
 protected:
     // Initialization of the window (dialog)
     virtual BOOL OnInitDialog();

@@ -63,6 +63,26 @@ BOOL Ui_SearchWnd::OnInitDialog() {
 	return TRUE;
 }
 
+void Ui_SearchWnd::SetupToolbar(){
+	if(m_SmsList.GetSelectionMode()){
+				m_Toolbar.SetButton(0,true,true,LOADSTRING(IDS_STR_REVERSE_SELECT).C_Str());
+				m_Toolbar.SetButton(1,true,m_SmsList.GetSelectedCount() > 0,LOADSTRING(IDS_STR_DELETE).C_Str());
+				m_Toolbar.SetButton(2,true,true,LOADSTRING(IDS_STR_FINISHED).C_Str());
+	}else{
+		if(m_SmsList.GetItemCount() == 0){
+				m_Toolbar.SetButton(0,true,true,LOADSTRING(IDS_STR_RETURN).C_Str());
+				m_Toolbar.SetButton(1,false,false,NULL);
+				m_Toolbar.SetButton(2,false,false,NULL);
+		}else{
+				m_Toolbar.SetButton(0,true,true,LOADSTRING(IDS_STR_RETURN).C_Str());
+				m_Toolbar.SetButton(2,true,true,LOADSTRING(IDS_STR_SELECT).C_Str());
+				m_Toolbar.SetButton(1,false,false,NULL);
+		}
+	}
+	m_Toolbar.Invalidate();
+	m_Toolbar.Update();
+}
+
 void Ui_SearchWnd::SetupList(){
 	m_SmsList.SetSelectedIndex(-1);
 	m_SmsList.RemoveAll();
@@ -70,6 +90,7 @@ void Ui_SearchWnd::SetupList(){
 	m_SmsList.Invalidate();
 	m_SmsList.reqUpdate();
 	m_SmsList.Update();
+	SetupToolbar();
 	return;
 }
 
@@ -95,8 +116,31 @@ void Ui_SearchWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 			{
 				int nIndex = lParam;
 				if (nIndex == 0) {
-					EndModal(ID_OK);
-					return;
+					if(m_SmsList.GetSelectionMode()){
+						m_SmsList.ReverseSelect();
+						m_SmsList.Invalidate();
+						m_SmsList.Update();
+						SetupToolbar();
+					}else{
+						EndModal(ID_OK);
+						return;
+					}
+				}
+				if(nIndex == 2){
+					m_SmsList.SetSelectionMode();
+					m_SmsList.Invalidate();
+					m_SmsList.Update();
+					SetupToolbar();
+				}
+				if(nIndex == 1){
+					if(MzMessageBoxEx(m_hWnd,
+						LOADSTRING(IDS_STR_DELETE_CONFIRM).C_Str(),
+						LOADSTRING(IDS_STR_OK).C_Str(),MZ_YESNO,false) == 1){
+							m_SmsList.DeleteSelectedItems();
+							m_SmsList.reqUpdate();
+							m_SmsList.Invalidate();
+							m_SmsList.Update();
+					}
 				}
 			}
 			break;
@@ -118,6 +162,7 @@ LRESULT Ui_SearchWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 						m_SmsList.SetSelectedIndex(nIndex);
 						m_SmsList.Invalidate();
 						m_SmsList.Update();
+						SetupToolbar();
 						return 0;
 					}
 				}

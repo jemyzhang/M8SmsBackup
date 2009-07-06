@@ -170,11 +170,14 @@ typedef struct SmsSimpleData{
 	BOOL	SendReceiveFlag;
 	LPWSTR	TimeStamp;
 	LPWSTR	Content;
+	BOOL	SelectionFlag;
     void Reset(){
         SAFE_RELEASE_LPWSTR(ContactName);
         SAFE_RELEASE_LPWSTR(MobileNumber);
         SAFE_RELEASE_LPWSTR(Content);
         SAFE_RELEASE_LPWSTR(TimeStamp);
+		SelectionFlag = false;
+		SendReceiveFlag = false;
     }
 	SmsSimpleData(){
         ContactName = NULL;
@@ -182,6 +185,7 @@ typedef struct SmsSimpleData{
 		SendReceiveFlag = false;
 		Content = NULL;
         TimeStamp = NULL;
+		SelectionFlag = false;
 	}
     ~SmsSimpleData(){
         Reset();
@@ -220,6 +224,7 @@ public:
 //sms相关操作
 	bool AppendSmsRecord(SmsData_ptr);
 	bool RemoveSmsRecord(SmsData_ptr);
+	bool RemoveSmsRecord(SmsSimpleData_ptr);
 	//联系人列表, in = NULL时返回key数量
 	UINT GetSmsContactList(SmsViewListKey_ptr = NULL);
 	//时间列表, in = NULL时返回key数量
@@ -248,7 +253,7 @@ private:
 public:
 	//contact相关操作
 	UINT AppendContactRecord(ContactData_ptr);
-	bool RemoveSmsRecord(ContactData_ptr);
+	bool RemoveContactRecord(ContactData_ptr);
 private:
     bool addContactRecord(LPWSTR number,LPWSTR name,TelLabel_t label);
 	bool isDuplicateContact(LPWSTR number,LPWSTR name,TelLabel_t label);

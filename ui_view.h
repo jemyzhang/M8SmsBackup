@@ -12,7 +12,8 @@ private:
     //0: main
     //1: contact list 2: phone number list 3: sms list
     //0x10: year list 0x11: month list, 0x12 day list, 0x13 sms list
-    UINT viewStatus; 
+    UINT viewStatus;
+	UINT viewStatusSavedBeforeView;	//查看按钮按下时保持前一值
     SmsViewListKey_ptr plistkey;
     UINT plistSize;
     WORD selectedYear;

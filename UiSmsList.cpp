@@ -1,6 +1,7 @@
 #include "UiSmsList.h"
 #include "resource.h"
 #include "ui_SmsViewer.h"
+#include "ui_ProgressBar.h"
 
 extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 
@@ -106,22 +107,49 @@ void UiSmsList::DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RE
     ::SetTextColor( hdcDst , cr );
     MzDrawText( hdcDst , prec->Content, &rcContent , DT_BOTTOM|DT_LEFT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
 	DeleteObject(hf);
+
+	if(bSelectionMode){
+		RECT rcSelection = {prcItem->right - 40,prcItem->top,prcItem->right,prcItem->bottom};
+		MzDrawControl(hdcDst, &rcSelection,  prec->SelectionFlag ? MZC_SELECTED : MZC_UNSELECTED, 0);
+	}
+
 }
 
 void UiSmsList::SetSelectedIndex(int nIndex){
-	if(nIndex != -1){
-        if(nIndex == seletedidx){   //show sms
-            Ui_SmsViewerWnd dlg;
-            dlg.SetViewRecord(plist_record,nIndex,plist_size);
-            RECT rcWork = MzGetWorkArea();
-            dlg.Create(rcWork.left, rcWork.top + RECT_HEIGHT(rcWork)/2, RECT_WIDTH(rcWork), RECT_HEIGHT(rcWork)/2,
-				GetParentWnd(), 0, WS_POPUP);
-            // set the animation of the window
-            dlg.SetAnimateType_Show(MZ_ANIMTYPE_SCROLL_BOTTOM_TO_TOP_2);
-            dlg.SetAnimateType_Hide(MZ_ANIMTYPE_SCROLL_TOP_TO_BOTTOM_1);
-            dlg.DoModal();
-        }
-    }
-    seletedidx = nIndex;
+	if(bSelectionMode){
+		plist_record[nIndex].SelectionFlag = !plist_record[nIndex].SelectionFlag;
+	}else{
+		if(nIndex != -1){
+			if(nIndex == seletedidx){   //show sms
+				Ui_SmsViewerWnd dlg;
+				dlg.SetViewRecord(plist_record,nIndex,plist_size);
+				RECT rcWork = MzGetWorkArea();
+				dlg.Create(rcWork.left, rcWork.top + RECT_HEIGHT(rcWork)/2, RECT_WIDTH(rcWork), RECT_HEIGHT(rcWork)/2,
+					GetParentWnd(), 0, WS_POPUP);
+				// set the animation of the window
+				dlg.SetAnimateType_Show(MZ_ANIMTYPE_SCROLL_BOTTOM_TO_TOP_2);
+				dlg.SetAnimateType_Hide(MZ_ANIMTYPE_SCROLL_TOP_TO_BOTTOM_1);
+				dlg.DoModal();
+			}
+		}
+		seletedidx = nIndex;
+	}
 	return UiList::SetSelectedIndex(nIndex);
+}
+
+void UiSmsList::DeleteSelectedItems(){
+	initUiCallbackDeleteSms();
+	UINT nDeleting = GetSelectedCount();
+	UINT nDeleted = 0;
+	UINT nCount = 0;
+	pldb->beginTrans();
+	for(UINT i = 0; i < plist_size; i++){
+		if(plist_record[i].SelectionFlag){
+			nDeleted += (pldb->RemoveSmsRecord(plist_record+i) ? 1 : 0);
+			uiCallbackDeleteSms(plist_record+i,nCount,nDeleting,nDeleted);
+			nCount++;
+		}
+	}
+	uiCallbackDeleteSms(NULL,0,0,0);
+	pldb->commitTrans();
 }

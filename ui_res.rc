@@ -97,6 +97,15 @@ BEGIN
     IDS_STR_VIEW_BY_CONTACT "按联系人查看"
     IDS_STR_VIEW_BY_DATE    "按日期查看"
     IDS_STR_SELECT          "选择"
+    IDS_STR_FINISHED        "完成"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STR_DELETE          "删除"
+    IDS_STR_DELETE_SMS      "删除短信记录中..."
+    IDS_STR_DELETE_CONFIRM  "确实要删除选中短信？"
+    IDS_STR_REVERSE_SELECT  "反选"
 END
 
 #endif    // 中文(中华人民共和国) resources

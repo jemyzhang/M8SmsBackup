@@ -54,6 +54,10 @@ void initUiCallbackRefreshSms(){
 	initProgressBar(LOADSTRING(IDS_STR_UPDATE_SMS).C_Str());//L"更新短信记录...");
 }
 
+void initUiCallbackDeleteSms(){
+	initProgressBar(LOADSTRING(IDS_STR_DELETE_SMS).C_Str());//L"更新短信记录...");
+}
+
 bool uiCallbackRefreshContact(ContactData_ptr pcontact,WORD nCount,WORD nSize,WORD nSuccess){
 	if(pcontact == NULL){
 		HideProgressBar();
@@ -86,6 +90,26 @@ bool uiCallbackRefreshSms(SmsData_ptr psms,WORD nCount,WORD nSize,WORD nSuccess)
 	sImported = sImported + infotext;
 	m_Progressdlg.SetTitle(sImported.C_Str());
 	wsprintf(infotext,L"%s %s (%d/%d)",psms->SendReceiveFlag == 1 ? L"[←]": L"[→]",psms->PNSort,nCount + 1,nSize);
+	m_Progressdlg.SetInfo(infotext);
+	m_Progressdlg.SetCurValue(nCount);
+	m_Progressdlg.UpdateProgress();
+	DateTime::waitms(0);
+	return true;
+}
+
+bool uiCallbackDeleteSms(SmsSimpleData_ptr psms,WORD nCount,WORD nSize,WORD nSuccess){
+	if(psms == NULL){
+		HideProgressBar();
+		return false;
+	}
+	ShowProgressBar();
+	SetProgressBarRange(0,nSize);
+	CMzString sImported = LOADSTRING(IDS_STR_DELETE_SMS);
+	wchar_t infotext[256];
+	wsprintf(infotext,L"%d",nSuccess);
+	sImported = sImported + infotext;
+	m_Progressdlg.SetTitle(sImported.C_Str());
+	wsprintf(infotext,L"%s %s (%d/%d)",psms->SendReceiveFlag == 1 ? L"[←]": L"[→]",psms->MobileNumber,nCount + 1,nSize);
 	m_Progressdlg.SetInfo(infotext);
 	m_Progressdlg.SetCurValue(nCount);
 	m_Progressdlg.UpdateProgress();

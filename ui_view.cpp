@@ -20,6 +20,7 @@ extern HINSTANCE LangresHandle;
 MZ_IMPLEMENT_DYNAMIC(Ui_ViewWnd)
 
 Ui_ViewWnd::Ui_ViewWnd(){
+	viewStatusSavedBeforeView = 0;
 	viewStatus = 0;
 	plistkey = 0;
 	plistSize = 0;
@@ -67,20 +68,28 @@ BOOL Ui_ViewWnd::OnInitDialog() {
 }
 
 void Ui_ViewWnd::SetupToolbar(){
-	if(viewStatus == 0){
-			m_Toolbar.SetButton(0,true,true,LOADSTRING(IDS_STR_RETURN).C_Str());
-			m_Toolbar.SetButton(1,false,false,NULL);
-			m_Toolbar.SetButton(2,false,false,NULL);
-	}else if((viewStatus & 0x0f) == 3 || 
-		viewStatus == 1 ||
-		viewStatus == 0x10){
+	if((viewStatus & 0x0f) == 3 && m_SmsList.GetSelectionMode()){
+		m_Toolbar.SetButton(0,false,false,NULL);
+		m_Toolbar.SetButton(1,true,m_SmsList.GetSelectedCount() > 0,LOADSTRING(IDS_STR_DELETE).C_Str());
+		m_Toolbar.SetButton(2,true,true,LOADSTRING(IDS_STR_FINISHED).C_Str());
+	}else{
+		//选择模式时，取消选择模式
+		if(m_SmsList.GetSelectionMode()) m_SmsList.SetSelectionMode();
+		if(viewStatus == 0 || 
+			viewStatus == 1 ||
+			viewStatus == 0x10){
+				m_Toolbar.SetButton(0,true,true,LOADSTRING(IDS_STR_RETURN).C_Str());
+				m_Toolbar.SetButton(1,false,false,NULL);
+				m_Toolbar.SetButton(2,false,false,NULL);
+		}else if((viewStatus & 0x0f) == 3){
 			m_Toolbar.SetButton(0,true,true,LOADSTRING(IDS_STR_RETURN).C_Str());
 			m_Toolbar.SetButton(1,false,false,NULL);
 			m_Toolbar.SetButton(2,true,true,LOADSTRING(IDS_STR_SELECT).C_Str());
-	}else{
+		}else{
 			m_Toolbar.SetButton(0,true,true,LOADSTRING(IDS_STR_RETURN).C_Str());
 			m_Toolbar.SetButton(1,true,true,LOADSTRING(IDS_STR_VIEW_SMS).C_Str());
-			m_Toolbar.SetButton(2,true,true,LOADSTRING(IDS_STR_SELECT).C_Str());
+			m_Toolbar.SetButton(2,false,false,NULL);
+		}
 	}
 	m_Toolbar.Invalidate();
 	m_Toolbar.Update();
@@ -189,6 +198,18 @@ void Ui_ViewWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 				}
 				break;
 			}
+		case MZ_IDC_BUTTON_VIEW_CONTACT_NAME:
+			{
+				if((viewStatus & 0x0f) == 3){
+					if(m_SmsList.GetSelectionMode()){
+						m_SmsList.ReverseSelect();
+						m_SmsList.Invalidate();
+						m_SmsList.Update();
+						SetupToolbar();
+					}
+				}
+			}
+			break;
 		case MZ_IDC_BUTTON_VIEW_DATE:
 			{
 				if(viewStatus != 0x10){
@@ -203,6 +224,15 @@ void Ui_ViewWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 			}
 		case MZ_IDC_BUTTON_VIEW_DATE_YEAR:
 			{
+				if((viewStatus & 0x0f) == 3 && 
+					viewStatusSavedBeforeView == 0x11 &&
+					m_SmsList.GetSelectionMode()){
+						m_SmsList.ReverseSelect();
+						m_SmsList.Invalidate();
+						m_SmsList.Update();
+						SetupToolbar();
+						break;;
+				}
 				if(viewStatus != 0x11){
 					m_Navibar.popUntil(MZ_IDC_BUTTON_VIEW_DATE_YEAR);
 					viewStatus = 0x11;
@@ -214,6 +244,15 @@ void Ui_ViewWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 			}
 		case MZ_IDC_BUTTON_VIEW_DATE_MONTH:
 			{
+				if((viewStatus & 0x0f) == 3 && 
+					viewStatusSavedBeforeView == 0x12 &&
+					m_SmsList.GetSelectionMode()){
+						m_SmsList.ReverseSelect();
+						m_SmsList.Invalidate();
+						m_SmsList.Update();
+						SetupToolbar();
+						break;;
+				}
 				if(viewStatus != 0x12){
 					m_Navibar.popUntil(MZ_IDC_BUTTON_VIEW_DATE_MONTH);
 					viewStatus = 0x12;
@@ -222,6 +261,18 @@ void Ui_ViewWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 				}
 				break;
 			}
+		case MZ_IDC_BUTTON_VIEW_DATE_DAY:
+			{
+				if((viewStatus & 0x0f) == 3){
+					if(m_SmsList.GetSelectionMode()){
+						m_SmsList.ReverseSelect();
+						m_SmsList.Invalidate();
+						m_SmsList.Update();
+						SetupToolbar();
+					}
+				}
+			}
+			break;
 		case MZ_IDC_TOOLBAR_MAIN:
 			{
 				int nIndex = lParam;
@@ -230,10 +281,33 @@ void Ui_ViewWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 					return;
 				}
 				if(nIndex == 1){
-					viewStatus = 0x13;
-					m_SmsList.SetupMode(0);
-					m_SmsList.SetupListDateTime(selectedYear,selectedMonth,selectedDay);
-					SetupList();
+					if((viewStatus & 0x0f) == 3){	//删除按钮
+						if(m_SmsList.GetSelectionMode()){//sms list选中模式
+							if(MzMessageBoxEx(m_hWnd,
+								LOADSTRING(IDS_STR_DELETE_CONFIRM).C_Str(),
+								LOADSTRING(IDS_STR_OK).C_Str(),MZ_YESNO,false) == 1){
+									m_SmsList.DeleteSelectedItems();
+									m_SmsList.reqUpdate();
+									m_SmsList.Invalidate();
+									m_SmsList.Update();
+							}
+
+						}
+					}else{//查看按钮
+						viewStatusSavedBeforeView = viewStatus;
+						viewStatus = 0x13;
+						m_SmsList.SetupMode(0);
+						m_SmsList.SetupListDateTime(selectedYear,selectedMonth,selectedDay);
+						SetupList();
+					}
+				}
+				if(nIndex == 2){
+					if((viewStatus & 0x0f) == 3){
+						m_SmsList.SetSelectionMode();
+						m_SmsList.Invalidate();
+						m_SmsList.Update();
+					}
+					SetupToolbar();
 				}
 			}
 			break;
@@ -255,6 +329,7 @@ LRESULT Ui_ViewWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 						m_SmsList.SetSelectedIndex(nIndex);
 						m_SmsList.Invalidate();
 						m_SmsList.Update();
+						SetupToolbar();
 						return 0;
 					}
 				}
