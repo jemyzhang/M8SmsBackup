@@ -22,6 +22,9 @@ WORD refreshContact(CallBackRefreshContact callback){
         contact.Reset();
     }
     ldb.commitTrans();
+    if(callback){
+        (*callback)(NULL,0,0,0);	//indicate end
+    }
     return nRet;
 }
 
@@ -39,8 +42,9 @@ WORD refreshSms(CallBackRefreshSms callback){
 	SmsData_t sms;
     for(int i = 0; i < count; i++){
 	    db.GetSms(i,sms);
-		if(sms.SmsType == 1) continue;	//MMS
-		if(sms.SmsType == 12){	//group send
+		if(sms.SmsType == 1){
+			continue;	//MMS
+		}else if(sms.SmsType == 12){	//group send
 			wchar_t* token = C::_wcstok(sms.MobileNumber,L"©«");
 			while(token){
 				SmsData_t newsms;
@@ -58,9 +62,9 @@ WORD refreshSms(CallBackRefreshSms callback){
 				token = C::_wcstok(NULL,L"©«");
 				newsms.Reset();
 			}
-			continue;
+		}else{
+			nRet += ldb.AppendSmsRecord(&sms) ? 1:0;
 		}
-        nRet += ldb.AppendSmsRecord(&sms) ? 1:0;
         if(callback){
             if(!(*callback)(&sms,i,count,nRet)){
                 break;
@@ -69,5 +73,8 @@ WORD refreshSms(CallBackRefreshSms callback){
         sms.Reset();
     }
     ldb.commitTrans();
+    if(callback){
+        (*callback)(NULL,0,0,0);	//indicate end
+    }
     return nRet;
 }

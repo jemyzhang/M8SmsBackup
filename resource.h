@@ -19,13 +19,20 @@
 #define IDS_STR_IMPORTED                115
 #define IDS_STR_PREVIOUS                116
 #define IDS_STR_NEXT                    117
+#define IDS_STR_KEYWORDS                118
+#define IDS_STR_SEARCH                  119
+#define IDS_STR_MENU_VIEW_TIP           120
+#define IDS_STR_MENU_SEARCH_TIP         121
+#define IDS_STR_MENU_UPDATE_TIP         122
+#define IDS_STR_MENU_CONFIG_TIP         123
 #define IDB_PNG_NAVI_BG                 201
 #define IDB_PNG_BEGIN                   201
 #define IDB_PNG_NAVI_BTN_BHL            202
 #define IDB_PNG_NAVI_BTN_BNR            203
 #define IDB_PNG_SMS_SEND                204
 #define IDB_PNG_SMS_RECV                205
-#define IDB_PNG_END                     205
+#define IDB_PNG_SEARCH                  206
+#define IDB_PNG_END                     206
 
 // Next default values for new objects
 // 

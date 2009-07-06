@@ -1,7 +1,8 @@
 #include "UiSmsList.h"
 #include "resource.h"
-extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 #include "ui_SmsViewer.h"
+
+extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 
 void UiSmsList::SetupList() {
     if(pldb == NULL) return;

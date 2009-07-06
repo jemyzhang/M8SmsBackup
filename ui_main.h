@@ -16,6 +16,7 @@ public:
 
 //	UiLogo	m_Logo;
 	UiButtonEx m_BtnView;		//查看
+	UiButtonEx m_BtnSearch;		//查找
 	UiButtonEx m_BtnRefresh;	//刷新
 	UiButtonEx m_BtnConfig;		//设置
 	UiMultiLineEdit m_TextAbout;

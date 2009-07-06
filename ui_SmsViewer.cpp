@@ -20,31 +20,31 @@ void UiSmsTitle::PaintWin(HDC hdcDst, RECT* prcWin, RECT* prcUpdate){
 		SmsResID = IDB_PNG_SMS_RECV - IDB_PNG_BEGIN;
 	}
 	SetBkMode(hdcDst,TRANSPARENT);
-	RECT rcSendReceive = {prcWin->left,prcWin->top,prcWin->left + 40,prcWin->top + 40};
+	RECT rcSendReceive = {prcWin->left,prcWin->top + 20,prcWin->left + 40,prcWin->top + 60};
 	pimg[SmsResID]->Draw(hdcDst,&rcSendReceive);
 
 	//ÐÕÃû
-	hf = FontHelper::GetFont( 25 );
+	hf = FontHelper::GetFont( 30 );
 	SelectObject( hdcDst , hf );
-	RECT rcName = {rcSendReceive.right,prcWin->top,rcSendReceive.right + 180,rcSendReceive.bottom};
+	RECT rcName = {rcSendReceive.right,prcWin->top,rcSendReceive.right + 200,rcSendReceive.bottom};
 	cr = RGB(255,255,255);
 	::SetTextColor( hdcDst , cr );
 	MzDrawText( hdcDst , precord->ContactName, &rcName , DT_BOTTOM|DT_LEFT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
 	DeleteObject(hf);
 
 	//ºÅÂë
-	hf = FontHelper::GetFont( 17 );
+	hf = FontHelper::GetFont( 20 );
 	SelectObject( hdcDst , hf );
-	RECT rcNumber = {prcWin->right - 160,prcWin->top,prcWin->right - 5,rcName.bottom - 20};
+	RECT rcNumber = {prcWin->right - 200,prcWin->top,prcWin->right - 5,rcName.bottom - 20};
 	cr = RGB(128,128,128);
 	::SetTextColor( hdcDst , cr );
 	MzDrawText( hdcDst , precord->MobileNumber, &rcNumber , DT_BOTTOM|DT_RIGHT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
 	DeleteObject(hf);
 
 	//ÈÕÆÚ
-	hf = FontHelper::GetFont( 17 );
+	hf = FontHelper::GetFont( 20 );
 	SelectObject( hdcDst , hf );
-	RECT rcDate = {prcWin->right - 160,rcNumber.bottom,prcWin->right - 5,rcNumber.bottom + 20};
+	RECT rcDate = {prcWin->right - 200,rcNumber.bottom,prcWin->right - 5,rcNumber.bottom + 20};
 	cr = RGB(128,128,128);
 	::SetTextColor( hdcDst , cr );
 	MzDrawText( hdcDst , precord->TimeStamp, &rcDate , DT_BOTTOM|DT_RIGHT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
@@ -72,10 +72,10 @@ BOOL Ui_SmsViewerWnd::OnInitDialog() {
 	AddUiWin(&m_Background);
 
 	int y = 10;
-	m_Title.SetPos(10, y, GetWidth() - 20, 40);
+	m_Title.SetPos(10, y, GetWidth() - 20, 60);
 	m_Background.AddChild(&m_Title);
 
-	y+=45;
+	y+=65;
 	m_Content.SetPos(10, y, GetWidth() - 20, GetHeight() - y - MZM_HEIGHT_TEXT_TOOLBAR);
 	m_Content.SetReadOnly(true);
 	m_Content.SetTextColor( RGB(255,255,255));

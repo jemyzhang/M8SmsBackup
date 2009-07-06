@@ -242,6 +242,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ui_search.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ui_SmsViewer.cpp"
 				>
 			</File>
@@ -312,6 +316,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ui_search.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ui_SmsViewer.h"
 				>
 			</File>
@@ -351,6 +359,10 @@
 			</File>
 			<File
 				RelativePath=".\images\ReceiveSms.png"
+				>
+			</File>
+			<File
+				RelativePath=".\images\Search.png"
 				>
 			</File>
 			<File

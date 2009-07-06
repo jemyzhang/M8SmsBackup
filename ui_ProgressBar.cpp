@@ -55,17 +55,17 @@ void initUiCallbackRefreshSms(){
 }
 
 bool uiCallbackRefreshContact(ContactData_ptr pcontact,WORD nCount,WORD nSize,WORD nSuccess){
-	if(nCount+1 >= nSize){
+	if(pcontact == NULL){
 		HideProgressBar();
 		return false;
 	}
 	ShowProgressBar();
 	SetProgressBarRange(0,nSize);
-    CMzString sImported = LOADSTRING(IDS_STR_UPDATE_CONTACT);
+	CMzString sImported = LOADSTRING(IDS_STR_UPDATE_CONTACT);
 	wchar_t infotext[256];
 	wsprintf(infotext,LOADSTRING(IDS_STR_IMPORTED).C_Str(),nSuccess);
-    sImported = sImported + infotext;
-    m_Progressdlg.SetTitle(sImported.C_Str());
+	sImported = sImported + infotext;
+	m_Progressdlg.SetTitle(sImported.C_Str());
 	wsprintf(infotext,L"%s (%d/%d)",pcontact->Name,nCount + 1,nSize);
 	m_Progressdlg.SetInfo(infotext);
 	m_Progressdlg.SetCurValue(nCount);
@@ -74,17 +74,17 @@ bool uiCallbackRefreshContact(ContactData_ptr pcontact,WORD nCount,WORD nSize,WO
 	return true;
 }
 bool uiCallbackRefreshSms(SmsData_ptr psms,WORD nCount,WORD nSize,WORD nSuccess){
-	if(nCount+1 >= nSize){
+	if(psms == NULL){
 		HideProgressBar();
 		return false;
 	}
 	ShowProgressBar();
 	SetProgressBarRange(0,nSize);
-    CMzString sImported = LOADSTRING(IDS_STR_UPDATE_SMS);
+	CMzString sImported = LOADSTRING(IDS_STR_UPDATE_SMS);
 	wchar_t infotext[256];
 	wsprintf(infotext,LOADSTRING(IDS_STR_IMPORTED).C_Str(),nSuccess);
-    sImported = sImported + infotext;
-    m_Progressdlg.SetTitle(sImported.C_Str());
+	sImported = sImported + infotext;
+	m_Progressdlg.SetTitle(sImported.C_Str());
 	wsprintf(infotext,L"%s %s (%d/%d)",psms->SendReceiveFlag == 1 ? L"[¡û]": L"[¡ú]",psms->PNSort,nCount + 1,nSize);
 	m_Progressdlg.SetInfo(infotext);
 	m_Progressdlg.SetCurValue(nCount);
