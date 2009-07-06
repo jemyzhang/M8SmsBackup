@@ -56,13 +56,13 @@ void UiSmsList::DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RE
         MzDrawSelectedBg(hdcDst, prcItem);
     }
 
-	SmsSimpleData_t rec = plist_record[nIndex];
+	SmsSimpleData_ptr prec = plist_record+nIndex;
 
     HFONT hf;
     COLORREF cr;
 	//收/发标记
     UINT SmsResID;
-    if(rec.SendReceiveFlag){
+    if(prec->SendReceiveFlag){
         SmsResID = IDB_PNG_SMS_SEND - IDB_PNG_BEGIN;
     }else{
         SmsResID = IDB_PNG_SMS_RECV - IDB_PNG_BEGIN;
@@ -77,7 +77,7 @@ void UiSmsList::DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RE
     RECT rcName = {rcSendReceive.right,prcItem->top,rcSendReceive.right + 180,rcSendReceive.bottom};
     cr = RGB(0,0,0);
     ::SetTextColor( hdcDst , cr );
-    MzDrawText( hdcDst , rec.ContactName, &rcName , DT_BOTTOM|DT_LEFT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
+    MzDrawText( hdcDst , prec->ContactName, &rcName , DT_BOTTOM|DT_LEFT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
 	DeleteObject(hf);
 
     //号码
@@ -86,7 +86,7 @@ void UiSmsList::DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RE
     RECT rcNumber = {prcItem->right - 160,prcItem->top,prcItem->right - 5,rcName.bottom - 20};
     cr = RGB(128,128,128);
     ::SetTextColor( hdcDst , cr );
-    MzDrawText( hdcDst , rec.MobileNumber, &rcNumber , DT_BOTTOM|DT_RIGHT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
+    MzDrawText( hdcDst , prec->MobileNumber, &rcNumber , DT_BOTTOM|DT_RIGHT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
 	DeleteObject(hf);
 
     //日期
@@ -95,7 +95,7 @@ void UiSmsList::DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RE
     RECT rcDate = {prcItem->right - 160,rcNumber.bottom,prcItem->right - 5,rcNumber.bottom + 20};
     cr = RGB(128,128,128);
     ::SetTextColor( hdcDst , cr );
-    MzDrawText( hdcDst , rec.TimeStamp, &rcDate , DT_BOTTOM|DT_RIGHT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
+    MzDrawText( hdcDst , prec->TimeStamp, &rcDate , DT_BOTTOM|DT_RIGHT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
 	DeleteObject(hf);
     //内容
     hf = FontHelper::GetFont( 20 );
@@ -103,18 +103,18 @@ void UiSmsList::DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RE
     RECT rcContent = {prcItem->left + 40,prcItem->top + 45,prcItem->right - 10,prcItem->bottom};
     cr = RGB(0,0,0);
     ::SetTextColor( hdcDst , cr );
-    MzDrawText( hdcDst , rec.Content, &rcContent , DT_BOTTOM|DT_LEFT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
+    MzDrawText( hdcDst , prec->Content, &rcContent , DT_BOTTOM|DT_LEFT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
 	DeleteObject(hf);
 }
 
 void UiSmsList::SetSelectedIndex(int nIndex){
-    if(nIndex != -1){
+	if(nIndex != -1){
         if(nIndex == seletedidx){   //show sms
             Ui_SmsViewerWnd dlg;
             dlg.SetViewRecord(plist_record,nIndex,plist_size);
             RECT rcWork = MzGetWorkArea();
             dlg.Create(rcWork.left, rcWork.top + RECT_HEIGHT(rcWork)/2, RECT_WIDTH(rcWork), RECT_HEIGHT(rcWork)/2,
-                GetParentWnd(), 0, WS_POPUP);
+				GetParentWnd(), 0, WS_POPUP);
             // set the animation of the window
             dlg.SetAnimateType_Show(MZ_ANIMTYPE_SCROLL_BOTTOM_TO_TOP_2);
             dlg.SetAnimateType_Hide(MZ_ANIMTYPE_SCROLL_TOP_TO_BOTTOM_1);
@@ -122,5 +122,5 @@ void UiSmsList::SetSelectedIndex(int nIndex){
         }
     }
     seletedidx = nIndex;
-    return UiList::SetSelectedIndex(nIndex);
+	return UiList::SetSelectedIndex(nIndex);
 }
