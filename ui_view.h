@@ -5,6 +5,12 @@
 #include "LocalDataBase.h"
 #include "UiSmsList.h"
 
+class UiSmsAmountList : public UiList {
+public:
+    // override the DrawItem member function to do your own drawing of the list
+    void DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RECT *prcUpdate);
+};
+
 // Main window derived from CMzWndEx
 class Ui_ViewWnd : public CMzWndEx {
     MZ_DECLARE_DYNAMIC(Ui_ViewWnd);
@@ -25,7 +31,7 @@ public:
 public:
     UiToolbar_Text m_Toolbar;
     UiNaviList m_Navibar;
-    UiList m_List;
+    UiSmsAmountList m_List;
     UiSmsList m_SmsList;
 protected:
     //设置右边列表内容

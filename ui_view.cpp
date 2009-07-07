@@ -45,6 +45,7 @@ BOOL Ui_ViewWnd::OnInitDialog() {
 	m_List.SetPos(108, y, GetWidth() - 108, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR);
 	m_List.SetID(MZ_IDC_LIST);
 	m_List.EnableNotifyMessage(true);
+	m_List.SetItemHeight(50);
 	AddUiWin(&m_List);
 
 	m_SmsList.SetPos(108, y, GetWidth() - 108, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR);
@@ -113,6 +114,11 @@ void Ui_ViewWnd::SetupList(){
 		m_SmsList.SetVisible(false);
 		m_List.SetVisible(true);
 	}
+	if(viewStatus == 0){
+		m_List.SetItemHeight(80);
+	}else{
+		m_List.SetItemHeight(50);
+	}
 	m_List.RemoveAll();
 	m_List.Invalidate();
 	m_List.Update();
@@ -157,9 +163,19 @@ void Ui_ViewWnd::SetupList(){
 			}
 			for(UINT i = 0; i < plistSize; i++){
 				wchar_t strkey[128];
-				wsprintf(strkey,L"%s (%d+%d=%d)",
-					plistkey[i].key,plistkey[i].nReceive,plistkey[i].nSend,
-					plistkey[i].nReceive+plistkey[i].nSend);
+				if(viewStatus == 0x11){
+					wsprintf(strkey,L"%04d-%s＼%d+%d=%d",selectedYear,
+						plistkey[i].key,plistkey[i].nReceive,plistkey[i].nSend,
+						plistkey[i].nReceive+plistkey[i].nSend);
+				}else if(viewStatus == 0x12){
+					wsprintf(strkey,L"%04d-%02d-%s＼%d+%d=%d",selectedYear,selectedMonth,
+						plistkey[i].key,plistkey[i].nReceive,plistkey[i].nSend,
+						plistkey[i].nReceive+plistkey[i].nSend);
+				}else{
+					wsprintf(strkey,L"%s＼%d+%d=%d",
+						plistkey[i].key,plistkey[i].nReceive,plistkey[i].nSend,
+						plistkey[i].nReceive+plistkey[i].nSend);
+				}
 				li.Text = strkey;
 				if(viewStatus >= 0x10 && viewStatus < 0x13){
 					WORD num;
@@ -349,7 +365,7 @@ LRESULT Ui_ViewWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 								viewStatus = nIndex == 0 ? 1 : 0x10;
 							}else if(viewStatus == 0x1){
 								UINT received, sent, total;
-								wchar_t *name = C::_wcstok(m_List.GetItem(nIndex)->Text.C_Str(),L" ");
+								wchar_t *name = C::_wcstok(m_List.GetItem(nIndex)->Text.C_Str(),L"＼");
 								total = ldb.GetSmsContactCount(name,received,sent);
 								wchar_t strcount2[128];
 								wsprintf(strcount2,L"%d/%d",received,sent,total);
@@ -418,4 +434,45 @@ LRESULT Ui_ViewWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 			}
 	}
 	return CMzWndEx::MzDefWndProc(message, wParam, lParam);
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+void UiSmsAmountList::DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RECT *prcUpdate) {
+
+	// draw the high-light background for the selected item
+    if (nIndex == GetSelectedIndex()) {
+        MzDrawSelectedBg(hdcDst, prcItem);
+    }
+
+	wchar_t *s = NULL;
+	C::newstrcpy(&s,GetItem(nIndex)->Text.C_Str());
+
+    HFONT hf;
+    COLORREF cr;
+    
+	wchar_t *str = C::_wcstok(s,L"＼");
+	wchar_t *str2 = C::_wcstok(NULL,L"＼");
+	if(str){
+		//으커1
+		hf = FontHelper::GetFont( str2 == NULL ? 30 : 25 );
+		SelectObject( hdcDst , hf );
+		RECT rc1 = {prcItem->left + 10,prcItem->top,prcItem->right - (str2 == NULL ? 10 : 150),prcItem->bottom};
+		cr = RGB(0,0,0);
+		::SetTextColor( hdcDst , cr );
+		MzDrawText( hdcDst , str, &rc1 , DT_VCENTER|(str2 == NULL ? DT_CENTER : DT_LEFT)|DT_SINGLELINE|DT_WORD_ELLIPSIS );
+		DeleteObject(hf);
+	}
+
+	if(str2){
+		//으커2
+		hf = FontHelper::GetFont( 20 );
+		SelectObject( hdcDst , hf );
+		RECT rc2 = {prcItem->right - 150,prcItem->top,prcItem->right - 5,prcItem->bottom};
+		cr = RGB(128,128,128);
+		::SetTextColor( hdcDst , cr );
+		MzDrawText( hdcDst, str2, &rc2 , DT_VCENTER|DT_LEFT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
+		DeleteObject(hf);
+	}
+	delete [] s;
 }
