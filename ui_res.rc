@@ -83,8 +83,8 @@ END
 STRINGTABLE 
 BEGIN
     IDS_STR_WEB_INFO        "获取更多软件请访问：\n%s"
-    IDS_STR_UPDATE_CONTACT  "更新联系人记录..."
-    IDS_STR_UPDATE_SMS      "更新短信记录..."
+    IDS_STR_UPDATE_CONTACT  "导入联系人记录..."
+    IDS_STR_UPDATE_SMS      "导入短信记录..."
     IDS_STR_IMPORTED        "已导入：%d"
     IDS_STR_PREVIOUS        "上一条"
     IDS_STR_NEXT            "下一条"
@@ -106,6 +106,11 @@ BEGIN
     IDS_STR_DELETE_SMS      "删除短信记录中..."
     IDS_STR_DELETE_CONFIRM  "确实要删除选中短信？"
     IDS_STR_REVERSE_SELECT  "反选"
+    IDS_STR_UPDATE_SIM_CONTACT "导入SIM卡联系人记录..."
+    IDS_STR_USE_SIM_PHONEBOOK "使用SIM卡联系人"
+    IDS_STR_OPTION_YES      "是"
+    IDS_STR_OPTION_NO       "否"
+    IDS_STR_BOOTUPDATE      "启动时自动更新数据库"
 END
 
 #endif    // 中文(中华人民共和国) resources

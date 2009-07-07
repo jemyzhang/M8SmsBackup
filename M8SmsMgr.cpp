@@ -3,12 +3,16 @@ using namespace MZ_CommonFunc;
 
 #include "M8SmsMgr.h"
 #include "resource.h"
+#include "appconfigini.h"
+#include "ui_ProgressBar.h"
+
 // The global variable of the application.
 M8SmsMgr theApp;
 HINSTANCE LangresHandle;
 HINSTANCE ImgresHandle;
 ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 ImagingHelper *imgArrow;
+AppConfigIni appconfig;
 
 void M8SmsMgr::loadImageRes(){
 	ImgresHandle = MzGetInstanceHandle();
@@ -58,6 +62,17 @@ BOOL M8SmsMgr::Init() {
     m_MainWnd.Create(rcWork.left, rcWork.top, RECT_WIDTH(rcWork), RECT_HEIGHT(rcWork), 0, 0, 0);
     m_MainWnd.Show();
 
+	if(appconfig.IniRefreshWhileLoad.Get()){
+		WORD n;
+		if(appconfig.IniUseSimPhoneBook.Get()){
+			initUiCallbackRefreshContact();
+			n = refreshSIMContact(uiCallbackRefreshSIMContact);
+		}
+		initUiCallbackRefreshContact();
+		n = refreshContact(uiCallbackRefreshContact);
+		initUiCallbackRefreshSms();
+		n = refreshSms(uiCallbackRefreshSms);
+	}
     // return TRUE means init success.
     return TRUE;
 }

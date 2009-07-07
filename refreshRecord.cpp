@@ -3,6 +3,37 @@
 #include "mz_commonfunc.h"
 using namespace MZ_CommonFunc;
 
+WORD refreshSIMContact(CallBackRefreshSIMContact callback){
+    WORD nRet = 0;
+	MzSimContactDataBase dbSimContact;
+	WORD simcount = dbSimContact.GetContactCount();
+    LocalDataBase ldb;
+    ldb.connect();
+    ldb.beginTrans();
+    ContactData_t contact;
+    for(WORD i = 0; i < simcount; i++){
+		if(dbSimContact.GetContact(i,contact)){
+			nRet += ldb.AppendContactRecord(&contact);
+		}else{
+			LPWSTR Number = NULL;
+			C::newstrcpy(&Number,L"0");
+			contact.MobileTels.push_back(Number);
+			C::newstrcpy(&contact.Name,L"SIM");
+		}
+		if(callback){
+			if(!(*callback)(&contact,i,simcount,nRet)){
+				break;
+			}
+		}
+        contact.Reset();
+    }
+    ldb.commitTrans();
+    if(callback){
+        (*callback)(NULL,0,0,0);	//indicate end
+    }
+    return nRet;
+}
+
 WORD refreshContact(CallBackRefreshContact callback){
     WORD nRet = 0;
     MzContactDataBase dbcontact;

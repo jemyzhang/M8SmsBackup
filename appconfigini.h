@@ -66,9 +66,8 @@ protected:
 public:
 	//是否启动时更新内容
 	MzConfig IniRefreshWhileLoad;
-	//导出时间范围
-	MzConfig IniExportSmsStartDate;
-	MzConfig IniExportSmsEndDate;
+	//是否使用SIM电话簿
+	MzConfig IniUseSimPhoneBook;
 private:
 	wchar_t ini_path[MAX_PATH];
 };

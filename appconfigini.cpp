@@ -1,12 +1,12 @@
 /*
- * @filename appconfigini.h
- * @note 应用程序配置文件读写类
- * @author JEMYZHANG
- * @date 2009.6.20
- * @ver. 1.1
- * @changelog
- *  ver.1.0 初始化程序
- *  ver.1.1 创建MzConfig类，简化键值读写
+* @filename appconfigini.h
+* @note 应用程序配置文件读写类
+* @author JEMYZHANG
+* @date 2009.6.20
+* @ver. 1.1
+* @changelog
+*  ver.1.0 初始化程序
+*  ver.1.1 创建MzConfig类，简化键值读写
 */
 
 #include "appconfigini.h"
@@ -56,6 +56,5 @@ void AppConfigIni::CreateIni(){
 
 void AppConfigIni::InitIniKey(){
 	IniRefreshWhileLoad.InitKey(L"Global",L"RefreshWhileLoad");
-	IniExportSmsStartDate.InitKey(L"Export",L"SMSStartDate");
-	IniExportSmsEndDate.InitKey(L"Export",L"SMSEndDate");
+	IniUseSimPhoneBook.InitKey(L"Global",L"UseSimPhoneBook");
 }

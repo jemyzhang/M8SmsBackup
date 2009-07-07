@@ -77,6 +77,27 @@ bool uiCallbackRefreshContact(ContactData_ptr pcontact,WORD nCount,WORD nSize,WO
 	DateTime::waitms(0);
 	return true;
 }
+
+bool uiCallbackRefreshSIMContact(ContactData_ptr pcontact,WORD nCount,WORD nSize,WORD nSuccess){
+	if(pcontact == NULL){
+		HideProgressBar();
+		return false;
+	}
+	ShowProgressBar();
+	SetProgressBarRange(0,nSize);
+	CMzString sImported = LOADSTRING(IDS_STR_UPDATE_SIM_CONTACT);
+	wchar_t infotext[256];
+	wsprintf(infotext,LOADSTRING(IDS_STR_IMPORTED).C_Str(),nSuccess);
+	sImported = sImported + infotext;
+	m_Progressdlg.SetTitle(sImported.C_Str());
+	wsprintf(infotext,L"%s (%d/%d)",pcontact->Name,nCount + 1,nSize);
+	m_Progressdlg.SetInfo(infotext);
+	m_Progressdlg.SetCurValue(nCount+1);
+	m_Progressdlg.UpdateProgress();
+	DateTime::waitms(0);
+	return true;
+}
+
 bool uiCallbackRefreshSms(SmsData_ptr psms,WORD nCount,WORD nSize,WORD nSuccess){
 	if(psms == NULL){
 		HideProgressBar();

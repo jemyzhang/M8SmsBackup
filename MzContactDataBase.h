@@ -2,6 +2,7 @@
 // include the MZFC library header file
 #include <mzfc_inc.h>
 #include "LocalDataBase.h"
+#include <simmgr.h>
 
 typedef enum 
 {
@@ -71,27 +72,32 @@ protected:
     BOOL Open();
 };
 
-#if 0
 class MzSimContactDataBase
 {
 private:
     BOOL bConnected;	//数据库是否打开成功
-    HANDLE hdDB;        //数据库句柄
-    CEGUID ceguid;      //存储数据库文件卷标识（GUID）
+    HSIM g_hSim;
+	SIMCAPS g_simcaps;
     CEOID ceoid;        //DWORD型 存储数据库对象标识和记录对象标识，惟一标识数据库的ID
 public:
-    MzSimContactDataBase(void);
-    ~MzSimContactDataBase(void);
+	MzSimContactDataBase(void){
+		g_hSim = NULL;
+		bConnected = Open();
+	}
+	~MzSimContactDataBase(void){
+		if(bConnected){
+			SimDeinitialize(g_hSim);
+			g_hSim = NULL; 
+		}
+	}
 public:
     //获取短信条数
     ULONG GetContactCount() { 
         if(!bConnected) return 0;//数据库没有成功打开时返回0
-        return 0; 
+        return g_simcaps.dwMaxPBIndex - g_simcaps.dwMinPBIndex+1;
     }
-    //获取短信内容
+    //获取Sim联系人内容
     BOOL GetContact(DWORD dwRecordID,ContactData_t &contact);
 protected:
     BOOL Open();
-    void ReadSimPhoneBook();
 };
-#endif

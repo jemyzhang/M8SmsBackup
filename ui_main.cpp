@@ -5,9 +5,12 @@ using namespace MZ_CommonFunc;
 #include "resource.h"
 #include "ui_view.h"
 #include "ui_search.h"
+#include "appconfigini.h"
+#include "ui_config.h"
 
 extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 extern HINSTANCE LangresHandle;
+extern AppConfigIni appconfig;
 
 #define MZ_IDC_TOOLBAR_MAIN 101
 #define MZ_IDC_BUTTON_VIEW 103
@@ -83,7 +86,7 @@ BOOL Ui_MainWnd::OnInitDialog() {
 	wsprintf(sa,LOADSTRING(IDS_STR_APPAUTHOR).C_Str(),L"JEMYZHANG");
 	sAbout = sa;
 	sAbout = sAbout + L"\n";
-	wsprintf(sa,LOADSTRING(IDS_STR_APPVERSION).C_Str(),L"1.01",L"20090707");
+	wsprintf(sa,LOADSTRING(IDS_STR_APPVERSION).C_Str(),L"1.10",L"20090707");
 	sAbout = sAbout + sa;
 	sAbout = sAbout + L"\n";
 	wsprintf(sa,LOADSTRING(IDS_STR_ADDTIONAL).C_Str(),L"jemyzhang@163.com");
@@ -132,6 +135,10 @@ void Ui_MainWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 		case MZ_IDC_BUTTON_REFRESH:
 			{
 				WORD n;
+				if(appconfig.IniUseSimPhoneBook.Get()){
+					initUiCallbackRefreshContact();
+					n = refreshSIMContact(uiCallbackRefreshSIMContact);
+				}
 				initUiCallbackRefreshContact();
 				n = refreshContact(uiCallbackRefreshContact);
 				initUiCallbackRefreshSms();
@@ -140,6 +147,14 @@ void Ui_MainWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 			}
 		case MZ_IDC_BUTTON_CONFIG:
 			{
+				Ui_ConfigWnd dlg;
+				RECT rcWork = MzGetWorkArea();
+				dlg.Create(rcWork.left, rcWork.top, RECT_WIDTH(rcWork), RECT_HEIGHT(rcWork),
+					m_hWnd, 0, WS_POPUP);
+				// set the animation of the window
+				dlg.SetAnimateType_Show(MZ_ANIMTYPE_SCROLL_RIGHT_TO_LEFT_2);
+				dlg.SetAnimateType_Hide(MZ_ANIMTYPE_SCROLL_LEFT_TO_RIGHT_1);
+				dlg.DoModal();
 				break;
 			}
 		case MZ_IDC_TOOLBAR_MAIN:

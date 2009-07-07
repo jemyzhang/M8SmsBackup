@@ -33,6 +33,11 @@
 #define IDS_STR_DELETE_SMS              129
 #define IDS_STR_DELETE_CONFIRM          130
 #define IDS_STR_REVERSE_SELECT          131
+#define IDS_STR_UPDATE_SIM_CONTACT      132
+#define IDS_STR_USE_SIM_PHONEBOOK       133
+#define IDS_STR_OPTION_YES              134
+#define IDS_STR_OPTION_NO               135
+#define IDS_STR_BOOTUPDATE              136
 #define IDB_PNG_NAVI_BG                 201
 #define IDB_PNG_BEGIN                   201
 #define IDB_PNG_NAVI_BTN_BHL            202

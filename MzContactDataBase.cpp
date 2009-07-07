@@ -2,7 +2,6 @@
 #include "mz_commonfunc.h"
 using namespace MZ_CommonFunc;
 
-#include <simmgr.h>
 #pragma comment(lib,"cellcore.lib")
 
 MzContactDataBase::MzContactDataBase(void)
@@ -137,47 +136,41 @@ BOOL MzContactDataBase::Open(){
     }
     return nRet;
 }
-
-#if 0
-void MzSimContactDataBase::ReadSimPhoneBook()
-{
-
-    //Sim Card
-    HSIM g_hSim = NULL;
-    SIMCAPS g_simcaps;
-    const DWORD g_dwLocation = SIM_PBSTORAGE_SIM;//SIM_PBSTORAGE_OWNNUMBERS;//SIM_PBSTORAGE_SIM;
-
-    DWORD dwRecNum=0;
-    DWORD dwCurRec = 0;
+////////////////////////////////////////////////////////////
+//Sim联系人读取
+////////////////////////////////////////////////////////////
+BOOL MzSimContactDataBase::Open(){
     if (FAILED(SimInitialize(SIM_INIT_NONE, NULL, 0, &g_hSim)))
-        return;
+        return FALSE;
     if (FAILED(SimGetDevCaps(g_hSim, SIM_CAPSTYPE_PBINDEXRANGE, &g_simcaps)))
-        return;
-
-    dwRecNum = g_simcaps.dwMaxPBIndex - g_simcaps.dwMinPBIndex+1;
-    dwCurRec = g_simcaps.dwMinPBIndex;
-    SIMPHONEBOOKENTRY simPhoneEntry;  
-    while( dwCurRec <= dwRecNum )
-    {
-        memset(&simPhoneEntry,0,sizeof(SIMPHONEBOOKENTRY));
-        if(SUCCEEDED(SimReadPhonebookEntry(g_hSim, g_dwLocation, dwCurRec, &simPhoneEntry)))
-        {
-            LPWSTR Mobile = NULL;
-            LPWSTR NAME = NULL;
-            Mobile = simPhoneEntry.lpszText;
-            NAME = simPhoneEntry.lpszAddress;
-            /*
-            int iItem = lstCtrl.InsertItem(lstCtrl.GetItemCount(),simPhoneEntry.lpszText);
-            lstCtrl.SetItemText(iItem,1,simPhoneEntry.lpszAddress);
-            CString tmp;
-            tmp.Format(_T("%ld"),dwCurRec);
-            lstCtrl.SetItemText(iItem,2,tmp);
-            */
-        } 
-        dwCurRec++;
-    }
-
-    SimDeinitialize(g_hSim);
-    g_hSim = NULL; 
+        return FALSE;
+	return TRUE;
 }
-#endif
+BOOL MzSimContactDataBase::GetContact(DWORD dwCurRec,ContactData_t &contact)
+{
+	BOOL nRet = FALSE;
+	if(!bConnected) return nRet;
+	//Sim Card
+	const DWORD g_dwLocation = SIM_PBSTORAGE_SIM;//SIM_PBSTORAGE_OWNNUMBERS;//SIM_PBSTORAGE_SIM;
+
+	DWORD dwRecNum = g_simcaps.dwMaxPBIndex - g_simcaps.dwMinPBIndex+1;
+	dwCurRec += g_simcaps.dwMinPBIndex;
+	if(dwCurRec > g_simcaps.dwMaxPBIndex) return nRet;
+
+
+	SIMPHONEBOOKENTRY simPhoneEntry;  
+	memset(&simPhoneEntry,0,sizeof(SIMPHONEBOOKENTRY));
+	if(SUCCEEDED(SimReadPhonebookEntry(g_hSim, g_dwLocation, dwCurRec, &simPhoneEntry)))
+	{
+		LPWSTR Mobile = NULL;
+		LPWSTR NAME = NULL;
+		Mobile = simPhoneEntry.lpszText;
+		NAME = simPhoneEntry.lpszAddress;
+		LPWSTR Number = NULL;
+		C::newstrcpy(&Number,simPhoneEntry.lpszAddress);
+		contact.MobileTels.push_back(Number);
+		C::newstrcpy(&contact.Name,simPhoneEntry.lpszText);
+		nRet = TRUE;
+	} 
+	return nRet;
+}
