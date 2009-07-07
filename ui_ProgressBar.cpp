@@ -72,7 +72,7 @@ bool uiCallbackRefreshContact(ContactData_ptr pcontact,WORD nCount,WORD nSize,WO
 	m_Progressdlg.SetTitle(sImported.C_Str());
 	wsprintf(infotext,L"%s (%d/%d)",pcontact->Name,nCount + 1,nSize);
 	m_Progressdlg.SetInfo(infotext);
-	m_Progressdlg.SetCurValue(nCount);
+	m_Progressdlg.SetCurValue(nCount+1);
 	m_Progressdlg.UpdateProgress();
 	DateTime::waitms(0);
 	return true;
@@ -91,7 +91,7 @@ bool uiCallbackRefreshSms(SmsData_ptr psms,WORD nCount,WORD nSize,WORD nSuccess)
 	m_Progressdlg.SetTitle(sImported.C_Str());
 	wsprintf(infotext,L"%s %s (%d/%d)",psms->SendReceiveFlag == 1 ? L"[¡û]": L"[¡ú]",psms->PNSort,nCount + 1,nSize);
 	m_Progressdlg.SetInfo(infotext);
-	m_Progressdlg.SetCurValue(nCount);
+	m_Progressdlg.SetCurValue(nCount+1);
 	m_Progressdlg.UpdateProgress();
 	DateTime::waitms(0);
 	return true;
@@ -111,7 +111,7 @@ bool uiCallbackDeleteSms(SmsSimpleData_ptr psms,WORD nCount,WORD nSize,WORD nSuc
 	m_Progressdlg.SetTitle(sImported.C_Str());
 	wsprintf(infotext,L"%s %s (%d/%d)",psms->SendReceiveFlag == 1 ? L"[¡û]": L"[¡ú]",psms->MobileNumber,nCount + 1,nSize);
 	m_Progressdlg.SetInfo(infotext);
-	m_Progressdlg.SetCurValue(nCount);
+	m_Progressdlg.SetCurValue(nCount+1);
 	m_Progressdlg.UpdateProgress();
 	DateTime::waitms(0);
 	return true;

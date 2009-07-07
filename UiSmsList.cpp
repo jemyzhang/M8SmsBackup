@@ -38,6 +38,7 @@ void UiSmsList::SetupList() {
     }
 }
 void UiSmsList::ClearList(){
+	RemoveAll();
     if(plist_record && plist_size > 0){
         for(UINT i = 0; i < plist_size; i++){
             plist_record[i].Reset();
@@ -150,6 +151,6 @@ void UiSmsList::DeleteSelectedItems(){
 			nCount++;
 		}
 	}
-	uiCallbackDeleteSms(NULL,0,0,0);
 	pldb->commitTrans();
+	uiCallbackDeleteSms(NULL,0,0,0);
 }
