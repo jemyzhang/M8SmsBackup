@@ -22,8 +22,6 @@ MZ_IMPLEMENT_DYNAMIC(Ui_ViewWnd)
 Ui_ViewWnd::Ui_ViewWnd(){
 	viewStatusSavedBeforeView = 0;
 	viewStatus = 0;
-	plistkey = 0;
-	plistSize = 0;
 	ldb.connect();
 }
 
@@ -44,6 +42,7 @@ BOOL Ui_ViewWnd::OnInitDialog() {
 
 	m_List.SetPos(108, y, GetWidth() - 108, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR);
 	m_List.SetID(MZ_IDC_LIST);
+	m_List.SetupDB(&ldb);
 	m_List.EnableNotifyMessage(true);
 	m_List.SetItemHeight(50);
 	AddUiWin(&m_List);
@@ -61,10 +60,6 @@ BOOL Ui_ViewWnd::OnInitDialog() {
 	AddUiWin(&m_Toolbar);
 
 	SetupList();
-	MzBeginWaitDlg(m_hWnd);
-	DateTime::waitms(0);
-	ldb.CreateTempSmsTable();
-	MzEndWaitDlg();
 	return TRUE;
 }
 
@@ -97,99 +92,59 @@ void Ui_ViewWnd::SetupToolbar(){
 }
 void Ui_ViewWnd::SetupList(){
 	if((viewStatus & 0x0f) == 3){    //smslist
-		m_List.SetVisible(false);
-		m_List.Invalidate();
-		m_List.Update();
+		if(m_List.IsVisible()){
+			m_List.SetVisible(false);
+			m_List.Invalidate();
+			m_List.Update();
+		}
 
+		m_SmsList.SetVisible(true);
 		m_SmsList.SetSelectedIndex(-1);
 		m_SmsList.RemoveAll();
-		m_SmsList.SetVisible(true);
-		m_SmsList.ScrollTo();
-		m_SmsList.Invalidate();
+		MzBeginWaitDlg(m_hWnd);
+		DateTime::waitms(2);
 		m_SmsList.reqUpdate();
+		MzEndWaitDlg();
+		m_SmsList.Invalidate();
 		m_SmsList.Update();
-		SetupToolbar();
-		return;
+		m_SmsList.ScrollTo();
 	}else{
-		m_SmsList.SetVisible(false);
-		m_List.SetVisible(true);
-	}
-	if(viewStatus == 0){
-		m_List.SetItemHeight(80);
-	}else{
-		m_List.SetItemHeight(50);
-	}
-	m_List.RemoveAll();
-	m_List.Invalidate();
-	m_List.Update();
-	ListItem li;
-	if(viewStatus == 0){
-		li.Text = LOADSTRING(IDS_STR_VIEW_BY_CONTACT);//L"按联系人分类";
-		m_List.AddItem(li);
+		if(m_SmsList.IsVisible()){
+			m_SmsList.SetVisible(false);
+			m_SmsList.Invalidate();
+			m_SmsList.Update();
+		}
 
-		li.Text = LOADSTRING(IDS_STR_VIEW_BY_DATE);;
-		m_List.AddItem(li);
-	}else{
-		if(plistkey && plistSize > 0){
-			for(UINT i = 0; i < plistSize; i++){
-				plistkey[i].Reset();
+		m_List.SetVisible(true);
+		m_List.RemoveAll();
+		m_List.Invalidate();
+		m_List.Update();
+		if(viewStatus == 0){
+			m_List.SetListMode(0);
+			m_List.SetItemHeight(80);
+		}else{
+			m_List.SetItemHeight(50);
+			if(viewStatus == 1){
+				m_List.SetListMode(1);
+			}else if(viewStatus == 0x10){
+				m_List.SetListMode(2);
+			}else if(viewStatus == 0x11){
+				m_List.SetListYear(selectedYear);
+				m_List.SetListMode(3);
+			}else if(viewStatus == 0x12){
+				m_List.SetListMonth(selectedYear,selectedMonth);
+				m_List.SetListMode(4);
 			}
-			delete plistkey;
-			plistkey = 0;
 		}
 		MzBeginWaitDlg(m_hWnd);
-		DateTime::waitms(0);
-		if(viewStatus == 1){
-			plistSize = ldb.GetSmsContactList();
-		}else if(viewStatus == 0x10){
-			plistSize = ldb.GetSmsYearList();
-		}else if(viewStatus == 0x11){
-			plistSize = ldb.GetSmsMonthList(selectedYear);
-		}else if(viewStatus == 0x12){
-			plistSize = ldb.GetSmsDayList(selectedYear,selectedMonth);
-		}else{
-			plistSize = 0;
-		}
-		if(plistSize > 0){
-			plistkey = new SmsViewListKey_t[plistSize];
-			if(viewStatus == 1){
-				plistSize = ldb.GetSmsContactList(plistkey);
-			}else if(viewStatus == 0x10){
-				plistSize = ldb.GetSmsYearList(plistkey);
-			}else if(viewStatus == 0x11){
-				plistSize = ldb.GetSmsMonthList(selectedYear,plistkey);
-			}else if(viewStatus == 0x12){
-				plistSize = ldb.GetSmsDayList(selectedYear,selectedMonth,plistkey);
-			}
-			for(UINT i = 0; i < plistSize; i++){
-				wchar_t strkey[128];
-				if(viewStatus == 0x11){
-					wsprintf(strkey,L"%04d-%s‖%d+%d=%d",selectedYear,
-						plistkey[i].key,plistkey[i].nReceive,plistkey[i].nSend,
-						plistkey[i].nReceive+plistkey[i].nSend);
-				}else if(viewStatus == 0x12){
-					wsprintf(strkey,L"%04d-%02d-%s‖%d+%d=%d",selectedYear,selectedMonth,
-						plistkey[i].key,plistkey[i].nReceive,plistkey[i].nSend,
-						plistkey[i].nReceive+plistkey[i].nSend);
-				}else{
-					wsprintf(strkey,L"%s‖%d+%d=%d",
-						plistkey[i].key,plistkey[i].nReceive,plistkey[i].nSend,
-						plistkey[i].nReceive+plistkey[i].nSend);
-				}
-				li.Text = strkey;
-				if(viewStatus >= 0x10 && viewStatus < 0x13){
-					WORD num;
-					swscanf(plistkey[i].key,L"%d",&num);
-					li.Data = (void *)num;
-				}
-				m_List.AddItem(li);
-			}
-		}
+		DateTime::waitms(2);
+		m_List.reqUpdate();
 		MzEndWaitDlg();
+
+		m_List.Invalidate();
+		m_List.Update();
+		m_List.ScrollTo();
 	}
-	m_List.ScrollTo();
-	m_List.Invalidate();
-	m_List.Update();
 	SetupToolbar();
 }
 
@@ -354,62 +309,33 @@ LRESULT Ui_ViewWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 					if (!m_List.IsMouseDownAtScrolling() && !m_List.IsMouseMoved()) {
 						int nIndex = m_List.CalcIndexOfPos(x, y);
 						if(nIndex != -1){
+							SmsViewListKey_ptr pkey = m_List.GetListItem(nIndex);
+							UINT received = pkey->nReceive;
+							UINT sent = pkey->nSend;
+							UINT total = sent + received;
+							wchar_t strcount[128];
+							wchar_t strcount2[128];
+							wsprintf(strcount2,L"%d/%d",sent,received);
+							wsprintf(strcount,L"%d",total);
 							if(viewStatus == 0){
-								UINT received, sent, total;
-								total = ldb.GetSmsCount(received,sent);
-								wchar_t strcount2[128];
-								wsprintf(strcount2,L"%d/%d",received,sent,total);
-								wchar_t strcount[128];
-								wsprintf(strcount,L"%d",total);
 								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_CONTACT + nIndex,nIndex == 0 ? L"联系人":L"日期",strcount,strcount2));
 								viewStatus = nIndex == 0 ? 1 : 0x10;
 							}else if(viewStatus == 0x1){
-								UINT received, sent, total;
-								wchar_t *name = C::_wcstok(m_List.GetItem(nIndex)->Text.C_Str(),L"‖");
-								total = ldb.GetSmsContactCount(name,received,sent);
-								wchar_t strcount2[128];
-								wsprintf(strcount2,L"%d/%d",received,sent,total);
-								wchar_t strcount[128];
-								wsprintf(strcount,L"%d",total);
-								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_CONTACT_NAME,name,strcount,strcount2));
+								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_CONTACT_NAME,pkey->key,strcount,strcount2));
 								viewStatus = 3;
 								m_SmsList.SetupMode(1);
-								m_SmsList.SetupListName(name);
+								m_SmsList.SetupListName(pkey->key);
 							}else if(viewStatus == 0x10){
-								UINT received, sent, total;
-								selectedYear = (WORD)m_List.GetItem(nIndex)->Data;
-								total = ldb.GetSmsYearCount(selectedYear,received,sent);
-								wchar_t strcount2[128];
-								wsprintf(strcount2,L"%d/%d",received,sent,total);
-								wchar_t strcount[128];
-								wsprintf(strcount,L"%d",total);
-								wchar_t strLabel[16];
-								wsprintf(strLabel,L"%04d",selectedYear);
-								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_DATE_YEAR,strLabel,strcount,strcount2));
+								selectedYear = _wtoi(pkey->key);
+								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_DATE_YEAR,pkey->key,strcount,strcount2));
 								viewStatus += 1;
 							}else if(viewStatus == 0x11){
-								UINT received, sent, total;
-								selectedMonth = (WORD)m_List.GetItem(nIndex)->Data;
-								total = ldb.GetSmsMonthCount(selectedYear,selectedMonth,received,sent);
-								wchar_t strcount2[128];
-								wsprintf(strcount2,L"%d/%d",received,sent,total);
-								wchar_t strcount[128];
-								wsprintf(strcount,L"%d",total);
-								wchar_t strLabel[16];
-								wsprintf(strLabel,L"%02d",selectedMonth);
-								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_DATE_MONTH,strLabel,strcount,strcount2));
+								selectedMonth = _wtoi(pkey->key);
+								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_DATE_MONTH,pkey->key,strcount,strcount2));
 								viewStatus += 1;
 							}else if(viewStatus == 0x12){
-								UINT received, sent, total;
-								selectedDay = (WORD)m_List.GetItem(nIndex)->Data;
-								total = ldb.GetSmsDayCount(selectedYear,selectedMonth,selectedDay,received,sent);
-								wchar_t strcount2[128];
-								wsprintf(strcount2,L"%d/%d",received,sent,total);
-								wchar_t strcount[128];
-								wsprintf(strcount,L"%d",total);
-								wchar_t strLabel[16];
-								wsprintf(strLabel,L"%02d",selectedDay);
-								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_DATE_DAY,strLabel,strcount,strcount2));
+								selectedDay = _wtoi(pkey->key);
+								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_DATE_DAY,pkey->key,strcount,strcount2));
 								viewStatus += 1;
 								m_SmsList.SetupMode(0);
 								m_SmsList.SetupListDateTime(selectedYear,selectedMonth,selectedDay);
@@ -438,41 +364,111 @@ LRESULT Ui_ViewWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 
 
 /////////////////////////////////////////////////////////////////////////////
-void UiSmsAmountList::DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RECT *prcUpdate) {
+void UiKeyList::SetupList() {
+    if(pldb == NULL) return;
 
+    switch(smode){
+        case 1:         //contact
+			plist_size = pldb->GetSmsContactList();
+            if(plist_size > 0){
+                plistkey = new SmsViewListKey_t[plist_size];
+                plist_size = pldb->GetSmsContactList(plistkey);
+            }
+            break;
+        case 2:
+			plist_size = pldb->GetSmsYearList();
+            if(plist_size > 0){
+                plistkey = new SmsViewListKey_t[plist_size];
+                plist_size = pldb->GetSmsYearList(plistkey);
+            }
+            break;
+        case 3:
+            plist_size = pldb->GetSmsMonthList(syear);
+            if(plist_size > 0){
+                plistkey = new SmsViewListKey_t[plist_size];
+                plist_size = pldb->GetSmsMonthList(syear,plistkey);
+            }
+            break;
+		case 4:
+            plist_size = pldb->GetSmsDayList(syear,smonth);
+            if(plist_size > 0){
+                plistkey = new SmsViewListKey_t[plist_size];
+                plist_size = pldb->GetSmsDayList(syear,smonth,plistkey);
+            }
+			break;
+		case 0:
+			plist_size = 2;
+			plistkey = new SmsViewListKey_t[plist_size];
+			C::newstrcpy(&plistkey->key, LOADSTRING(IDS_STR_VIEW_BY_CONTACT));
+			C::newstrcpy(&(plistkey+1)->key, LOADSTRING(IDS_STR_VIEW_BY_DATE));
+			pldb->GetSmsCount(plistkey->nReceive,plistkey->nSend);
+			(plistkey+1)->nReceive = plistkey->nReceive;
+			(plistkey+1)->nSend = plistkey->nSend;
+			break;
+        default:
+            break;
+    }
+    for(UINT i = 0; i < plist_size; i++){
+        ListItem li;
+        AddItem(li);
+    }
+}
+void UiKeyList::ClearList(){
+	RemoveAll();
+    if(plistkey && plist_size > 0){
+        for(UINT i = 0; i < plist_size; i++){
+            plistkey[i].Reset();
+        }
+        delete plistkey;
+        plistkey = 0;
+        plist_size = 0;
+    }
+}
+
+void UiKeyList::DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RECT *prcUpdate) {
+	if(plistkey == NULL || plist_size == 0) return;
 	// draw the high-light background for the selected item
     if (nIndex == GetSelectedIndex()) {
         MzDrawSelectedBg(hdcDst, prcItem);
     }
 
-	wchar_t *s = NULL;
-	C::newstrcpy(&s,GetItem(nIndex)->Text.C_Str());
-
+	SmsViewListKey_ptr pkey = plistkey + nIndex;
     HFONT hf;
     COLORREF cr;
     
-	wchar_t *str = C::_wcstok(s,L"‖");
-	wchar_t *str2 = C::_wcstok(NULL,L"‖");
-	if(str){
-		//栏目1
-		hf = FontHelper::GetFont( str2 == NULL ? 30 : 25 );
-		SelectObject( hdcDst , hf );
-		RECT rc1 = {prcItem->left + 10,prcItem->top,prcItem->right - (str2 == NULL ? 10 : 150),prcItem->bottom};
-		cr = RGB(0,0,0);
-		::SetTextColor( hdcDst , cr );
-		MzDrawText( hdcDst , str, &rc1 , DT_VCENTER|(str2 == NULL ? DT_CENTER : DT_LEFT)|DT_SINGLELINE|DT_WORD_ELLIPSIS );
-		DeleteObject(hf);
+	wchar_t str[256];
+	switch(smode){
+		case 0:
+		case 1:
+		case 2:
+			wsprintf(str,pkey->key);
+			break;
+		case 3:
+			wsprintf(str,L"%04d-%s",syear,pkey->key);
+			break;
+		case 4:
+			wsprintf(str,L"%04d-%02d-%s",syear,smonth,pkey->key);
+			break;
 	}
 
-	if(str2){
+	//栏目1
+	hf = FontHelper::GetFont( smode == 0 ? 30 : 25 );
+	SelectObject( hdcDst , hf );
+	RECT rc1 = {prcItem->left + 10,prcItem->top,prcItem->right - (smode == 0 ? 10 : 150),prcItem->bottom};
+	cr = RGB(0,0,0);
+	::SetTextColor( hdcDst , cr );
+	MzDrawText( hdcDst , str, &rc1 , DT_VCENTER|(smode == 0 ? DT_CENTER : DT_LEFT)|DT_SINGLELINE|DT_WORD_ELLIPSIS );
+	DeleteObject(hf);
+
+	if(smode != 0){
+		wsprintf(str,L"%d+%d=%d",pkey->nSend,pkey->nReceive,pkey->nReceive+pkey->nSend);
 		//栏目2
 		hf = FontHelper::GetFont( 20 );
 		SelectObject( hdcDst , hf );
 		RECT rc2 = {prcItem->right - 150,prcItem->top,prcItem->right - 5,prcItem->bottom};
 		cr = RGB(128,128,128);
 		::SetTextColor( hdcDst , cr );
-		MzDrawText( hdcDst, str2, &rc2 , DT_VCENTER|DT_LEFT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
+		MzDrawText( hdcDst, str, &rc2 , DT_VCENTER|DT_LEFT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
 		DeleteObject(hf);
 	}
-	delete [] s;
 }

@@ -56,10 +56,6 @@ BOOL Ui_SearchWnd::OnInitDialog() {
 	m_Toolbar.SetID(MZ_IDC_TOOLBAR_MAIN);
 	AddUiWin(&m_Toolbar);
 
-	MzBeginWaitDlg(m_hWnd);
-	DateTime::waitms(0);
-	ldb.CreateTempSmsTable();
-	MzEndWaitDlg();
 	return TRUE;
 }
 
@@ -87,8 +83,11 @@ void Ui_SearchWnd::SetupList(){
 	m_SmsList.SetSelectedIndex(-1);
 	m_SmsList.RemoveAll();
 	m_SmsList.ScrollTo();
-	m_SmsList.Invalidate();
+	MzBeginWaitDlg(m_hWnd);
+	DateTime::waitms(2);
 	m_SmsList.reqUpdate();
+	MzEndWaitDlg();
+	m_SmsList.Invalidate();
 	m_SmsList.Update();
 	SetupToolbar();
 	return;

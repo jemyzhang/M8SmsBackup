@@ -286,8 +286,8 @@ bool LocalDataBase::CreateTempSmsTable(){
 
     wsprintf(sqlcmdw,L"insert into '%s' (name,telnumber,content,timestamps,sendreceive,year,month,day) "
         L"select PN as name,PhoneNumber, content,timestamps,sendreceive,"
-        L"strftime('%%Y',sms_v1.timestamps),strftime('%%m',sms_v1.timestamps),strftime('%%d',sms_v1.timestamps)"
-        L"from sms_v1 where (select count(*) from contacts_v1 where contacts_v1.PhoneNumber ==  sms_v1.PN)=0",TABLE_TEMP);
+        L"strftime('%%Y',timestamps),strftime('%%m',timestamps),strftime('%%d',timestamps)"
+        L"from sms_v1 where PN not in (select PhoneNumber from contacts_v1)",TABLE_TEMP);
     if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         sqlite3_step(pStmt);
     }

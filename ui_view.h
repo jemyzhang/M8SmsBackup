@@ -5,10 +5,49 @@
 #include "LocalDataBase.h"
 #include "UiSmsList.h"
 
-class UiSmsAmountList : public UiList {
+class UiKeyList : public UiList {
 public:
+	UiKeyList(){
+		plistkey = 0; plist_size = 0; smode = 0;
+		syear = 0; smonth = 0;
+		pldb = 0;
+	}
     // override the DrawItem member function to do your own drawing of the list
     void DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RECT *prcUpdate);
+public:
+	void SetListMode(UINT mode) {
+        smode = mode;
+	}
+	void SetListYear(WORD year){
+		syear = year;
+	}
+	void SetListMonth(WORD year, WORD month){
+		syear = year;
+		smonth = month;
+	}
+	void reqUpdate(){
+        ClearList();
+        SetupList();
+ 	}
+    void SetupDB(LocalDataBase *pl){
+        pldb = pl;
+    }
+	SmsViewListKey_ptr GetListItem(int nIndex){
+		if(plistkey == NULL || nIndex >= plist_size){
+			return NULL;
+		}
+		return (plistkey+nIndex);
+	}
+protected:
+	void ClearList();
+	void SetupList();
+private:
+    SmsViewListKey_ptr plistkey;
+    UINT plist_size;
+	UINT smode; //0: main 1: contact 2: year 3: month 4: day 
+	UINT syear;	//查询时需要year
+	UINT smonth;
+	LocalDataBase *pldb;
 };
 
 // Main window derived from CMzWndEx
@@ -20,8 +59,6 @@ private:
     //0x10: year list 0x11: month list, 0x12 day list, 0x13 sms list
     UINT viewStatus;
 	UINT viewStatusSavedBeforeView;	//查看按钮按下时保持前一值
-    SmsViewListKey_ptr plistkey;
-    UINT plistSize;
     WORD selectedYear;
     WORD selectedMonth;
     WORD selectedDay;
@@ -31,7 +68,7 @@ public:
 public:
     UiToolbar_Text m_Toolbar;
     UiNaviList m_Navibar;
-    UiSmsAmountList m_List;
+    UiKeyList m_List;
     UiSmsList m_SmsList;
 protected:
     //设置右边列表内容

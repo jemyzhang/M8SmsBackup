@@ -14,7 +14,6 @@ public:
         plist_record = NULL; plist_size = 0;
         smode = 0;
         pldb = NULL;
-        breq = false;
         seletedidx = -1;
 		bSelectionMode = false;
     }
@@ -38,16 +37,8 @@ public:
         pldb = pl;
     }
     void reqUpdate(){
-        breq = true;
-    }
-	/// update the control
-    virtual void Update(){
-        if(breq){
-            breq = false;
-            ClearList();
-            SetupList();
-        }
-        UiList::Update();
+        ClearList();
+        SetupList();
     }
     void SetSelectedIndex(int index);
 	void SetSelectionMode(){
@@ -74,6 +65,13 @@ public:
 		return nCount;
 	}
 	void DeleteSelectedItems();
+	//获取列表短信内容
+	SmsSimpleData_ptr GetSmsItem(int nIndex){
+		if(plist_record == NULL || nIndex >= plist_size){
+			return NULL;
+		}
+		return (plist_record+nIndex);
+	}
 private:
 	void SetupList();
 	void ClearList();
@@ -87,7 +85,6 @@ private:
     UINT plist_size;
     UINT smode; //0: datetime, 1: name, 2: content
     LocalDataBase *pldb;
-    bool breq;
     int seletedidx;
 	bool bSelectionMode;	//是否为选择模式
 };
