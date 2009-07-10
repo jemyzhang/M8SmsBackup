@@ -217,9 +217,12 @@ public:
     ~LocalDataBase();
 public:
 	bool connect();
-	bool disconnect() { disconnectDatabase(); return true; }
+	bool disconnect() { return disconnectDatabase(); }
 	bool decrypt(wchar_t* pwd,int len);
 	bool encrypt(wchar_t* pwd,int len);
+
+	//check if pwd is correct, db will disconnected automatically after this operation
+	bool checkpwd(wchar_t* pwd,int len);	
 public:
 //smsÏà¹Ø²Ù×÷
 	bool AppendSmsRecord(SmsData_ptr);
@@ -265,9 +268,10 @@ private:
 	const void* pzTail;
 	wchar_t sqlcmdw[512];
     wchar_t db_path[MAX_PATH];
+	bool bconnected;
 protected:
-    void connectDatabase(const wchar_t*);
-    void disconnectDatabase();
+    bool connectDatabase(const wchar_t*);
+    bool disconnectDatabase();
     void createDefaultDatabase();
 	bool decrytpDatabase(const char* pwd,int len);	//true: successful
 	bool setDatabasePassword(const char* pwd,int len);	//true: successful

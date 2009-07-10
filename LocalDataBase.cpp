@@ -12,20 +12,41 @@ LocalDataBase::LocalDataBase() {
         wsprintf(db_path,DEFAULT_DB);
     }
     bTempTableCreated = false;
+	bconnected = false;
+	db = NULL;
 }
 
 LocalDataBase::~LocalDataBase() {
-    disconnectDatabase();
+    if(bconnected){
+        disconnectDatabase();
+    }
 }
 
 bool LocalDataBase::connect(){
-    bool rc = false;
-    if(File::FileExists(db_path)){	//file exists
-        rc = true;
+	if(bconnected) return bconnected;
+
+	bconnected = connectDatabase(db_path);
+    return bconnected;
+}
+
+bool LocalDataBase::checkpwd(wchar_t* pwd,int len){
+	bool nRet = false;
+	if(!bconnected) connect();
+	if(!bconnected) return nRet;
+
+	if(pwd && len != 0){
+		decrypt(pwd,len);
+	}
+    wsprintf(sqlcmdw,L"select count(*) from sqlite_master");
+	int rc;
+    if ((rc = sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail)) == SQLITE_OK) {
+        nRet = (sqlite3_step(pStmt) == SQLITE_ROW);
     }
-    connectDatabase(db_path);
-    createDefaultDatabase();
-    return rc;
+    sqlite3_finalize(pStmt);
+    if(!nRet){
+	    disconnect();
+    }
+	return nRet;
 }
 
 bool LocalDataBase::decrypt(wchar_t* pwd, int len){
@@ -75,21 +96,27 @@ bool LocalDataBase::encrypt(wchar_t* pwd, int len){
 //sqlite database operation
 unsigned short zName[] = {'p', 'i', 'n', 'y', 'i', 'n', 0};
 
-void LocalDataBase::connectDatabase(const wchar_t * dbfile) {
+bool LocalDataBase::connectDatabase(const wchar_t * dbfile) {
     const wchar_t* f = dbfile;
     if (f == NULL) {
         f = DEFAULT_DB;
     }
+    bool bfileNotExists = false;
+    if(!File::FileExists((TCHAR*)f)){
+        bfileNotExists = true;
+    }
     int rc = sqlite3_open16(f, &db);
     //创建拼音搜索库
     sqlite3_create_collation16(db, (const char*)zName, SQLITE_UTF16, 0, pinyin_cmp);
+    //文件新建时创建默认表
+    if(bfileNotExists) createDefaultDatabase();
 
-    return;
+    return (rc == SQLITE_OK);
 }
 
-void LocalDataBase::disconnectDatabase() {
-    sqlite3_close(db);
-    return;
+bool LocalDataBase::disconnectDatabase() {
+    bconnected = !(sqlite3_close(db) == SQLITE_OK);
+    return !bconnected;
 }
 
 void LocalDataBase::createDefaultDatabase() {
@@ -237,10 +264,11 @@ UINT LocalDataBase::GetSmsCount(UINT &received, UINT &sent){
     UINT total = 0;
     received = 0;
     sent = 0;
+    int rc = 0;
 
     wsprintf(sqlcmdw,L"select count(*) from %s",TABLE_SMS);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
-        if (sqlite3_step(pStmt) == SQLITE_ROW){
+    if ((rc = sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail)) == SQLITE_OK) {
+        if ((rc = sqlite3_step(pStmt)) == SQLITE_ROW){
             total = sqlite3_column_int(pStmt, 0);
         }
     }

@@ -3,12 +3,17 @@
 #include "mz_commonfunc.h"
 using namespace MZ_CommonFunc;
 
+extern wchar_t g_password[256];
+extern int g_password_len;
+
 WORD refreshSIMContact(CallBackRefreshSIMContact callback){
     WORD nRet = 0;
 	MzSimContactDataBase dbSimContact;
 	WORD simcount = dbSimContact.GetContactCount();
     LocalDataBase ldb;
-    ldb.connect();
+	if(!ldb.checkpwd(g_password,g_password_len)){
+		return 0;
+	}
     ldb.beginTrans();
     ContactData_t contact;
     for(WORD i = 0; i < simcount; i++){
@@ -39,7 +44,9 @@ WORD refreshContact(CallBackRefreshContact callback){
     MzContactDataBase dbcontact;
     WORD count = dbcontact.GetContactCount();
     LocalDataBase ldb;
-    ldb.connect();
+	if(!ldb.checkpwd(g_password,g_password_len)){
+		return 0;
+	}
     ldb.beginTrans();
     ContactData_t contact;
     for(WORD i = 0; i < count; i++){
@@ -68,7 +75,9 @@ WORD refreshSms(CallBackRefreshSms callback){
 	ULONG count = db.GetSmsCount();
 
     LocalDataBase ldb;
-    ldb.connect();
+	if(!ldb.checkpwd(g_password,g_password_len)){
+		return 0;
+	}
     ldb.beginTrans();
 	SmsData_t sms;
     for(int i = 0; i < count; i++){

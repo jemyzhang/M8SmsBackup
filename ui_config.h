@@ -24,6 +24,7 @@ public:
 	UiButtonEx m_BtnUseSimPhoneBookSW;	//使用SIM联系人 ON/OFF
 	UiButtonEx m_BtnBootUpdate;		//启动时自动更新
 	UiButtonEx m_BtnBootUpdateSW;	//启动时自动更新 ON/OFF
+    UiButtonEx m_BtnSetupPassword;
 protected:
     // Initialization of the window (dialog)
     virtual BOOL OnInitDialog();

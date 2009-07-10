@@ -10,13 +10,17 @@ extern HINSTANCE LangresHandle;
 #define MZ_IDC_BUTTON_SEARCH 102
 
 #define MZ_IDC_SMS_LIST 121
+extern wchar_t g_password[256];
+extern int g_password_len;
 
 MZ_IMPLEMENT_DYNAMIC(Ui_SearchWnd)
 
 Ui_SearchWnd::Ui_SearchWnd(){
 	plistkey = 0;
 	plistSize = 0;
-	ldb.connect();
+	if(!ldb.checkpwd(g_password,g_password_len)){
+		return;
+	}
 }
 
 Ui_SearchWnd::~Ui_SearchWnd(){

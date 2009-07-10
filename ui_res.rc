@@ -111,6 +111,18 @@ BEGIN
     IDS_STR_OPTION_YES      "是"
     IDS_STR_OPTION_NO       "否"
     IDS_STR_BOOTUPDATE      "启动时自动更新数据库"
+    IDS_STR_PWD_TIP         "留空则清空密码"
+    IDS_STR_PWD_LOCKED      "请输入访问密码"
+    IDS_STR_PWD_INCORRECT   "密码错误，请重输"
+    IDS_STR_PWD_CLEAR_S     "密码清除成功"
+    IDS_STR_PWD_SET_S       "密码设置成功"
+    IDS_STR_PWD_SETUP       "设置密码"
+    IDS_STR_PWD_CLEAR_F     "密码清除失败"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STR_PWD_SET_F       "密码设置失败"
 END
 
 #endif    // 中文(中华人民共和国) resources

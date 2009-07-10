@@ -7,6 +7,7 @@ using namespace MZ_CommonFunc;
 #include "ui_search.h"
 #include "appconfigini.h"
 #include "ui_config.h"
+#include "passwordDlg.h"
 
 extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 extern HINSTANCE LangresHandle;
@@ -19,6 +20,9 @@ extern AppConfigIni appconfig;
 #define MZ_IDC_BUTTON_SEARCH 106
 
 MZ_IMPLEMENT_DYNAMIC(Ui_MainWnd)
+
+extern wchar_t g_password[256];
+extern int g_password_len;
 
 Ui_MainWnd::Ui_MainWnd(){
 }
@@ -86,7 +90,7 @@ BOOL Ui_MainWnd::OnInitDialog() {
 	wsprintf(sa,LOADSTRING(IDS_STR_APPAUTHOR).C_Str(),L"JEMYZHANG");
 	sAbout = sa;
 	sAbout = sAbout + L"\n";
-	wsprintf(sa,LOADSTRING(IDS_STR_APPVERSION).C_Str(),L"1.10",L"20090707");
+	wsprintf(sa,LOADSTRING(IDS_STR_APPVERSION).C_Str(),L"1.20",L"20090710");
 	sAbout = sAbout + sa;
 	sAbout = sAbout + L"\n";
 	wsprintf(sa,LOADSTRING(IDS_STR_ADDTIONAL).C_Str(),L"jemyzhang@163.com");
@@ -107,6 +111,11 @@ BOOL Ui_MainWnd::OnInitDialog() {
 
 void Ui_MainWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 	UINT_PTR id = LOWORD(wParam);
+    if(id >= MZ_IDC_BUTTON_VIEW && id <= MZ_IDC_BUTTON_SEARCH){
+        if(!CheckPassword(m_hWnd)){
+            return;
+        }
+    }
 	switch (id) {
 		case MZ_IDC_BUTTON_VIEW:
 			{

@@ -3,6 +3,7 @@
 #include <mzfc_inc.h>
 #include "LocalDataBase.h"
 #include "UiImage.h"
+#include "UiControlBackground.h"
 
 class UiSmsTitle : public UiStatic {
 public:
@@ -15,17 +16,6 @@ private:
 	SmsSimpleData_ptr precord;
 };
 
-class UiControlBG : public UiWin
-{
-public:
-	UiControlBG(void){}
-	~UiControlBG(void) {}
-protected:
-	virtual void PaintWin(HDC hdcDst, RECT* prcWin, RECT* prcUpdate){
-		UiWin::PaintWin(hdcDst, prcWin, prcUpdate);
-		MzDrawGridPopupMenuBG_480(hdcDst,prcWin);
-	}
-};
 // Main window derived from CMzWndEx
 class Ui_SmsViewerWnd : public CMzWndEx {
 	MZ_DECLARE_DYNAMIC(Ui_SmsViewerWnd);
@@ -40,7 +30,7 @@ public:
 	UiToolbar_Text m_Toolbar;
 	UiMultiLineEdit m_Content;
 	UiSmsTitle m_Title;
-	UiControlBG m_Background;
+	UiControlBackground m_Background;
 public:
 	//设置右边列表内容
 	void SetViewRecord(SmsSimpleData_ptr p,int idx, int nsize){

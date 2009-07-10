@@ -3,6 +3,7 @@
 #include "appconfigini.h"
 #include "mz_commonfunc.h"
 using namespace MZ_CommonFunc;
+#include "passwordDlg.h"
 
 extern HINSTANCE LangresHandle;
 extern AppConfigIni appconfig;
@@ -13,6 +14,7 @@ MZ_IMPLEMENT_DYNAMIC(Ui_ConfigWnd)
 
 #define MZ_IDC_BTN_USE_SIM		102
 #define MZ_IDC_BTN_BOOT_UPDATE		103
+#define MZ_IDC_BTN_SETUP_PASSWORD   104
 
 //////
 
@@ -63,6 +65,14 @@ BOOL Ui_ConfigWnd::OnInitDialog() {
 	m_BtnBootUpdateSW.SetButtonMode(MZC_BUTTON_MODE_HOLD);
 	m_BtnBootUpdateSW.SetID(MZ_IDC_BTN_BOOT_UPDATE);
     AddUiWin(&m_BtnBootUpdateSW);
+
+	y+=MZM_HEIGHT_BUTTONEX;
+	m_BtnSetupPassword.SetPos(0,y, GetWidth(), MZM_HEIGHT_BUTTONEX);
+	m_BtnSetupPassword.SetText(LOADSTRING(IDS_STR_PWD_SETUP).C_Str());
+    m_BtnSetupPassword.SetButtonType(MZC_BUTTON_LINE_NONE);
+	m_BtnSetupPassword.SetTextMaxLen(0);
+    m_BtnSetupPassword.SetID(MZ_IDC_BTN_SETUP_PASSWORD);
+    AddUiWin(&m_BtnSetupPassword);
 
 	m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR, GetWidth(), MZM_HEIGHT_TEXT_TOOLBAR);
     m_Toolbar.SetButton(0, true, true, LOADSTRING(IDS_STR_RETURN).C_Str());
@@ -123,6 +133,13 @@ void Ui_ConfigWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 			updateBootUpdate();
 			break;
 		}
+        case MZ_IDC_BTN_SETUP_PASSWORD:
+        {
+            if(ShowPasswordDlg(1,m_hWnd)){
+                EndModal(ID_OK);
+            }
+            break;
+        }
         case MZ_IDC_TOOLBAR_CONFIG:
         {
             int nIndex = lParam;

@@ -14,6 +14,9 @@ ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 ImagingHelper *imgArrow;
 AppConfigIni appconfig;
 
+extern wchar_t g_password[256];
+extern int g_password_len;
+
 void M8SmsMgr::loadImageRes(){
 	ImgresHandle = MzGetInstanceHandle();
 	for(int i = 0; i < sizeof(pimg) / sizeof(pimg[0]); i++){
@@ -47,6 +50,12 @@ BOOL M8SmsMgr::Init() {
 
     //载入资源
     LoadRes();
+
+    //初始化default密码
+	wchar_t defaultpwd[6] = {0x10,0x15,0x13,0x18,0x08,0x01};
+    g_password_len = 6;
+    memcpy(g_password,defaultpwd,sizeof(wchar_t)*6);
+
     //检测程序是否已经运行
     HWND pWnd = isRuning();
     if(pWnd)

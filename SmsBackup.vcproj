@@ -227,6 +227,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\passwordDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\pinyin_sort.cpp"
 				>
 			</File>
@@ -243,6 +247,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ui_password.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ui_ProgressBar.cpp"
 				>
 			</File>
@@ -256,6 +264,10 @@
 			</File>
 			<File
 				RelativePath=".\ui_view.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UiControlBackground.cpp"
 				>
 			</File>
 			<File
@@ -301,6 +313,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\passwordDlg.h"
+				>
+			</File>
+			<File
 				RelativePath=".\pinyin_sort.h"
 				>
 			</File>
@@ -321,6 +337,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ui_password.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ui_ProgressBar.h"
 				>
 			</File>
@@ -334,6 +354,10 @@
 			</File>
 			<File
 				RelativePath=".\ui_view.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UiControlBackground.h"
 				>
 			</File>
 			<File

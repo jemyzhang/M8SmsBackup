@@ -38,6 +38,14 @@
 #define IDS_STR_OPTION_YES              134
 #define IDS_STR_OPTION_NO               135
 #define IDS_STR_BOOTUPDATE              136
+#define IDS_STR_PWD_TIP                 137
+#define IDS_STR_PWD_LOCKED              138
+#define IDS_STR_PWD_INCORRECT           139
+#define IDS_STR_PWD_CLEAR_S             140
+#define IDS_STR_PWD_SET_S               141
+#define IDS_STR_PWD_SETUP               142
+#define IDS_STR_PWD_CLEAR_F             143
+#define IDS_STR_PWD_SET_F               144
 #define IDB_PNG_NAVI_BG                 201
 #define IDB_PNG_BEGIN                   201
 #define IDB_PNG_NAVI_BTN_BHL            202
