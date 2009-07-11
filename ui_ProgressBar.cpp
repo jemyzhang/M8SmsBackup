@@ -4,7 +4,9 @@
 using namespace MZ_CommonFunc;
 #include "resource.h"
 extern HINSTANCE LangresHandle;
+#include "appconfigini.h"
 
+extern AppConfigIni appconfig;
 static bool brangeSet = false;
 static bool bdlgshown = false;
 static MzProgressDialog m_Progressdlg;
@@ -74,7 +76,7 @@ bool uiCallbackRefreshContact(ContactData_ptr pcontact,WORD nCount,WORD nSize,WO
 	m_Progressdlg.SetInfo(infotext);
 	m_Progressdlg.SetCurValue(nCount+1);
 	m_Progressdlg.UpdateProgress();
-	DateTime::waitms(0);
+	//DateTime::waitms(0);
 	return true;
 }
 
@@ -94,7 +96,7 @@ bool uiCallbackRefreshSIMContact(ContactData_ptr pcontact,WORD nCount,WORD nSize
 	m_Progressdlg.SetInfo(infotext);
 	m_Progressdlg.SetCurValue(nCount+1);
 	m_Progressdlg.UpdateProgress();
-	DateTime::waitms(0);
+	//DateTime::waitms(0);
 	return true;
 }
 
@@ -103,6 +105,11 @@ bool uiCallbackRefreshSms(SmsData_ptr psms,WORD nCount,WORD nSize,WORD nSuccess)
 		HideProgressBar();
 		return false;
 	}
+    if(appconfig.IniUpdateMethod.Get()){
+        if(nCount%7){
+            return true;
+        }
+    }
 	ShowProgressBar();
 	SetProgressBarRange(0,nSize);
 	CMzString sImported = LOADSTRING(IDS_STR_UPDATE_SMS);
@@ -110,11 +117,11 @@ bool uiCallbackRefreshSms(SmsData_ptr psms,WORD nCount,WORD nSize,WORD nSuccess)
 	wsprintf(infotext,LOADSTRING(IDS_STR_IMPORTED).C_Str(),nSuccess);
 	sImported = sImported + infotext;
 	m_Progressdlg.SetTitle(sImported.C_Str());
-	wsprintf(infotext,L"%s %s (%d/%d)",psms->SendReceiveFlag == 1 ? L"[¡û]": L"[¡ú]",psms->PNSort,nCount + 1,nSize);
+	wsprintf(infotext,L"%s %s (%d/%d)",psms->SendReceiveFlag == 1 ? L"[¡û]": L"[¡ú]",psms->MobileNumber,nCount + 1,nSize);
 	m_Progressdlg.SetInfo(infotext);
 	m_Progressdlg.SetCurValue(nCount+1);
 	m_Progressdlg.UpdateProgress();
-	DateTime::waitms(0);
+	//DateTime::waitms(0);
 	return true;
 }
 
@@ -134,6 +141,6 @@ bool uiCallbackDeleteSms(SmsSimpleData_ptr psms,WORD nCount,WORD nSize,WORD nSuc
 	m_Progressdlg.SetInfo(infotext);
 	m_Progressdlg.SetCurValue(nCount+1);
 	m_Progressdlg.UpdateProgress();
-	DateTime::waitms(0);
+	//DateTime::waitms(0);
 	return true;
 }

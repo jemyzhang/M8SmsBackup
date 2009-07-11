@@ -123,6 +123,17 @@ END
 STRINGTABLE 
 BEGIN
     IDS_STR_PWD_SET_F       "密码设置失败"
+    IDS_STR_REFRESH_METHOD  "数据库更新方式"
+    IDS_STR_REFRESH_FAST    "快速更新"
+    IDS_STR_REFRESH_WHOLE   "完全更新"
+    IDS_STR_BACKUP_RESTORE  "数据库备份与恢复"
+    IDS_STR_BACKUP_S        "数据备份成功"
+    IDS_STR_BACKUP          "备份"
+    IDS_STR_DELETE_S        "删除成功"
+    IDS_STR_OPERATE         "操作"
+    IDS_STR_RESTORE         "恢复"
+    IDS_STR_WARN_RESTORE    "数据库恢复将会覆盖您现有的数据库，可能造成数据丢失等问题，是否继续？"
+    IDS_STR_RESTORE_S       "恢复成功"
 END
 
 #endif    // 中文(中华人民共和国) resources

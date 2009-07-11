@@ -68,6 +68,8 @@ public:
 	MzConfig IniRefreshWhileLoad;
 	//是否使用SIM电话簿
 	MzConfig IniUseSimPhoneBook;
+    //刷新方式: 0: 完全刷新; 1: 快速刷新
+    MzConfig IniUpdateMethod;
 private:
 	wchar_t ini_path[MAX_PATH];
 };

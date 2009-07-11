@@ -31,7 +31,7 @@ values('%s','%s','%s','%04d-%02d-%02d %02d:%02d:%02d',%d)"
 #define DELETE_SELECT_CONTACT  L"delete from '%s' "CONTACT_EQU_CONDITION
 #define UPDATE_SELECT_CONTACT	L"update '%s' set Name='%s',Label=%d where PhoneNumber='%s'"
 
-#define SMS_EQU_CONDITION   L"where PhoneNumber='%s' and Content='%s' and TimeStamps='%04d-%02d-%02d %02d:%02d:%02d' and SendReceive=%d"
+#define SMS_EQU_CONDITION   L"where PhoneNumber='%s' and TimeStamps='%04d-%02d-%02d %02d:%02d:%02d' and SendReceive=%d"
 #define COUNT_SELECT_SMS  L"select count(*) from '%s' "SMS_EQU_CONDITION
 #define DELETE_SELECT_SMS  L"delete from '%s' "SMS_EQU_CONDITION
 
@@ -247,6 +247,8 @@ public:
     UINT GetSmsByContact(LPWSTR,SmsSimpleData_ptr = NULL);
     //根据短信内容搜索短信条目
     UINT GetSmsByContent(LPWSTR,SmsSimpleData_ptr = NULL);
+    //获取短信时间
+    SYSTEMTIME GetSmsLatestDateTime();
 public:
 	bool CreateTempSmsTable();	//建立内联表格
 private:

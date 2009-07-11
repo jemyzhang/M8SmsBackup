@@ -39,7 +39,7 @@ bool LocalDataBase::checkpwd(wchar_t* pwd,int len){
 	}
     wsprintf(sqlcmdw,L"select count(*) from sqlite_master");
 	int rc;
-    if ((rc = sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail)) == SQLITE_OK) {
+    if ((rc = sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail)) == SQLITE_OK) {
         nRet = (sqlite3_step(pStmt) == SQLITE_ROW);
     }
     sqlite3_finalize(pStmt);
@@ -126,13 +126,13 @@ void LocalDataBase::createDefaultDatabase() {
     //create account table
     wsprintf(sqlcmdw, CREATE_CONTACT_TBL, TABLE_CONTACT);
 
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         sqlite3_step(pStmt);
     }
     sqlite3_finalize(pStmt);
 
     wsprintf(sqlcmdw, CREATE_SMS_TBL, TABLE_SMS);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         sqlite3_step(pStmt);
     }
     sqlite3_finalize(pStmt);
@@ -159,7 +159,7 @@ bool LocalDataBase::AppendSmsRecord(SmsData_ptr psms){
         psms->PNSort,psms->MobileNumber,psms->Content,
         smstm.wYear,smstm.wMonth,smstm.wDay,smstm.wHour,smstm.wMinute,smstm.wSecond,
         psms->SendReceiveFlag);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         nRet = (sqlite3_step(pStmt) == SQLITE_DONE);
     }
     sqlite3_finalize(pStmt);
@@ -172,10 +172,10 @@ bool LocalDataBase::isDuplicateSms(SmsData_ptr psms){
     if(psms == NULL) return nRet;
     SYSTEMTIME smstm = psms->TimeStamp;
     wsprintf(sqlcmdw,COUNT_SELECT_SMS,TABLE_SMS,
-        psms->MobileNumber,psms->Content,
+        psms->MobileNumber,
         smstm.wYear,smstm.wMonth,smstm.wDay,smstm.wHour,smstm.wMinute,smstm.wSecond,
         psms->SendReceiveFlag);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         if (sqlite3_step(pStmt) == SQLITE_ROW){
             nRet = (sqlite3_column_int(pStmt, 0) != 0);
         }
@@ -191,7 +191,7 @@ bool LocalDataBase::isDuplicateContact(LPWSTR number,LPWSTR name,TelLabel_t labe
 
     wsprintf(sqlcmdw,COUNT_SELECT_CONTACT,TABLE_CONTACT,
         number,name,label);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         if (sqlite3_step(pStmt) == SQLITE_ROW){
             nRet = (sqlite3_column_int(pStmt, 0) != 0);
         }
@@ -206,7 +206,7 @@ bool LocalDataBase::updateContact(LPWSTR number,LPWSTR name,TelLabel_t label){
 
     wsprintf(sqlcmdw,UPDATE_SELECT_CONTACT,TABLE_CONTACT,
         name,label,number);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         nRet = (sqlite3_step(pStmt) == SQLITE_DONE);
     }
     sqlite3_finalize(pStmt);
@@ -221,7 +221,7 @@ bool LocalDataBase::addContactRecord(LPWSTR number,LPWSTR name,TelLabel_t label)
 
     wsprintf(sqlcmdw,INSERT_CONTACT,TABLE_CONTACT,
         number,name,label);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         nRet = (sqlite3_step(pStmt) == SQLITE_DONE);
     }
     sqlite3_finalize(pStmt);
@@ -267,7 +267,7 @@ UINT LocalDataBase::GetSmsCount(UINT &received, UINT &sent){
     int rc = 0;
 
     wsprintf(sqlcmdw,L"select count(*) from %s",TABLE_SMS);
-    if ((rc = sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail)) == SQLITE_OK) {
+    if ((rc = sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail)) == SQLITE_OK) {
         if ((rc = sqlite3_step(pStmt)) == SQLITE_ROW){
             total = sqlite3_column_int(pStmt, 0);
         }
@@ -278,7 +278,7 @@ UINT LocalDataBase::GetSmsCount(UINT &received, UINT &sent){
         wsprintf(sqlcmdw,L"select count(*) from %s where SendReceive=%d",
             TABLE_SMS,
             SMS_RECEIVE);
-        if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
             if (sqlite3_step(pStmt) == SQLITE_ROW){
                 received = sqlite3_column_int(pStmt, 0);
             }
@@ -295,7 +295,7 @@ bool LocalDataBase::CreateTempSmsTable(){
 
     wsprintf(sqlcmdw,L"create temp table if not exists '%s' "
         L"(name text,telnumber text, content text,timestamps datetime,sendreceive numeric, year text, month text, day text)",TABLE_TEMP);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         if (sqlite3_step(pStmt) == SQLITE_DONE){
             bTempTableCreated = true;
         }
@@ -307,7 +307,7 @@ bool LocalDataBase::CreateTempSmsTable(){
         L"select contacts_v1.Name, sms_v1.PhoneNumber, sms_v1.content,sms_v1.timestamps,sms_v1.sendreceive,"
         L"strftime('%%Y',sms_v1.timestamps),strftime('%%m',sms_v1.timestamps),strftime('%%d',sms_v1.timestamps)"
         L"from contacts_v1,sms_v1 where (contacts_v1.PhoneNumber =  sms_v1.PN)",TABLE_TEMP);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         sqlite3_step(pStmt);
     }
     sqlite3_finalize(pStmt);
@@ -316,7 +316,7 @@ bool LocalDataBase::CreateTempSmsTable(){
         L"select PN as name,PhoneNumber, content,timestamps,sendreceive,"
         L"strftime('%%Y',timestamps),strftime('%%m',timestamps),strftime('%%d',timestamps)"
         L"from sms_v1 where PN not in (select PhoneNumber from contacts_v1)",TABLE_TEMP);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         sqlite3_step(pStmt);
     }
     sqlite3_finalize(pStmt);
@@ -332,7 +332,7 @@ UINT LocalDataBase::GetSmsContactList(SmsViewListKey_ptr plist){
     UINT nSize = 0;
     //GetSize
     wsprintf(sqlcmdw,L"select count(distinct name) from '%s'",TABLE_TEMP);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         if (sqlite3_step(pStmt) == SQLITE_ROW){
             nSize = sqlite3_column_int(pStmt, 0);
         }
@@ -342,7 +342,7 @@ UINT LocalDataBase::GetSmsContactList(SmsViewListKey_ptr plist){
 
     SmsViewListKey_ptr pkey = plist;
     wsprintf(sqlcmdw,L"select distinct name from '%s' order by name collate pinyin",TABLE_TEMP);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         while (sqlite3_step(pStmt) == SQLITE_ROW){
             C::newstrcpy(&(pkey++)->key,(LPWSTR) sqlite3_column_text16(pStmt, 0));
         }
@@ -356,7 +356,7 @@ UINT LocalDataBase::GetSmsContactList(SmsViewListKey_ptr plist){
         wsprintf(sqlcmdw,
             L"select sendreceive from '%s' where name='%s'",
             TABLE_TEMP,plist[i].key);
-        if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
             while (sqlite3_step(pStmt) == SQLITE_ROW){
                 SmsSendReceive_t sr = (SmsSendReceive_t)sqlite3_column_int(pStmt, 0);
                 if(sr == SMS_SEND){
@@ -380,7 +380,7 @@ UINT LocalDataBase::GetSmsYearList(SmsViewListKey_ptr plist){
     UINT nSize = 0;
     //GetSize
     wsprintf(sqlcmdw,L"select count(distinct year) from '%s'",TABLE_TEMP);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         if (sqlite3_step(pStmt) == SQLITE_ROW){
             nSize = sqlite3_column_int(pStmt, 0);
         }
@@ -390,7 +390,7 @@ UINT LocalDataBase::GetSmsYearList(SmsViewListKey_ptr plist){
 
     SmsViewListKey_ptr pkey = plist;
     wsprintf(sqlcmdw,L"select distinct year from '%s'",TABLE_TEMP);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         while (sqlite3_step(pStmt) == SQLITE_ROW){
             C::newstrcpy(&(pkey++)->key,(LPWSTR) sqlite3_column_text16(pStmt, 0));
         }
@@ -404,7 +404,7 @@ UINT LocalDataBase::GetSmsYearList(SmsViewListKey_ptr plist){
         wsprintf(sqlcmdw,
             L"select sendreceive from '%s' where year='%s'",
             TABLE_TEMP,plist[i].key);
-        if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
             while (sqlite3_step(pStmt) == SQLITE_ROW){
                 SmsSendReceive_t sr = (SmsSendReceive_t)sqlite3_column_int(pStmt, 0);
                 if(sr == SMS_SEND){
@@ -429,7 +429,7 @@ UINT LocalDataBase::GetSmsMonthList(WORD year, SmsViewListKey_ptr plist){
     //GetSize
     wsprintf(sqlcmdw,L"select count(distinct month) from '%s' where year='%04d'",
         TABLE_TEMP,year);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         if (sqlite3_step(pStmt) == SQLITE_ROW){
             nSize = sqlite3_column_int(pStmt, 0);
         }
@@ -440,7 +440,7 @@ UINT LocalDataBase::GetSmsMonthList(WORD year, SmsViewListKey_ptr plist){
     SmsViewListKey_ptr pkey = plist;
     wsprintf(sqlcmdw,L"select distinct month from '%s' where year='%04d'",
         TABLE_TEMP,year);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         while (sqlite3_step(pStmt) == SQLITE_ROW){
             C::newstrcpy(&(pkey++)->key,(LPWSTR) sqlite3_column_text16(pStmt, 0));
         }
@@ -454,7 +454,7 @@ UINT LocalDataBase::GetSmsMonthList(WORD year, SmsViewListKey_ptr plist){
         wsprintf(sqlcmdw,
             L"select sendreceive from '%s' where month='%s' and year='%04d'",
             TABLE_TEMP,plist[i].key,year);
-        if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
             while (sqlite3_step(pStmt) == SQLITE_ROW){
                 SmsSendReceive_t sr = (SmsSendReceive_t)sqlite3_column_int(pStmt, 0);
                 if(sr == SMS_SEND){
@@ -479,7 +479,7 @@ UINT LocalDataBase::GetSmsDayList(WORD year, WORD month,SmsViewListKey_ptr plist
     //GetSize
     wsprintf(sqlcmdw,L"select count(distinct day) from '%s' where year='%04d' and month='%02d'",
         TABLE_TEMP,year,month);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         if (sqlite3_step(pStmt) == SQLITE_ROW){
             nSize = sqlite3_column_int(pStmt, 0);
         }
@@ -490,7 +490,7 @@ UINT LocalDataBase::GetSmsDayList(WORD year, WORD month,SmsViewListKey_ptr plist
     SmsViewListKey_ptr pkey = plist;
     wsprintf(sqlcmdw,L"select distinct day from '%s' where year='%04d'and month='%02d'",
         TABLE_TEMP,year,month);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         while (sqlite3_step(pStmt) == SQLITE_ROW){
             C::newstrcpy(&(pkey++)->key,(LPWSTR) sqlite3_column_text16(pStmt, 0));
         }
@@ -504,7 +504,7 @@ UINT LocalDataBase::GetSmsDayList(WORD year, WORD month,SmsViewListKey_ptr plist
         wsprintf(sqlcmdw,
             L"select sendreceive from '%s' where day='%s' and month='%02d' and year='%04d'",
             TABLE_TEMP,plist[i].key,month,year);
-        if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
             while (sqlite3_step(pStmt) == SQLITE_ROW){
                 SmsSendReceive_t sr = (SmsSendReceive_t)sqlite3_column_int(pStmt, 0);
                 if(sr == SMS_SEND){
@@ -531,7 +531,7 @@ UINT LocalDataBase::GetSmsYearCount(WORD year, UINT &received, UINT &sent){
     //GetSize
     wsprintf(sqlcmdw,L"select count(*) from '%s' where year='%04d'",
         TABLE_TEMP,year);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         if (sqlite3_step(pStmt) == SQLITE_ROW){
             total = sqlite3_column_int(pStmt, 0);
         }
@@ -540,7 +540,7 @@ UINT LocalDataBase::GetSmsYearCount(WORD year, UINT &received, UINT &sent){
     if(total > 0){
         wsprintf(sqlcmdw,L"select count(*) from '%s' where year='%04d' and sendreceive=%d",
             TABLE_TEMP,year,SMS_SEND);
-        if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
             if (sqlite3_step(pStmt) == SQLITE_ROW){
                 sent = sqlite3_column_int(pStmt, 0);
             }
@@ -563,7 +563,7 @@ UINT LocalDataBase::GetSmsMonthCount(WORD year, WORD month, UINT &received, UINT
     //GetSize
     wsprintf(sqlcmdw,L"select count(*) from '%s' where year='%04d' and month='%02d'",
         TABLE_TEMP,year,month);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         if (sqlite3_step(pStmt) == SQLITE_ROW){
             total = sqlite3_column_int(pStmt, 0);
         }
@@ -572,7 +572,7 @@ UINT LocalDataBase::GetSmsMonthCount(WORD year, WORD month, UINT &received, UINT
     if(total > 0){
         wsprintf(sqlcmdw,L"select count(*) from '%s' where year='%04d' and month='%02d' and sendreceive=%d",
             TABLE_TEMP,year,month,SMS_SEND);
-        if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
             if (sqlite3_step(pStmt) == SQLITE_ROW){
                 sent = sqlite3_column_int(pStmt, 0);
             }
@@ -595,7 +595,7 @@ UINT LocalDataBase::GetSmsDayCount(WORD year, WORD month,WORD day, UINT &receive
     //GetSize
     wsprintf(sqlcmdw,L"select count(*) from '%s' where year='%04d' and month='%02d' and day='%02d'",
         TABLE_TEMP,year,month,day);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         if (sqlite3_step(pStmt) == SQLITE_ROW){
             total = sqlite3_column_int(pStmt, 0);
         }
@@ -604,7 +604,7 @@ UINT LocalDataBase::GetSmsDayCount(WORD year, WORD month,WORD day, UINT &receive
     if(total > 0){
         wsprintf(sqlcmdw,L"select count(*) from '%s' where year='%04d' and month='%02d' and day='%02d' and sendreceive=%d",
             TABLE_TEMP,year,month,day,SMS_SEND);
-        if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
             if (sqlite3_step(pStmt) == SQLITE_ROW){
                 sent = sqlite3_column_int(pStmt, 0);
             }
@@ -629,7 +629,7 @@ UINT LocalDataBase::GetSmsContactCount(LPWSTR name,UINT &received, UINT &sent){
     //GetSize
     wsprintf(sqlcmdw,L"select count(*) from '%s' where name='%s'",
         TABLE_TEMP,name);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         if (sqlite3_step(pStmt) == SQLITE_ROW){
             total = sqlite3_column_int(pStmt, 0);
         }
@@ -638,7 +638,7 @@ UINT LocalDataBase::GetSmsContactCount(LPWSTR name,UINT &received, UINT &sent){
     if(total > 0){
         wsprintf(sqlcmdw,L"select count(*) from '%s' where name='%s' and sendreceive=%d",
             TABLE_TEMP,name,SMS_SEND);
-        if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
             if (sqlite3_step(pStmt) == SQLITE_ROW){
                 sent = sqlite3_column_int(pStmt, 0);
             }
@@ -663,7 +663,7 @@ UINT LocalDataBase::GetSmsByDate(WORD year, WORD month, WORD day,SmsSimpleData_p
 
     UINT total = 0;
     wsprintf(sqlcmdw,strsql.C_Str(),L"count(*)",TABLE_TEMP,year,month,day);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         if (sqlite3_step(pStmt) == SQLITE_ROW){
             total = sqlite3_column_int(pStmt, 0);
         }
@@ -676,7 +676,7 @@ UINT LocalDataBase::GetSmsByDate(WORD year, WORD month, WORD day,SmsSimpleData_p
     wsprintf(sqlcmdw,strsql.C_Str(),
         L"name,telnumber,content,strftime('%Y-%m-%d %H:%M:%S',timestamps),sendreceive",
         TABLE_TEMP,year,month,day);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         while (sqlite3_step(pStmt) == SQLITE_ROW){
             C::newstrcpy(&pi->ContactName,(LPWSTR) sqlite3_column_text16(pStmt, 0));
             C::newstrcpy(&pi->MobileNumber,(LPWSTR) sqlite3_column_text16(pStmt, 1));
@@ -699,7 +699,7 @@ UINT LocalDataBase::GetSmsByContact(LPWSTR pname,SmsSimpleData_ptr plist){
     }
     UINT total = 0;
     wsprintf(sqlcmdw,L"select count(*) from '%s' where name='%s'",TABLE_TEMP,pname);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         if (sqlite3_step(pStmt) == SQLITE_ROW){
             total = sqlite3_column_int(pStmt, 0);
         }
@@ -711,7 +711,7 @@ UINT LocalDataBase::GetSmsByContact(LPWSTR pname,SmsSimpleData_ptr plist){
     wsprintf(sqlcmdw,L"select name,telnumber,content,strftime('%%Y-%%m-%%d %%H:%%M:%%S',timestamps),sendreceive from '%s' "
                     L"where name='%s' order by timestamps",
                     TABLE_TEMP,pname);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         while (sqlite3_step(pStmt) == SQLITE_ROW){
             C::newstrcpy(&pi->ContactName,(LPWSTR) sqlite3_column_text16(pStmt, 0));
             C::newstrcpy(&pi->MobileNumber,(LPWSTR) sqlite3_column_text16(pStmt, 1));
@@ -734,7 +734,7 @@ UINT LocalDataBase::GetSmsByContent(LPWSTR pcontent,SmsSimpleData_ptr plist){
     }
     UINT total = 0;
     wsprintf(sqlcmdw,L"select count(*) from '%s' where content like '%%%s%%'",TABLE_TEMP,pcontent);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         if (sqlite3_step(pStmt) == SQLITE_ROW){
             total = sqlite3_column_int(pStmt, 0);
         }
@@ -746,7 +746,7 @@ UINT LocalDataBase::GetSmsByContent(LPWSTR pcontent,SmsSimpleData_ptr plist){
     wsprintf(sqlcmdw,L"select name,telnumber,content,strftime('%%Y-%%m-%%d %%H:%%M:%%S',timestamps),sendreceive from '%s' "
                     L"where content like '%%%s%%' order by timestamps",
                     TABLE_TEMP,pcontent);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         while (sqlite3_step(pStmt) == SQLITE_ROW){
             C::newstrcpy(&pi->ContactName,(LPWSTR) sqlite3_column_text16(pStmt, 0));
             C::newstrcpy(&pi->MobileNumber,(LPWSTR) sqlite3_column_text16(pStmt, 1));
@@ -770,23 +770,41 @@ bool LocalDataBase::RemoveSmsRecord(SmsSimpleData_ptr psms){
     }
 	//从短信表中删除
 	wsprintf(sqlcmdw,
-		L"delete from '%s' where PhoneNumber='%s' and Content='%s' and TimeStamps='%s' and SendReceive=%d",
+		L"delete from '%s' where PhoneNumber='%s' and TimeStamps='%s' and SendReceive=%d",
 		TABLE_SMS,
-		psms->MobileNumber,psms->Content,psms->TimeStamp,psms->SendReceiveFlag);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+		psms->MobileNumber,psms->TimeStamp,psms->SendReceiveFlag);
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         if (sqlite3_step(pStmt) == SQLITE_DONE){
             nRet = true;
         }
     }
 	//从#sms#中删除
 	wsprintf(sqlcmdw,
-		L"delete from '%s' where telnumber='%s' and content='%s' and timestamps='%s' and sendreceive=%d",
+		L"delete from '%s' where telnumber='%s' and timestamps='%s' and sendreceive=%d",
 		TABLE_TEMP,
-		psms->MobileNumber,psms->Content,psms->TimeStamp,psms->SendReceiveFlag);
-    if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+		psms->MobileNumber,psms->TimeStamp,psms->SendReceiveFlag);
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         if (sqlite3_step(pStmt) == SQLITE_DONE){
             nRet = true;
         }
     }
 	return nRet;
+}
+
+///////////////////////////////////////////////
+SYSTEMTIME LocalDataBase::GetSmsLatestDateTime(){
+    SYSTEMTIME dt = {0,0,0,0,0,0,0,0};
+    UINT s,r;
+    GetSmsCount(s,r);
+    if(s+r == 0) return dt;
+    wsprintf(sqlcmdw,
+        L"SELECT max(TimeStamps) FROM %s",TABLE_SMS);
+    if (sqlite3_prepare16_v2(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
+        if (sqlite3_step(pStmt) == SQLITE_ROW){
+            swscanf((LPWSTR) sqlite3_column_text16(pStmt, 0),
+                L"%04d-%02d-%02d %02d:%02d:%02d",
+                &dt.wYear,&dt.wMonth,&dt.wDay,&dt.wHour,&dt.wMinute,&dt.wSecond);
+        }
+    }
+    return dt;
 }

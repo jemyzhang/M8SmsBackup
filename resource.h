@@ -46,6 +46,17 @@
 #define IDS_STR_PWD_SETUP               142
 #define IDS_STR_PWD_CLEAR_F             143
 #define IDS_STR_PWD_SET_F               144
+#define IDS_STR_REFRESH_METHOD          145
+#define IDS_STR_REFRESH_FAST            146
+#define IDS_STR_REFRESH_WHOLE           147
+#define IDS_STR_BACKUP_RESTORE          148
+#define IDS_STR_BACKUP_S                149
+#define IDS_STR_BACKUP                  150
+#define IDS_STR_DELETE_S                151
+#define IDS_STR_OPERATE                 152
+#define IDS_STR_RESTORE                 153
+#define IDS_STR_WARN_RESTORE            154
+#define IDS_STR_RESTORE_S               155
 #define IDB_PNG_NAVI_BG                 201
 #define IDB_PNG_BEGIN                   201
 #define IDB_PNG_NAVI_BTN_BHL            202

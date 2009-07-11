@@ -13,9 +13,11 @@ public:
 private:
 	void updateUseSimPhoneBook();
 	void updateBootUpdate();
+    void updateUpdateMethod();
 	void updateUi(){
 		updateUseSimPhoneBook();
 		updateBootUpdate();
+        updateUpdateMethod();
 	}
 public:
     UiToolbar_Text m_Toolbar;	//确定
@@ -24,7 +26,9 @@ public:
 	UiButtonEx m_BtnUseSimPhoneBookSW;	//使用SIM联系人 ON/OFF
 	UiButtonEx m_BtnBootUpdate;		//启动时自动更新
 	UiButtonEx m_BtnBootUpdateSW;	//启动时自动更新 ON/OFF
+	UiButtonEx m_BtnUpdateMethod;	//更新方式
     UiButtonEx m_BtnSetupPassword;
+	UiButtonEx m_BtnBackup;	//备份数据库
 protected:
     // Initialization of the window (dialog)
     virtual BOOL OnInitDialog();

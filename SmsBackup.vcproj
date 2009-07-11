@@ -239,6 +239,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ui_backup.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ui_config.cpp"
 				>
 			</File>
@@ -326,6 +330,10 @@
 			</File>
 			<File
 				RelativePath=".\resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ui_backup.h"
 				>
 			</File>
 			<File
