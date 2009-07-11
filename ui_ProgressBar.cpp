@@ -105,7 +105,7 @@ bool uiCallbackRefreshSms(SmsData_ptr psms,WORD nCount,WORD nSize,WORD nSuccess)
 		HideProgressBar();
 		return false;
 	}
-    if(appconfig.IniUpdateMethod.Get()){
+    if(appconfig.IniUpdateMethod.Get() && nSize > 20){
         if(nCount%7){
             return true;
         }

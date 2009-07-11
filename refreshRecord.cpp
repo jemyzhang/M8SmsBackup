@@ -80,7 +80,6 @@ WORD refreshSms(CallBackRefreshSms callback){
 	if(!ldb.checkpwd(g_password,g_password_len)){
 		return 0;
 	}
-    ldb.beginTrans();
 	SmsData_t sms;
     bool bfast = false;
     SYSTEMTIME edt;
@@ -88,6 +87,7 @@ WORD refreshSms(CallBackRefreshSms callback){
         bfast = true;
         edt = ldb.GetSmsLatestDateTime();
     }
+    ldb.beginTrans();
     for(int i = 0; i < count; i++){
         bool bomit = false; //ÊÇ·ñÌø¹ý
 	    db.GetSms(i,sms);
