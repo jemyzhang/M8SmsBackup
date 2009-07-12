@@ -11,6 +11,7 @@ public:
 		plistkey = 0; plist_size = 0; smode = 0;
 		syear = 0; smonth = 0;
 		pldb = 0;
+        EnableScrollBarV(true);
 	}
     // override the DrawItem member function to do your own drawing of the list
     void DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RECT *prcUpdate);

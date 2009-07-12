@@ -16,6 +16,7 @@ public:
         pldb = NULL;
         seletedidx = -1;
 		bSelectionMode = false;
+        EnableScrollBarV(true);
     }
     ~UiSmsList(){
         ClearList();
