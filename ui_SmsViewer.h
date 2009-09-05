@@ -28,7 +28,7 @@ public:
 	~Ui_SmsViewerWnd();
 public:
 	UiToolbar_Text m_Toolbar;
-	UiMultiLineEdit m_Content;
+	UiEdit m_Content;
 	UiSmsTitle m_Title;
 	UiControlBackground m_Background;
 public:

@@ -19,7 +19,7 @@ public:
 	UiButtonEx m_BtnSearch;		//≤È’“
 	UiButtonEx m_BtnRefresh;	//À¢–¬
 	UiButtonEx m_BtnConfig;		//…Ë÷√
-	UiMultiLineEdit m_TextAbout;
+	UiEdit m_TextAbout;
 protected:
     // Initialization of the window (dialog)
     virtual BOOL OnInitDialog();

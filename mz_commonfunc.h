@@ -2,6 +2,7 @@
 // include the MZFC library header file
 #include <mzfc_inc.h>
 #include <list>
+using std::list;
 
 typedef enum TextEncode{
 	ttcAnsi, 
