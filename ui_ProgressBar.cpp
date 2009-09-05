@@ -144,3 +144,24 @@ bool uiCallbackDeleteSms(SmsSimpleData_ptr psms,WORD nCount,WORD nSize,WORD nSuc
 	//DateTime::waitms(0);
 	return true;
 }
+
+void initUiCallbackUpdateDatabase(){
+	initProgressBar(L"数据库升级中...");
+}
+void uiCallBackUpdateDatabase(LPWSTR title = NULL,LPWSTR msg = NULL, UINT progress = 0){
+	if(progress == 0){
+		HideProgressBar();
+		return;
+	}
+	ShowProgressBar();
+	SetProgressBarRange(0,100);
+	if(title){
+		m_Progressdlg.SetTitle(title);
+	}
+	if(msg){
+		m_Progressdlg.SetInfo(msg);
+	}
+	m_Progressdlg.SetCurValue(progress);
+	m_Progressdlg.UpdateProgress();
+	return;
+}

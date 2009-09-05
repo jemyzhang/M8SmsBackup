@@ -325,20 +325,44 @@ LRESULT Ui_ViewWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_CONTACT + nIndex,nIndex == 0 ? L"联系人":L"日期",strcount,strcount2));
 								viewStatus = nIndex == 0 ? 1 : 0x10;
 							}else if(viewStatus == 0x1){
+								ldb.GetSmsContactCount(pkey->key ,pkey->nReceive,pkey->nSend);
+								received = pkey->nReceive;
+								sent = pkey->nSend;
+								total = sent + received;
+								wsprintf(strcount2,L"%d/%d",sent,received);
+								wsprintf(strcount,L"%d",total);
 								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_CONTACT_NAME,pkey->key,strcount,strcount2));
 								viewStatus = 3;
 								m_SmsList.SetupMode(1);
 								m_SmsList.SetupListName(pkey->key);
 							}else if(viewStatus == 0x10){
 								selectedYear = _wtoi(pkey->key);
+								ldb.GetSmsYearCount(selectedYear ,pkey->nReceive,pkey->nSend);
+								received = pkey->nReceive;
+								sent = pkey->nSend;
+								total = sent + received;
+								wsprintf(strcount2,L"%d/%d",sent,received);
+								wsprintf(strcount,L"%d",total);
 								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_DATE_YEAR,pkey->key,strcount,strcount2));
 								viewStatus += 1;
 							}else if(viewStatus == 0x11){
 								selectedMonth = _wtoi(pkey->key);
+								ldb.GetSmsMonthCount(selectedYear, selectedMonth, pkey->nReceive,pkey->nSend);
+								received = pkey->nReceive;
+								sent = pkey->nSend;
+								total = sent + received;
+								wsprintf(strcount2,L"%d/%d",sent,received);
+								wsprintf(strcount,L"%d",total);
 								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_DATE_MONTH,pkey->key,strcount,strcount2));
 								viewStatus += 1;
 							}else if(viewStatus == 0x12){
 								selectedDay = _wtoi(pkey->key);
+								ldb.GetSmsDayCount(selectedYear, selectedMonth, selectedDay, pkey->nReceive,pkey->nSend);
+								received = pkey->nReceive;
+								sent = pkey->nSend;
+								total = sent + received;
+								wsprintf(strcount2,L"%d/%d",sent,received);
+								wsprintf(strcount,L"%d",total);
 								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_DATE_DAY,pkey->key,strcount,strcount2));
 								viewStatus += 1;
 								m_SmsList.SetupMode(0);
@@ -463,7 +487,7 @@ void UiKeyList::DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RE
 	::SetTextColor( hdcDst , cr );
 	MzDrawText( hdcDst , str, &rc1 , DT_VCENTER|(smode == 0 ? DT_CENTER : DT_LEFT)|DT_SINGLELINE|DT_WORD_ELLIPSIS );
 	DeleteObject(hf);
-
+#if 0
 	if(smode != 0){
 		wsprintf(str,L"%d+%d=%d",pkey->nSend,pkey->nReceive,pkey->nReceive+pkey->nSend);
 		//栏目2
@@ -475,4 +499,5 @@ void UiKeyList::DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RE
 		MzDrawText( hdcDst, str, &rc2 , DT_VCENTER|DT_LEFT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
 		DeleteObject(hf);
 	}
+#endif
 }

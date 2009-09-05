@@ -5,7 +5,6 @@
 
 #include <list>
 #include "sqlite3\sqlite3.h"
-
 using namespace std;
 
 #ifdef _DEBUG
@@ -15,16 +14,20 @@ using namespace std;
 #endif
 
 #define TABLE_CONTACT	L"contacts_v1"
-#define TABLE_SMS	L"sms_v1"
-#define TABLE_TEMP	L"#sms#"
+#define TABLE_SMS	L"sms_v2"
+
+
+#define TABLE_SMS_OLD	L"sms_v1"
 
 #define CREATE_CONTACT_TBL L"CREATE TABLE IF NOT EXISTS '%s' (PhoneNumber text primary key,Name text NOT NULL,Label numeric NOT NULL)"
-#define CREATE_SMS_TBL L"CREATE TABLE IF NOT EXISTS  '%s' (PN text not null, PhoneNumber text not null, Content text not null, TimeStamps datetime not null, SendReceive numeric not null)"
-#define CREATE_TEMP_TBL L"create temp table if not exists '%s' (name text,content text,timestamps datetime,sendreceive numeric)"
+#define CREATE_SMS_TBL L"CREATE TABLE IF NOT EXISTS  '%s' \
+ (Name text not null, PN text not null, PhoneNumber text not null, Content text not null, \
+TimeStamps datetime not null, SendReceive numeric not null, \
+Year text, Month text, Day text)"
 
 #define INSERT_CONTACT L"INSERT INTO '%s' (PhoneNumber,Name,Label) values('%s','%s',%d)"
-#define INSERT_SMS L"INSERT INTO '%s' (PN,PhoneNumber,Content,TimeStamps,SendReceive) \
-values('%s','%s','%s','%04d-%02d-%02d %02d:%02d:%02d',%d)"
+#define INSERT_SMS L"INSERT INTO '%s' (Name, PN,PhoneNumber,Content,TimeStamps,SendReceive,Year,Month,Day) \
+values('%s', '%s','%s','%s','%04d-%02d-%02d %02d:%02d:%02d',%d, '%02d','%02d','%02d')"
 
 #define CONTACT_EQU_CONDITION   L"where PhoneNumber='%s' and Name='%s' and Label=%d"
 #define COUNT_SELECT_CONTACT  L"select count(*) from '%s' "CONTACT_EQU_CONDITION
@@ -211,6 +214,8 @@ typedef struct SmsViewListKey{
     }
 }SmsViewListKey_t,*SmsViewListKey_ptr;
 
+typedef void (*CallBackDatabaseUpdate)(LPWSTR title,LPWSTR msg, UINT progress);
+
 class LocalDataBase {
 public:
     LocalDataBase();
@@ -249,12 +254,9 @@ public:
     UINT GetSmsByContent(LPWSTR,SmsSimpleData_ptr = NULL);
     //获取短信时间
     SYSTEMTIME GetSmsLatestDateTime();
-public:
-	bool CreateTempSmsTable();	//建立内联表格
 private:
     //插入记录前检查是否有重复sms
     bool isDuplicateSms(SmsData_ptr);
-    bool bTempTableCreated;
 public:
 	//contact相关操作
 	UINT AppendContactRecord(ContactData_ptr);
@@ -263,6 +265,7 @@ private:
     bool addContactRecord(LPWSTR number,LPWSTR name,TelLabel_t label);
 	bool isDuplicateContact(LPWSTR number,LPWSTR name,TelLabel_t label);
 	bool updateContact(LPWSTR number,LPWSTR name,TelLabel_t label);
+	LPWSTR getContactName(LPWSTR phonenumber);	//使用后，需要销毁返回值
 private:
     //sqlite operations
     sqlite3* db;
@@ -305,5 +308,11 @@ public:
 		sqlite3_finalize(pStmt);
 		return rc;
 	}
+//数据库升级
+private:
+	bool TableExists(wchar_t* tablename);	//检测表是否存在
+	void MigrateSmsData();	//迁移短信数据表
+	void DropOldSmsTable(); //删除老的短信数据表
+	void updateV2(CallBackDatabaseUpdate callback = NULL);	//升级数据库到v2
 };
 
