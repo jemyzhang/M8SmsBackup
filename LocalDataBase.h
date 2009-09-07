@@ -313,6 +313,7 @@ private:
 	bool TableExists(wchar_t* tablename);	//检测表是否存在
 	void MigrateSmsData();	//迁移短信数据表
 	void DropOldSmsTable(); //删除老的短信数据表
+public:
 	void updateV2(CallBackDatabaseUpdate callback = NULL);	//升级数据库到v2
 };
 

@@ -2,7 +2,6 @@
 #include "pinyin_sort.h"
 #include "mz_commonfunc.h"
 using namespace MZ_CommonFunc;
-#include "ui_ProgressBar.h"
 
 LocalDataBase::LocalDataBase() {
     wchar_t currpath[MAX_PATH];
@@ -45,10 +44,6 @@ bool LocalDataBase::checkpwd(wchar_t* pwd,int len){
     sqlite3_finalize(pStmt);
     if(!nRet){
 	    disconnect();
-	}else{
-		//检查是否要升级数据库
-		initUiCallbackUpdateDatabase();
-		updateV2(uiCallBackUpdateDatabase);
 	}
 	return nRet;
 }
@@ -168,6 +163,7 @@ bool LocalDataBase::AppendSmsRecord(SmsData_ptr psms){
         nRet = (sqlite3_step(pStmt) == SQLITE_DONE);
     }
     sqlite3_finalize(pStmt);
+	delete [] pname;
     return nRet;
 }
 
@@ -293,7 +289,7 @@ LPWSTR LocalDataBase::getContactName(LPWSTR phonenumber){
 	}
 	if(!bconnected) return pname;
 
-    wsprintf(sqlcmdw,L"select Name from '%' where PhoneNumber='%s'",TABLE_CONTACT,phonenumber);
+    wsprintf(sqlcmdw,L"select Name from '%s' where PhoneNumber='%s'",TABLE_CONTACT,phonenumber);
     if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
 		if(sqlite3_step(pStmt) == SQLITE_ROW){
 			C::newstrcpy(&pname,(LPWSTR)sqlite3_column_text16(pStmt, 0));

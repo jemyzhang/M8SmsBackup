@@ -90,7 +90,7 @@ BOOL Ui_MainWnd::OnInitDialog() {
 	wsprintf(sa,LOADSTRING(IDS_STR_APPAUTHOR).C_Str(),L"JEMYZHANG");
 	sAbout = sa;
 	sAbout = sAbout + L"\n";
-	wsprintf(sa,LOADSTRING(IDS_STR_APPVERSION).C_Str(),L"1.4",L"20090905");
+	wsprintf(sa,LOADSTRING(IDS_STR_APPVERSION).C_Str(),L"1.4",L"20090906");
 	sAbout = sAbout + sa;
 	sAbout = sAbout + L"\n";
 	wsprintf(sa,LOADSTRING(IDS_STR_ADDTIONAL).C_Str(),L"jemyzhang@163.com");
@@ -116,6 +116,12 @@ void Ui_MainWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
             return;
         }
     }
+	LocalDataBase ldb;
+	ldb.checkpwd(g_password,g_password_len);
+	//检查是否要升级数据库
+	initUiCallbackUpdateDatabase();
+	ldb.updateV2(uiCallBackUpdateDatabase);
+
 	switch (id) {
 		case MZ_IDC_BUTTON_VIEW:
 			{
