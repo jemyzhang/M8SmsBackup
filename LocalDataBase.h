@@ -75,6 +75,8 @@ typedef enum TelLabelType{
 
 typedef struct ContactData{
 	LPWSTR	Name;
+	LPWSTR	FirstName;
+	LPWSTR	LastName;
 	TelNumbers_t	MobileTels;
     TelNumbers_t    WorkTels;
     TelNumbers_t    HomeTels;
@@ -83,6 +85,14 @@ typedef struct ContactData{
         if(Name){
             delete [] Name;
             Name = NULL;
+        }
+        if(FirstName){
+            delete [] FirstName;
+            FirstName = NULL;
+        }
+        if(LastName){
+            delete [] LastName;
+            LastName = NULL;
         }
         TelNumbers_t::iterator i;
         if(MobileTels.size()){
@@ -116,6 +126,8 @@ typedef struct ContactData{
     }
 	ContactData(){
         Name = NULL;
+		FirstName = NULL;
+		LastName = NULL;
 	}
     ~ContactData(){
         Reset();

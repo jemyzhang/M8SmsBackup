@@ -53,6 +53,13 @@ BOOL MzContactDataBase::GetContact(WORD dwRecordID,ContactData_t &contact){
                         contact.MobileTels.push_back(Number);
                     }
                     break;
+				case RadioTel://也是移动电话？
+                    {
+                        LPWSTR Number = NULL;
+                        C::newstrcpy(&Number,pRecord->val.lpwstr);
+                        contact.MobileTels.push_back(Number);
+                    }
+                    break;
                 case WorkTel:
                     {
                         LPWSTR Number = NULL;
@@ -78,6 +85,17 @@ BOOL MzContactDataBase::GetContact(WORD dwRecordID,ContactData_t &contact){
                     {
                         C::newstrcpy(&contact.Name,pRecord->val.lpwstr);
                     }
+					break;
+                case Firstname://名
+                    {
+                        C::newstrcpy(&contact.FirstName ,pRecord->val.lpwstr);
+                    }
+					break;
+                case Lastname://姓
+                    {
+                        C::newstrcpy(&contact.LastName ,pRecord->val.lpwstr);
+                    }
+					break;
                 default:
                     break;
                 }
