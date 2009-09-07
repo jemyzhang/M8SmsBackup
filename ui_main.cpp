@@ -90,7 +90,7 @@ BOOL Ui_MainWnd::OnInitDialog() {
 	wsprintf(sa,LOADSTRING(IDS_STR_APPAUTHOR).C_Str(),L"JEMYZHANG");
 	sAbout = sa;
 	sAbout = sAbout + L"\n";
-	wsprintf(sa,LOADSTRING(IDS_STR_APPVERSION).C_Str(),L"1.4",L"20090906");
+	wsprintf(sa,LOADSTRING(IDS_STR_APPVERSION).C_Str(),L"1.41",L"20090907");
 	sAbout = sAbout + sa;
 	sAbout = sAbout + L"\n";
 	wsprintf(sa,LOADSTRING(IDS_STR_ADDTIONAL).C_Str(),L"jemyzhang@163.com");
