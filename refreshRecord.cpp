@@ -8,6 +8,36 @@ extern AppConfigIni appconfig;
 extern wchar_t g_password[256];
 extern int g_password_len;
 
+/*
+	去除联系人电话号码前的国家代码+86
+*/
+void getridCountryCode(ContactData_ptr pcontact){
+    if(pcontact == NULL) return;
+
+    TelNumbers_t::iterator i;
+    if(pcontact->MobileTels.size()){
+        for( i = pcontact->MobileTels.begin(); i != pcontact->MobileTels.end(); i++){
+			C::removeSpecStr(*i,L"+86");
+        }
+    }
+    if(pcontact->WorkTels.size()){
+        for( i = pcontact->WorkTels.begin(); i != pcontact->WorkTels.end(); i++){
+			C::removeSpecStr(*i,L"+86");            
+        }
+    }
+    if(pcontact->HomeTels.size()){
+        for( i = pcontact->HomeTels.begin(); i != pcontact->HomeTels.end(); i++){
+			C::removeSpecStr(*i,L"+86");       
+        }
+    }
+    if(pcontact->HomeTel2s.size()){
+        for( i = pcontact->HomeTel2s.begin(); i != pcontact->HomeTel2s.end(); i++){
+			C::removeSpecStr(*i,L"+86");            
+        }
+    }
+    return;
+}
+
 WORD refreshSIMContact(CallBackRefreshSIMContact callback){
     WORD nRet = 0;
 	MzSimContactDataBase dbSimContact;
@@ -20,6 +50,7 @@ WORD refreshSIMContact(CallBackRefreshSIMContact callback){
     ContactData_t contact;
     for(WORD i = 0; i < simcount; i++){
 		if(dbSimContact.GetContact(i,contact)){
+			getridCountryCode(&contact);
 			nRet += ldb.AppendContactRecord(&contact);
 		}else{
 			LPWSTR Number = NULL;
@@ -53,6 +84,7 @@ WORD refreshContact(CallBackRefreshContact callback){
     ContactData_t contact;
     for(WORD i = 0; i < count; i++){
         dbcontact.GetContact(i,contact);
+		getridCountryCode(&contact);
         nRet += ldb.AppendContactRecord(&contact);
         if(callback){
             if(!(*callback)(&contact,i,count,nRet)){

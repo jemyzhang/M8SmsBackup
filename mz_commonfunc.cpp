@@ -96,6 +96,39 @@ void MZ_CommonC::newstrcpy(wchar_t** pdst,const wchar_t* src){
 	*pdst = newdst;
 }
 
+wchar_t* MZ_CommonC::removeSpecStr(wchar_t* str, wchar_t* spec){
+	if(str == NULL || spec == NULL) return str;
+
+	int len_str = lstrlen(str);
+	int len_spec = lstrlen(spec);
+	if(len_str == 0 || len_spec == 0 || len_spec > len_str) return str;
+	//wchar_t* resStr = new wchar_t[len_str+1];
+	wchar_t* resStr = str;	//直接替换
+	int resStrLenCnt = 0;
+	int curCnt = 0;	//标位
+	int specCnt = 0;	//特定字符串位置
+	int SamePos = 0;	//检测到相同字符串的起始位置
+	while(curCnt < len_str){
+		if(str[curCnt] == spec[specCnt]){
+			if(specCnt == 0) SamePos = curCnt;	//记录起始位置
+			specCnt++;
+			if(specCnt == len_spec) specCnt = 0;
+			curCnt++;
+		}else{
+			if(specCnt != 0){	//对比到一半出现不相同
+				for(int i = 0; i < specCnt; i++){
+					resStr[resStrLenCnt++] = str[SamePos++];
+				}
+				specCnt = 0;
+			}else{
+				resStr[resStrLenCnt++] = str[curCnt++];
+			}
+		}
+	}
+	resStr[resStrLenCnt] = '\0';
+	return resStr;
+}
+
 wchar_t* MZ_CommonC::removeWrap(wchar_t* dst, wchar_t* src){
 	*dst = '\0';
 	if(src == NULL) return dst;

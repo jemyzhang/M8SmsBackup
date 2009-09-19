@@ -18,6 +18,8 @@ class MZ_CommonC
 {
 public:
 	static void newstrcpy(wchar_t** pdst,const wchar_t* src);
+	//去除字符串中特定的字符
+	static wchar_t* removeSpecStr(wchar_t* sStr, wchar_t* dStr);
 	//remove LF to "\n"
 	static wchar_t* removeWrap(wchar_t* dst, wchar_t* src);
 	//restore "\n" "\r" to LF
