@@ -29,6 +29,9 @@ public:
 public:
 	UiToolbar_Text m_Toolbar;
 	UiEdit m_Content;
+	UiButton_Image m_ReportSms;
+	UiButton_Image m_ReplySms;
+	UiButton_Image m_ForwardSms;
 	UiSmsTitle m_Title;
 	UiControlBackground m_Background;
 public:

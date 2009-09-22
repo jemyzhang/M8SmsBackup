@@ -8,6 +8,11 @@ extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 
 #define MZ_IDC_TOOLBAR_MAIN 101
 
+#define MZ_IDC_BUTTON_FORWARD 102
+#define MZ_IDC_BUTTON_REPLY 103
+#define MZ_IDC_BUTTON_REPORT 104
+
+
 void UiSmsTitle::PaintWin(HDC hdcDst, RECT* prcWin, RECT* prcUpdate){
 	if(precord == NULL) return;
 	HFONT hf;
@@ -76,11 +81,36 @@ BOOL Ui_SmsViewerWnd::OnInitDialog() {
 	m_Background.AddChild(&m_Title);
 
 	y+=65;
-	m_Content.SetPos(10, y, GetWidth() - 20, GetHeight() - y - MZM_HEIGHT_TEXT_TOOLBAR);
+	m_Content.SetPos(10, y, GetWidth() - 20 - 48, GetHeight() - y - MZM_HEIGHT_TEXT_TOOLBAR);
 	m_Content.SetReadOnly(true);
     //m_Content.SetInsideScroll(true);
 	m_Content.SetTextColor( RGB(255,255,255));
 	m_Background.AddChild(&m_Content);
+
+	int btnX = GetWidth() - 20 - 48;
+	int btnY = y;
+	m_ForwardSms.SetPos(btnX, btnY, 48, 48);
+	m_ForwardSms.SetButtonType(MZC_BUTTON_DOWNLOAD);
+	m_ForwardSms.SetID(MZ_IDC_BUTTON_FORWARD);
+	m_ForwardSms.SetImage_Normal(pimg[IDB_PNG_FORWARD_SMS - IDB_PNG_BEGIN]);
+	m_ForwardSms.SetImage_Pressed(pimg[IDB_PNG_FORWARD_SMS - IDB_PNG_BEGIN]);
+	m_Background.AddChild(&m_ForwardSms);
+
+	btnY += 48;
+	m_ReplySms.SetPos(btnX, btnY, 48, 48);
+	m_ReplySms.SetButtonType(MZC_BUTTON_DOWNLOAD);
+	m_ReplySms.SetID(MZ_IDC_BUTTON_REPLY);
+	m_ReplySms.SetImage_Normal(pimg[IDB_PNG_REPLY_SMS - IDB_PNG_BEGIN]);
+	m_ReplySms.SetImage_Pressed(pimg[IDB_PNG_REPLY_SMS - IDB_PNG_BEGIN]);
+	m_Background.AddChild(&m_ReplySms);
+
+	btnY += 48;
+	m_ReportSms.SetPos(btnX, btnY, 48, 48);
+	m_ReportSms.SetButtonType(MZC_BUTTON_DOWNLOAD);
+	m_ReportSms.SetID(MZ_IDC_BUTTON_REPORT);
+	m_ReportSms.SetImage_Normal(pimg[IDB_PNG_FORWARD_SMS - IDB_PNG_BEGIN]);
+	m_ReportSms.SetImage_Pressed(pimg[IDB_PNG_FORWARD_SMS - IDB_PNG_BEGIN]);
+	m_Background.AddChild(&m_ReportSms);
 
 	m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR, GetWidth(), MZM_HEIGHT_TEXT_TOOLBAR);
 	m_Toolbar.SetButton(0,true,true,LOADSTRING(IDS_STR_PREVIOUS).C_Str());

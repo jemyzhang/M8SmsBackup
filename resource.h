@@ -65,7 +65,10 @@
 #define IDB_PNG_SMS_RECV                205
 #define IDB_PNG_SEARCH                  206
 #define IDB_PNG_LOGO                    207
-#define IDB_PNG_END                     207
+#define IDB_PNG_REPORT_SMS				208
+#define IDB_PNG_REPLY_SMS				209
+#define IDB_PNG_FORWARD_SMS				210
+#define IDB_PNG_END                     210
 
 // Next default values for new objects
 // 
