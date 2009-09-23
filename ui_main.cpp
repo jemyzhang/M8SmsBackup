@@ -9,6 +9,19 @@ using namespace MZ_CommonFunc;
 #include "ui_config.h"
 #include "passwordDlg.h"
 
+#ifdef DEBUG
+#define BUILD_CONFIG	L"D"
+#else
+#define BUILD_CONFIG	L"R"
+#endif
+#ifdef MZFC_STATIC
+#define BUILD_METHOD L"s"
+#else
+#define BUILD_METHOD L"d"
+#endif
+#define VER_STRING L"1.51"BUILD_METHOD
+#define BUILD_STRING L"20090923"BUILD_CONFIG
+
 extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 extern HINSTANCE LangresHandle;
 extern AppConfigIni appconfig;
@@ -90,7 +103,7 @@ BOOL Ui_MainWnd::OnInitDialog() {
 	wsprintf(sa,LOADSTRING(IDS_STR_APPAUTHOR).C_Str(),L"JEMYZHANG");
 	sAbout = sa;
 	sAbout = sAbout + L"\n";
-	wsprintf(sa,LOADSTRING(IDS_STR_APPVERSION).C_Str(),L"1.50",L"20090922");
+	wsprintf(sa,LOADSTRING(IDS_STR_APPVERSION).C_Str(),VER_STRING,BUILD_STRING);
 	sAbout = sAbout + sa;
 	sAbout = sAbout + L"\n";
 	wsprintf(sa,LOADSTRING(IDS_STR_ADDTIONAL).C_Str(),L"jemyzhang@163.com");

@@ -523,7 +523,7 @@ UINT LocalDataBase::GetSmsByDate(WORD year, WORD month, WORD day,SmsSimpleData_p
     sqlite3_finalize(pStmt);
     if(total == 0 || plist == NULL) return total;
 
-    strsql = strsql + L" order by timestamps";
+    strsql = strsql + L" order by timestamps DESC";
     SmsSimpleData_ptr pi = plist;
     wsprintf(sqlcmdw,strsql.C_Str(),
         L"name,phonenumber,content,strftime('%Y-%m-%d %H:%M:%S',timestamps),sendreceive",
@@ -557,7 +557,7 @@ UINT LocalDataBase::GetSmsByContact(LPWSTR pname,SmsSimpleData_ptr plist){
 
     SmsSimpleData_ptr pi = plist;
     wsprintf(sqlcmdw,L"select name,phonenumber,content,strftime('%%Y-%%m-%%d %%H:%%M:%%S',timestamps),sendreceive from '%s' "
-                    L"where name='%s' order by timestamps",
+                    L"where name='%s' order by timestamps DESC",
                     TABLE_SMS,pname);
     if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         while (sqlite3_step(pStmt) == SQLITE_ROW){
@@ -588,7 +588,7 @@ UINT LocalDataBase::GetSmsByContent(LPWSTR pcontent,SmsSimpleData_ptr plist){
 
     SmsSimpleData_ptr pi = plist;
     wsprintf(sqlcmdw,L"select name,phonenumber,content,strftime('%%Y-%%m-%%d %%H:%%M:%%S',timestamps),sendreceive from '%s' "
-                    L"where content like '%%%s%%' order by timestamps",
+                    L"where content like '%%%s%%' order by timestamps DESC",
                     TABLE_SMS,pcontent);
     if (sqlite3_prepare16(db,sqlcmdw,-1,&pStmt,&pzTail) == SQLITE_OK) {
         while (sqlite3_step(pStmt) == SQLITE_ROW){

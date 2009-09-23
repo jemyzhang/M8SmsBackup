@@ -1,11 +1,5 @@
 #include "ui_main.h"
 
-#define VER_STRING L"1.00"
-#ifdef MZFC_STATIC
-#define BUILD_STRING L"20090625(S)"
-#else
-#define BUILD_STRING L"20090625(D)"
-#endif
 #define APPNAME L"∂Ã–≈π‹¿Ì"
 #ifdef _DEBUG
 #define CONFIG_INI L"Program Files\\M8SmsMgr\\M8SmsMgr.ini"
