@@ -1,6 +1,6 @@
 #include "ui_SmsViewer.h"
-#include "mz_commonfunc.h"
-using namespace MZ_CommonFunc;
+#include <MzCommon.h>
+using namespace MzCommon;
 #include "resource.h"
 
 extern HINSTANCE LangresHandle;
@@ -83,7 +83,7 @@ BOOL Ui_SmsViewerWnd::OnInitDialog() {
 	y+=65;
 	m_Content.SetPos(10, y, GetWidth() - 20 - 48, GetHeight() - y - MZM_HEIGHT_TEXT_TOOLBAR);
 	m_Content.SetReadOnly(true);
-    //m_Content.SetInsideScroll(true);
+    m_Content.SetInsideScroll(true);
 	m_Content.SetTextColor( RGB(255,255,255));
 	m_Background.AddChild(&m_Content);
 

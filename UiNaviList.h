@@ -2,8 +2,8 @@
 // include the MZFC library header file
 #include <mzfc_inc.h>
 #include <list>
-#include "mz_commonfunc.h"
-using namespace MZ_CommonFunc;
+#include <MzCommon.h>
+using namespace MzCommon;
 
 //
 class UiNaviButton :
@@ -41,7 +41,7 @@ public:
     virtual int OnLButtonUp(UINT fwKeys, int xPos, int yPos){
         SetState(MZCS_BUTTON_PRESSED);
         Invalidate();
-        Update();
+        //Update();
         return UiButton::OnLButtonUp(fwKeys,xPos,yPos);
     }
 private:
@@ -66,14 +66,14 @@ public:
             }
             size_t nCount = GetChildrenCount();
             for(size_t i = 0; i < nCount; i++){
-                UiNaviButton* mButton = (UiNaviButton *)GetChild(i);
-                mButton->SetState(MZCS_BUTTON_NORMAL);
+                UiNaviButton* mb = (UiNaviButton *)GetChild(i);
+                mb->SetState(MZCS_BUTTON_NORMAL);
             }
             mButton->SetPos(0,nCount * 106,GetWidth(),106);
             mButton->SetState(MZCS_BUTTON_PRESSED);
             AddChild(mButton);
             Invalidate();
-            Update();
+            //Update();
         }
     }
     void pop(){
@@ -88,7 +88,7 @@ public:
         UiNaviButton* mButton = (UiNaviButton *)GetChild(nCount-1);
         RemoveChild(mButton);
         Invalidate();
-        Update();
+        //Update();
         delete mButton;
     }
     //pop the button until the specfic one
@@ -108,7 +108,7 @@ public:
             }
         }
         Invalidate();
-        Update();
+        //Update();
     }
     virtual void PaintWin(HDC hdcDst, RECT* prcWin, RECT* prcUpdate);
 };

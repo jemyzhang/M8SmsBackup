@@ -1,12 +1,11 @@
 #include "refreshRecord.h"
 #include "LocalDataBase.h"
-#include "mz_commonfunc.h"
-using namespace MZ_CommonFunc;
+#include <MzCommon.h>
+using namespace MzCommon;
 #include "appconfigini.h"
 
-extern AppConfigIni appconfig;
-extern wchar_t g_password[256];
-extern int g_password_len;
+extern SmsBackupConfig appconfig;
+extern LocalDataBase *g_pldb;
 
 /*
 	去除联系人电话号码前的国家代码+86
@@ -42,16 +41,12 @@ WORD refreshSIMContact(CallBackRefreshSIMContact callback){
     WORD nRet = 0;
 	MzSimContactDataBase dbSimContact;
 	WORD simcount = dbSimContact.GetContactCount();
-    LocalDataBase ldb;
-	if(!ldb.checkpwd(g_password,g_password_len)){
-		return 0;
-	}
-    ldb.beginTrans();
+    g_pldb->beginTrans();
     ContactData_t contact;
     for(WORD i = 0; i < simcount; i++){
 		if(dbSimContact.GetContact(i,contact)){
 			getridCountryCode(&contact);
-			nRet += ldb.AppendContactRecord(&contact);
+			nRet += g_pldb->AppendContactRecord(&contact);
 		}else{
 			LPWSTR Number = NULL;
 			C::newstrcpy(&Number,L"0");
@@ -65,7 +60,7 @@ WORD refreshSIMContact(CallBackRefreshSIMContact callback){
 		}
         contact.Reset();
     }
-    ldb.commitTrans();
+    g_pldb->commitTrans();
     if(callback){
         (*callback)(NULL,0,0,0);	//indicate end
     }
@@ -76,16 +71,12 @@ WORD refreshContact(CallBackRefreshContact callback){
     WORD nRet = 0;
     MzContactDataBase dbcontact;
     WORD count = dbcontact.GetContactCount();
-    LocalDataBase ldb;
-	if(!ldb.checkpwd(g_password,g_password_len)){
-		return 0;
-	}
-    ldb.beginTrans();
+    g_pldb->beginTrans();
     ContactData_t contact;
     for(WORD i = 0; i < count; i++){
         dbcontact.GetContact(i,contact);
 		getridCountryCode(&contact);
-        nRet += ldb.AppendContactRecord(&contact);
+        nRet += g_pldb->AppendContactRecord(&contact);
         if(callback){
             if(!(*callback)(&contact,i,count,nRet)){
                 break;
@@ -93,7 +84,7 @@ WORD refreshContact(CallBackRefreshContact callback){
         }
         contact.Reset();
     }
-    ldb.commitTrans();
+    g_pldb->commitTrans();
     if(callback){
         (*callback)(NULL,0,0,0);	//indicate end
     }
@@ -108,18 +99,14 @@ WORD refreshSms(CallBackRefreshSms callback){
 	MzSMSDataBase db(L"\\Disk\\sms.edb");
 	ULONG count = db.GetSmsCount();
 
-    LocalDataBase ldb;
-	if(!ldb.checkpwd(g_password,g_password_len)){
-		return 0;
-	}
 	SmsData_t sms;
     bool bfast = false;
     SYSTEMTIME edt;
     if(appconfig.IniUpdateMethod.Get()){
         bfast = true;
-        edt = ldb.GetSmsLatestDateTime();
+        edt = g_pldb->GetSmsLatestDateTime();
     }
-    ldb.beginTrans();
+    g_pldb->beginTrans();
     for(int i = 0; i < count; i++){
         bool bomit = false; //是否跳过
 	    db.GetSms(i,sms);
@@ -145,12 +132,12 @@ WORD refreshSms(CallBackRefreshSms callback){
 				    groupsms.SendReceiveFlag = sms.SendReceiveFlag;
 				    groupsms.PNSort = token;
 				    groupsms.MobileNumber = token;
-				    nRet += ldb.AppendSmsRecord(&groupsms) ? 1:0;
+				    nRet += g_pldb->AppendSmsRecord(&groupsms) ? 1:0;
 				    token = C::_wcstok(NULL,L"┇");
 				    groupsms.Reset();
 			    }
 		    }else{
-			    nRet += ldb.AppendSmsRecord(&sms) ? 1:0;
+			    nRet += g_pldb->AppendSmsRecord(&sms) ? 1:0;
 		    }
         }
         if(callback){
@@ -160,7 +147,7 @@ WORD refreshSms(CallBackRefreshSms callback){
         }
         sms.Reset();
     }
-    ldb.commitTrans();
+    g_pldb->commitTrans();
     if(callback){
         (*callback)(NULL,0,0,0);	//indicate end
     }

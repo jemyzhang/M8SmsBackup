@@ -3,7 +3,7 @@
 
 // include the MZFC library header file
 #include <mzfc_inc.h>
-#include "UiImage.h"
+#include <UiImage.h>
 // Main window derived from CMzWndEx
 
 class Ui_MainWnd : public CMzWndEx {
@@ -19,7 +19,7 @@ public:
 	UiButtonEx m_BtnSearch;		//≤È’“
 	UiButtonEx m_BtnRefresh;	//À¢–¬
 	UiButtonEx m_BtnConfig;		//…Ë÷√
-	UiEdit m_TextAbout;
+	UiMultiLineEdit m_TextAbout;
 protected:
     // Initialization of the window (dialog)
     virtual BOOL OnInitDialog();

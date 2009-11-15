@@ -2,7 +2,7 @@
 // include the MZFC library header file
 #include <mzfc_inc.h>
 #include "LocalDataBase.h"
-#include "UiImage.h"
+#include <UiImage.h>
 #include "UiControlBackground.h"
 
 class UiSmsTitle : public UiStatic {
@@ -28,7 +28,7 @@ public:
 	~Ui_SmsViewerWnd();
 public:
 	UiToolbar_Text m_Toolbar;
-	UiEdit m_Content;
+	UiMultiLineEdit m_Content;
 	UiButton_Image m_ReportSms;
 	UiButton_Image m_ReplySms;
 	UiButton_Image m_ForwardSms;
@@ -53,10 +53,10 @@ private:
 			SmsSimpleData_ptr pr = precord + viewIndex;
 			m_Content.SetText(pr->Content);
 			m_Content.Invalidate();
-			m_Content.Update();
+			//m_Content.Update();
 			m_Title.SetRecord(pr);
 			m_Title.Invalidate();
-			m_Title.Update();
+			//m_Title.Update();
 		}
 	}
 protected:

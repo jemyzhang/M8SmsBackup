@@ -1,7 +1,7 @@
 #include "ui_main.h"
 #include "ui_ProgressBar.h"
-#include "mz_commonfunc.h"
-using namespace MZ_CommonFunc;
+#include <MzCommon.h>
+using namespace MzCommon;
 #include "resource.h"
 #include "ui_view.h"
 #include "ui_search.h"
@@ -19,12 +19,12 @@ using namespace MZ_CommonFunc;
 #else
 #define BUILD_METHOD L"d"
 #endif
-#define VER_STRING L"1.51"BUILD_METHOD
-#define BUILD_STRING L"20090923"BUILD_CONFIG
+#define VER_STRING L"1.61"BUILD_METHOD
+#define BUILD_STRING L"20091115"BUILD_CONFIG
 
 extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 extern HINSTANCE LangresHandle;
-extern AppConfigIni appconfig;
+extern SmsBackupConfig appconfig;
 
 #define MZ_IDC_TOOLBAR_MAIN 101
 #define MZ_IDC_BUTTON_VIEW 103
@@ -92,7 +92,7 @@ BOOL Ui_MainWnd::OnInitDialog() {
 	m_BtnConfig.SetTextMaxLen2(0);
 	AddUiWin(&m_BtnConfig);
 
-	y+=MZM_HEIGHT_BUTTONEX;
+	y=GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR - MZM_HEIGHT_BUTTONEX*2;
 	m_TextAbout.SetPos(0, y, GetWidth(), GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR - y);
 	m_TextAbout.SetEnable(false);
 	m_TextAbout.SetTextColor(RGB(128,128,128));
@@ -106,11 +106,8 @@ BOOL Ui_MainWnd::OnInitDialog() {
 	wsprintf(sa,LOADSTRING(IDS_STR_APPVERSION).C_Str(),VER_STRING,BUILD_STRING);
 	sAbout = sAbout + sa;
 	sAbout = sAbout + L"\n";
-	wsprintf(sa,LOADSTRING(IDS_STR_ADDTIONAL).C_Str(),L"jemyzhang@163.com");
-	sAbout = sAbout + sa;
-	sAbout = sAbout + L"\n";
-	wsprintf(sa,LOADSTRING(IDS_STR_WEB_INFO).C_Str(),L"http://sites.google.com/site/idaprc/m8-softs");
-	sAbout = sAbout + sa;
+	sAbout = sAbout + L"Email: jemy.zhang@gmail.com\n";
+	sAbout = sAbout + L"(C)2009 JEMYZHANG  保留所有权利";
 	m_TextAbout.SetText(sAbout.C_Str());
 	AddUiWin(&m_TextAbout);
 
@@ -129,12 +126,6 @@ void Ui_MainWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
             return;
         }
     }
-	LocalDataBase ldb;
-	ldb.checkpwd(g_password,g_password_len);
-	//检查是否要升级数据库
-	initUiCallbackUpdateDatabase();
-	ldb.updateV2(uiCallBackUpdateDatabase);
-
 	switch (id) {
 		case MZ_IDC_BUTTON_VIEW:
 			{

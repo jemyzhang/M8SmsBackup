@@ -1,13 +1,17 @@
 #include "ui_config.h"
 #include "resource.h"
 #include "appconfigini.h"
-#include "mz_commonfunc.h"
-using namespace MZ_CommonFunc;
-#include "passwordDlg.h"
+#include <MzCommon.h>
+using namespace MzCommon;
+#include "ui_password.h"
 #include "ui_backup.h"
+#include "LocalDataBase.h"
+#include "ui_ProgressBar.h"
 
 extern HINSTANCE LangresHandle;
-extern AppConfigIni appconfig;
+extern SmsBackupConfig appconfig;
+extern int g_password_len;
+extern LocalDataBase *g_pldb;
 
 MZ_IMPLEMENT_DYNAMIC(Ui_ConfigWnd)
 
@@ -18,6 +22,8 @@ MZ_IMPLEMENT_DYNAMIC(Ui_ConfigWnd)
 #define MZ_IDC_BTN_SETUP_PASSWORD   104
 #define MZ_IDC_BTN_UPDATE_METHOD    105
 #define MZ_IDC_BTN_SETUP_BACKUP     106
+#define MZ_IDC_BTN_SETUP_OPTIMIZE   107
+#define MZ_IDC_BTN_SETUP_CONTACT_CLEAR  108
 //////
 
 Ui_ConfigWnd::Ui_ConfigWnd(void)
@@ -43,7 +49,7 @@ BOOL Ui_ConfigWnd::OnInitDialog() {
 	y+=MZM_HEIGHT_CAPTION;
 	m_BtnUseSimPhoneBook.SetPos(0,y, GetWidth() - 120, MZM_HEIGHT_BUTTONEX);
 	m_BtnUseSimPhoneBook.SetText(LOADSTRING(IDS_STR_USE_SIM_PHONEBOOK).C_Str());
-    m_BtnUseSimPhoneBook.SetButtonType(MZC_BUTTON_LINE_NONE);
+    m_BtnUseSimPhoneBook.SetButtonType(MZC_BUTTON_LINE_BOTTOM);
 	m_BtnUseSimPhoneBook.SetTextMaxLen(0);
 	m_BtnUseSimPhoneBook.SetEnable(false);
     AddUiWin(&m_BtnUseSimPhoneBook);
@@ -57,7 +63,7 @@ BOOL Ui_ConfigWnd::OnInitDialog() {
 	y+=MZM_HEIGHT_BUTTONEX;
 	m_BtnBootUpdate.SetPos(0,y, GetWidth() - 120, MZM_HEIGHT_BUTTONEX);
 	m_BtnBootUpdate.SetText(LOADSTRING(IDS_STR_BOOTUPDATE).C_Str());
-    m_BtnBootUpdate.SetButtonType(MZC_BUTTON_LINE_NONE);
+    m_BtnBootUpdate.SetButtonType(MZC_BUTTON_LINE_BOTTOM);
 	m_BtnBootUpdate.SetTextMaxLen(0);
 	m_BtnBootUpdate.SetEnable(false);
     AddUiWin(&m_BtnBootUpdate);
@@ -71,7 +77,7 @@ BOOL Ui_ConfigWnd::OnInitDialog() {
 	y+=MZM_HEIGHT_BUTTONEX;
 	m_BtnUpdateMethod.SetPos(0,y, GetWidth(), MZM_HEIGHT_BUTTONEX);
 	m_BtnUpdateMethod.SetText(LOADSTRING(IDS_STR_REFRESH_METHOD).C_Str());
-    m_BtnUpdateMethod.SetButtonType(MZC_BUTTON_LINE_NONE);
+    m_BtnUpdateMethod.SetButtonType(MZC_BUTTON_LINE_BOTTOM);
 	m_BtnUpdateMethod.SetTextMaxLen(0);
     m_BtnUpdateMethod.SetID(MZ_IDC_BTN_UPDATE_METHOD);
     AddUiWin(&m_BtnUpdateMethod);
@@ -79,7 +85,7 @@ BOOL Ui_ConfigWnd::OnInitDialog() {
     y+=MZM_HEIGHT_BUTTONEX;
 	m_BtnSetupPassword.SetPos(0,y, GetWidth(), MZM_HEIGHT_BUTTONEX);
 	m_BtnSetupPassword.SetText(LOADSTRING(IDS_STR_PWD_SETUP).C_Str());
-    m_BtnSetupPassword.SetButtonType(MZC_BUTTON_LINE_NONE);
+    m_BtnSetupPassword.SetButtonType(MZC_BUTTON_LINE_BOTTOM);
 	m_BtnSetupPassword.SetTextMaxLen(0);
     m_BtnSetupPassword.SetID(MZ_IDC_BTN_SETUP_PASSWORD);
     AddUiWin(&m_BtnSetupPassword);
@@ -88,12 +94,31 @@ BOOL Ui_ConfigWnd::OnInitDialog() {
 	m_BtnBackup.SetPos(0,y, GetWidth(), MZM_HEIGHT_BUTTONEX);
 	m_BtnBackup.SetText(LOADSTRING(IDS_STR_BACKUP).C_Str());
 	m_BtnBackup.SetText2(LOADSTRING(IDS_STR_BACKUP_RESTORE).C_Str());
-    m_BtnBackup.SetButtonType(MZC_BUTTON_LINE_NONE);
+    m_BtnBackup.SetButtonType(MZC_BUTTON_LINE_BOTTOM);
 	m_BtnBackup.SetTextMaxLen(0);
     m_BtnBackup.SetID(MZ_IDC_BTN_SETUP_BACKUP);
     AddUiWin(&m_BtnBackup);
 
-	m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR, GetWidth(), MZM_HEIGHT_TEXT_TOOLBAR);
+    y+=MZM_HEIGHT_BUTTONEX;
+	m_BtnOptimize.SetPos(0,y, GetWidth(), MZM_HEIGHT_BUTTONEX);
+	m_BtnOptimize.SetText(LOADSTRING(IDS_STR_OPTIMIZE).C_Str());
+	m_BtnOptimize.SetText2(LOADSTRING(IDS_STR_OPTIMIZE_DTL).C_Str());
+    m_BtnOptimize.SetButtonType(MZC_BUTTON_LINE_BOTTOM);
+	m_BtnOptimize.SetTextMaxLen(0);
+    m_BtnOptimize.SetID(MZ_IDC_BTN_SETUP_OPTIMIZE);
+    AddUiWin(&m_BtnOptimize);
+
+    y+=MZM_HEIGHT_BUTTONEX;
+	m_BtnClearContact.SetPos(0,y, GetWidth(), MZM_HEIGHT_BUTTONEX);
+	m_BtnClearContact.SetText(LOADSTRING(IDS_STR_CONTACT_CLEAR).C_Str());
+	m_BtnClearContact.SetText2(LOADSTRING(IDS_STR_CONTACT_CLEAR_DTL).C_Str());
+    m_BtnClearContact.SetButtonType(MZC_BUTTON_LINE_BOTTOM);
+	m_BtnClearContact.SetTextMaxLen(0);
+    m_BtnClearContact.SetID(MZ_IDC_BTN_SETUP_CONTACT_CLEAR);
+    AddUiWin(&m_BtnClearContact);
+
+    m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR, GetWidth(), MZM_HEIGHT_TEXT_TOOLBAR);
+    m_Toolbar.EnableLeftArrow(true);
     m_Toolbar.SetButton(0, true, true, LOADSTRING(IDS_STR_RETURN).C_Str());
     m_Toolbar.SetID(MZ_IDC_TOOLBAR_CONFIG);
     AddUiWin(&m_Toolbar);
@@ -110,9 +135,9 @@ void Ui_ConfigWnd::updateBootUpdate(){
 		m_BtnBootUpdate.SetText2(LOADSTRING(IDS_STR_OPTION_YES).C_Str());
 	}
 	m_BtnBootUpdate.Invalidate();
-	m_BtnBootUpdate.Update();
+	//m_BtnBootUpdate.Update();
 	m_BtnBootUpdateSW.Invalidate();
-	m_BtnBootUpdateSW.Update();
+	//m_BtnBootUpdateSW.Update();
 }
 
 void Ui_ConfigWnd::updateUseSimPhoneBook(){
@@ -124,9 +149,9 @@ void Ui_ConfigWnd::updateUseSimPhoneBook(){
 		m_BtnUseSimPhoneBook.SetText2(LOADSTRING(IDS_STR_OPTION_YES).C_Str());
 	}
 	m_BtnUseSimPhoneBook.Invalidate();
-	m_BtnUseSimPhoneBook.Update();
+	//m_BtnUseSimPhoneBook.Update();
 	m_BtnUseSimPhoneBookSW.Invalidate();
-	m_BtnUseSimPhoneBookSW.Update();
+	//m_BtnUseSimPhoneBookSW.Update();
 }
 
 void Ui_ConfigWnd::updateUpdateMethod(){
@@ -136,7 +161,7 @@ void Ui_ConfigWnd::updateUpdateMethod(){
 		m_BtnUpdateMethod.SetText2(LOADSTRING(IDS_STR_REFRESH_FAST).C_Str());
 	}
 	m_BtnUpdateMethod.Invalidate();
-	m_BtnUpdateMethod.Update();
+	//m_BtnUpdateMethod.Update();
 }
 
 void Ui_ConfigWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
@@ -174,7 +199,29 @@ void Ui_ConfigWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
         }
         case MZ_IDC_BTN_SETUP_PASSWORD:
         {
-            if(ShowPasswordDlg(1,m_hWnd)){
+            Ui_PasswordWnd dlg;
+            dlg.setMode(1);
+            RECT rcWork = MzGetWorkArea();
+            dlg.Create(rcWork.left, rcWork.top + RECT_HEIGHT(rcWork)/4, RECT_WIDTH(rcWork), RECT_HEIGHT(rcWork)*3/4,
+                m_hWnd, 0, WS_POPUP);
+            // set the animation of the window
+            dlg.SetAnimateType_Show(MZ_ANIMTYPE_SCROLL_BOTTOM_TO_TOP_2);
+            dlg.SetAnimateType_Hide(MZ_ANIMTYPE_SCROLL_TOP_TO_BOTTOM_1);
+            int rc = dlg.DoModal();
+            if(rc == ID_OK){
+                //启动等待画面
+                wchar_t* p = 0;
+                int len = 0;
+                dlg.getPassword(&p,&len);
+                SetPasswordWaitDlg dlg;
+                dlg.setPassword(p,len);
+                dlg.Create(rcWork.left + 30, rcWork.top + 200, RECT_WIDTH(rcWork) - 60, RECT_HEIGHT(rcWork) - 400,
+                    m_hWnd, 0, WS_POPUP);
+                // set the animation of the window
+                dlg.SetAnimateType_Show(MZ_ANIMTYPE_NONE);
+                dlg.SetAnimateType_Hide(MZ_ANIMTYPE_FADE);
+                dlg.DoModal();
+                //密码设置完成后退出
                 EndModal(ID_OK);
             }
             break;
@@ -192,6 +239,7 @@ void Ui_ConfigWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
             if(rc == ID_OK){
                 EndModal(ID_OK);
             }
+            break;
         }
         case MZ_IDC_TOOLBAR_CONFIG:
         {
@@ -200,10 +248,81 @@ void Ui_ConfigWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 				EndModal(ID_OK);
 				return;
 			}
+            break;
 		}
+        case MZ_IDC_BTN_SETUP_OPTIMIZE:
+        {
+            OptimizeWaitDlg dlg;
+            RECT rcWork = MzGetWorkArea();
+            dlg.Create(rcWork.left + 30, rcWork.top + 200, RECT_WIDTH(rcWork) - 60, RECT_HEIGHT(rcWork) - 400,
+                m_hWnd, 0, WS_POPUP);
+            // set the animation of the window
+            dlg.SetAnimateType_Show(MZ_ANIMTYPE_NONE);
+            dlg.SetAnimateType_Hide(MZ_ANIMTYPE_FADE);
+            dlg.DoModal();
+            return;
+        }
+        case MZ_IDC_BTN_SETUP_CONTACT_CLEAR:
+        {
+            g_pldb->ClearContactTable();
+            if(appconfig.IniUseSimPhoneBook.Get()){
+                initUiCallbackRefreshContact();
+                refreshSIMContact(uiCallbackRefreshSIMContact);
+            }
+            initUiCallbackRefreshContact();
+            refreshContact(uiCallbackRefreshContact);
+            break;
+        }
 	}
 }
 
 LRESULT Ui_ConfigWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
     return CMzWndEx::MzDefWndProc(message, wParam, lParam);
+}
+
+bool OptimizeWaitDlg::CallBackProcess(){
+    if(g_pldb == 0) return false;
+    g_pldb->indexDatabase();
+    g_pldb->reorgDatebase();
+    return true;
+}
+
+void SetPasswordWaitDlg::setPassword(wchar_t* p, int sz){
+    if(p == 0 || sz == 0){
+        if(pWd) delete pWd;
+        pWd = 0;
+        len = 0;
+        setMessage(L"清除密码中，请稍候。");
+    }else{
+        C::newstrcpy(&pWd,p);
+        len = sz;
+        setMessage(L"设定密码中，请稍候。");
+    }
+}
+
+bool SetPasswordWaitDlg::CallBackProcess(){
+    wchar_t defaultpwd[6] = {0x10,0x15,0x13,0x18,0x08,0x01};
+
+    if(pWd == NULL || len == 0){
+        if(g_pldb->encrypt(defaultpwd,6)){
+            m_Message.SetText(LOADSTRING(IDS_STR_PWD_CLEAR_S).C_Str());
+            g_password_len = 0;
+        }else{
+            m_Message.SetText(LOADSTRING(IDS_STR_PWD_CLEAR_F).C_Str());
+        }
+    }else{
+        if(g_pldb->encrypt(pWd,len)){
+            m_Message.SetText(LOADSTRING(IDS_STR_PWD_SET_S).C_Str());
+            g_password_len = 0;
+        }else{
+            m_Message.SetText(LOADSTRING(IDS_STR_PWD_SET_F).C_Str());
+        }
+    }
+    m_Message.Invalidate();
+    //m_Message.Update();
+
+    //销毁数据库连接
+    delete g_pldb;
+    g_pldb = 0;
+    return true;
 }

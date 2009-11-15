@@ -1,8 +1,9 @@
 #include "ui_backup.h"
 #include <list>
-#include "mz_commonfunc.h"
-using namespace MZ_CommonFunc;
+#include <MzCommon.h>
+using namespace MzCommon;
 #include "resource.h"
+#include "LocalDataBase.h"
 
 #define MZ_IDC_TOOLBAR_ACCOUNTS 101
 #define MZ_IDC_BACKUP_LIST 102
@@ -12,6 +13,7 @@ using namespace MZ_CommonFunc;
 #define IDC_PPM_RECOVER 110
 
 extern HINSTANCE LangresHandle;
+extern LocalDataBase *g_pldb;
 
 MZ_IMPLEMENT_DYNAMIC(Ui_BackupWnd)
 #ifdef _DEBUG
@@ -23,6 +25,8 @@ MZ_IMPLEMENT_DYNAMIC(Ui_BackupWnd)
 #define BACKUP_PARENT_DIR1	L"\\Disk\\User\\Backup"
 #define BACKUP_DIR			L"\\Disk\\User\\Backup\\M8SmsBackup"
 #endif
+
+list<SYSTEMTIME> dirtimes;
 
 BOOL Ui_BackupWnd::OnInitDialog() {
     // Must all the Init of parent class first!
@@ -96,6 +100,9 @@ void Ui_BackupWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 						return;
 					}
 					//恢复数据库
+                    //恢复前断开数据库
+                    delete g_pldb; g_pldb = 0;
+
                     int nIndex = m_List.GetSelectedIndex();
                     if(nIndex == -1) return;
                     BOOL nRet = brecover(m_List.GetItem(nIndex)->Text);
@@ -142,20 +149,20 @@ LRESULT Ui_BackupWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
                     int nIndex = m_List.CalcIndexOfPos(x, y);
                     m_List.SetSelectedIndex(nIndex);
                     m_List.Invalidate();
-                    m_List.Update();
+                    //m_List.Update();
 			 		m_Toolbar.SetButton(1, true, true, LOADSTRING(IDS_STR_OPERATE).C_Str());
 					m_Toolbar.Invalidate();
-					m_Toolbar.Update();
+					//m_Toolbar.Update();
                 }
                 return 0;
             }
             if (nID == MZ_IDC_BACKUP_LIST && nNotify == MZ_MN_MOUSEMOVE) {
                 m_List.SetSelectedIndex(-1);
                 m_List.Invalidate();
-                m_List.Update();
+                //m_List.Update();
 			 	m_Toolbar.SetButton(1, true, false, LOADSTRING(IDS_STR_OPERATE).C_Str());
 				m_Toolbar.Invalidate();
-				m_Toolbar.Update();
+				//m_Toolbar.Update();
                return 0;
             }
        }
@@ -164,8 +171,25 @@ LRESULT Ui_BackupWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 }
 
 void Ui_BackupWnd::updateList(){
-	m_List.RemoveAll();
+    getbackuplist();
 
+    m_List.RemoveAll();
+
+    ListItem li;
+	list<SYSTEMTIME>::iterator it = dirtimes.begin();
+	for(; it != dirtimes.end(); it++){
+		SYSTEMTIME tm = *it;
+		wchar_t dispname[128];
+		wsprintf(dispname,L"%04d-%02d-%02d %02d:%02d:%02d",
+			tm.wYear,tm.wMonth,tm.wDay,tm.wHour,tm.wMinute,tm.wSecond);
+		li.Text = dispname;
+		m_List.AddItem(li);
+	}
+	m_List.Invalidate();
+	//m_List.Update();
+}
+
+void Ui_BackupWnd::getbackuplist(){
 	//获取所有文件夹
 	list<CMzString> _dirs;
 	int nDir = File::ListDirectory(BACKUP_DIR,_dirs);
@@ -174,7 +198,8 @@ void Ui_BackupWnd::updateList(){
 	}
 
 	//排序目录
-	list<SYSTEMTIME> dirtimes;
+    dirtimes.clear();
+
 	list<CMzString>::iterator i = _dirs.begin();
 	for(; i != _dirs.end();i++){
 		CMzString dir = *i;
@@ -202,19 +227,6 @@ void Ui_BackupWnd::updateList(){
 			}
 		}
 	}
-
-	ListItem li;
-	list<SYSTEMTIME>::iterator it = dirtimes.begin();
-	for(; it != dirtimes.end(); it++){
-		SYSTEMTIME tm = *it;
-		wchar_t dispname[32];
-		wsprintf(dispname,L"%04d-%02d-%02d %02d:%02d:%02d",
-			tm.wYear,tm.wMonth,tm.wDay,tm.wHour,tm.wMinute,tm.wSecond);
-		li.Text = dispname;
-		m_List.AddItem(li);
-	}
-	m_List.Invalidate();
-	m_List.Update();
 }
 
 BOOL Ui_BackupWnd::brecover(CMzString &itemname){
@@ -231,7 +243,7 @@ BOOL Ui_BackupWnd::brecover(CMzString &itemname){
 	fpath = fpath + L"\\";
 	fpath = fpath + dispname;
 	//获取当前目录
-	wchar_t currpath[320];
+	wchar_t currpath[MAX_PATH];
 	File::GetCurrentPath(currpath);
 	//准备文件
 	list<CMzString> sfile;
@@ -273,9 +285,9 @@ BOOL Ui_BackupWnd::bbackup(){
 	s.push_back(L"sms.db");
 	s.push_back(L"m8smsbackup.ini");
 	//获取当前目录
-	wchar_t currpath[320];
+	wchar_t currpath[MAX_PATH];
 	File::GetCurrentPath(currpath);
 	//备份数据
-	File::BackupFiles(currpath,dir,s);
+	nRet = File::BackupFiles(currpath,dir,s);
 	return nRet;
 }

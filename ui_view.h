@@ -66,6 +66,7 @@ private:
 public:
 	Ui_ViewWnd();
 	~Ui_ViewWnd();
+    void OnTimer(UINT nIDEvent);
 public:
     UiToolbar_Text m_Toolbar;
     UiNaviList m_Navibar;
@@ -85,7 +86,5 @@ protected:
 
     // override the MZFC command handler
     virtual void OnMzCommand(WPARAM wParam, LPARAM lParam);
-private:
-    LocalDataBase ldb;
 };
 

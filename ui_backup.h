@@ -7,7 +7,7 @@
 class Ui_BackupWnd : public CMzWndEx {
     MZ_DECLARE_DYNAMIC(Ui_BackupWnd);
 public:
-    Ui_BackupWnd() {   }
+    Ui_BackupWnd() { }
 protected:
     UiToolbar_Text m_Toolbar;
     UiCaption m_Caption1;
@@ -26,6 +26,7 @@ public:
 	static BOOL bbackup();
 	static BOOL brecover(CMzString &itemname);
 	static BOOL bdelete(CMzString &itemname);
+    static void getbackuplist();
 };
 
 #endif /*_UI_BACKUP_H*/

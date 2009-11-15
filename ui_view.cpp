@@ -1,6 +1,6 @@
 #include "ui_view.h"
-#include "mz_commonfunc.h"
-using namespace MZ_CommonFunc;
+#include <MzCommon.h>
+using namespace MzCommon;
 #include "resource.h"
 
 extern HINSTANCE LangresHandle;
@@ -18,15 +18,11 @@ extern HINSTANCE LangresHandle;
 #define MZ_IDC_SMS_LIST 121
 
 MZ_IMPLEMENT_DYNAMIC(Ui_ViewWnd)
-extern wchar_t g_password[256];
-extern int g_password_len;
+extern LocalDataBase *g_pldb;
 
 Ui_ViewWnd::Ui_ViewWnd(){
 	viewStatusSavedBeforeView = 0;
 	viewStatus = 0;
-	if(!ldb.checkpwd(g_password,g_password_len)){
-		return;
-	}
 }
 
 Ui_ViewWnd::~Ui_ViewWnd(){
@@ -46,7 +42,7 @@ BOOL Ui_ViewWnd::OnInitDialog() {
 
 	m_List.SetPos(108, y, GetWidth() - 108, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR);
 	m_List.SetID(MZ_IDC_LIST);
-	m_List.SetupDB(&ldb);
+	m_List.SetupDB(g_pldb);
 	m_List.EnableNotifyMessage(true);
 	m_List.SetItemHeight(50);
 	AddUiWin(&m_List);
@@ -55,7 +51,7 @@ BOOL Ui_ViewWnd::OnInitDialog() {
 	m_SmsList.SetID(MZ_IDC_SMS_LIST);
 	m_SmsList.EnableNotifyMessage(true);
 	m_SmsList.SetVisible(false);
-	m_SmsList.SetupDB(&ldb);
+	m_SmsList.SetupDB(g_pldb);
 	m_SmsList.SetItemHeight(80);
 	AddUiWin(&m_SmsList);
 
@@ -63,8 +59,17 @@ BOOL Ui_ViewWnd::OnInitDialog() {
 	m_Toolbar.SetID(MZ_IDC_TOOLBAR_MAIN);
 	AddUiWin(&m_Toolbar);
 
-	SetupList();
+    SetTimer(m_hWnd,0x1010,100,NULL);
 	return TRUE;
+}
+
+void Ui_ViewWnd::OnTimer(UINT nIDEvent){
+    switch(nIDEvent){
+        case 0x1010:
+            KillTimer(m_hWnd,0x1010);
+            SetupList();
+            break;
+    }
 }
 
 void Ui_ViewWnd::SetupToolbar(){
@@ -92,37 +97,36 @@ void Ui_ViewWnd::SetupToolbar(){
 		}
 	}
 	m_Toolbar.Invalidate();
-	m_Toolbar.Update();
+	//m_Toolbar.Update();
 }
 void Ui_ViewWnd::SetupList(){
 	if((viewStatus & 0x0f) == 3){    //smslist
 		if(m_List.IsVisible()){
 			m_List.SetVisible(false);
 			m_List.Invalidate();
-			m_List.Update();
+			//m_List.Update();
 		}
 
 		m_SmsList.SetVisible(true);
 		m_SmsList.SetSelectedIndex(-1);
 		m_SmsList.RemoveAll();
 		MzBeginWaitDlg(m_hWnd);
-		DateTime::waitms(2);
 		m_SmsList.reqUpdate();
 		MzEndWaitDlg();
 		m_SmsList.Invalidate();
-		m_SmsList.Update();
+		//m_SmsList.Update();
 		m_SmsList.ScrollTo();
 	}else{
 		if(m_SmsList.IsVisible()){
 			m_SmsList.SetVisible(false);
 			m_SmsList.Invalidate();
-			m_SmsList.Update();
+			//m_SmsList.Update();
 		}
 
 		m_List.SetVisible(true);
 		m_List.RemoveAll();
 		m_List.Invalidate();
-		m_List.Update();
+		//m_List.Update();
 		if(viewStatus == 0){
 			m_List.SetListMode(0);
 			m_List.SetItemHeight(80);
@@ -145,9 +149,9 @@ void Ui_ViewWnd::SetupList(){
 		m_List.reqUpdate();
 		MzEndWaitDlg();
 
-		m_List.Invalidate();
-		m_List.Update();
 		m_List.ScrollTo();
+		//m_List.Invalidate();
+		//m_List.Update();
 	}
 	SetupToolbar();
 }
@@ -179,7 +183,7 @@ void Ui_ViewWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 					if(m_SmsList.GetSelectionMode()){
 						m_SmsList.ReverseSelect();
 						m_SmsList.Invalidate();
-						m_SmsList.Update();
+						//m_SmsList.Update();
 						SetupToolbar();
 					}
 				}
@@ -204,7 +208,7 @@ void Ui_ViewWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 					m_SmsList.GetSelectionMode()){
 						m_SmsList.ReverseSelect();
 						m_SmsList.Invalidate();
-						m_SmsList.Update();
+						//m_SmsList.Update();
 						SetupToolbar();
 						break;;
 				}
@@ -224,7 +228,7 @@ void Ui_ViewWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 					m_SmsList.GetSelectionMode()){
 						m_SmsList.ReverseSelect();
 						m_SmsList.Invalidate();
-						m_SmsList.Update();
+						//m_SmsList.Update();
 						SetupToolbar();
 						break;;
 				}
@@ -242,7 +246,7 @@ void Ui_ViewWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 					if(m_SmsList.GetSelectionMode()){
 						m_SmsList.ReverseSelect();
 						m_SmsList.Invalidate();
-						m_SmsList.Update();
+						//m_SmsList.Update();
 						SetupToolbar();
 					}
 				}
@@ -264,7 +268,7 @@ void Ui_ViewWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 									m_SmsList.DeleteSelectedItems();
 									m_SmsList.reqUpdate();
 									m_SmsList.Invalidate();
-									m_SmsList.Update();
+									//m_SmsList.Update();
 							}
 
 						}
@@ -280,7 +284,7 @@ void Ui_ViewWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 					if((viewStatus & 0x0f) == 3){
 						m_SmsList.SetSelectionMode();
 						m_SmsList.Invalidate();
-						m_SmsList.Update();
+						//m_SmsList.Update();
 					}
 					SetupToolbar();
 				}
@@ -303,7 +307,7 @@ LRESULT Ui_ViewWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 						int nIndex = m_SmsList.CalcIndexOfPos(x, y);
 						m_SmsList.SetSelectedIndex(nIndex);
 						m_SmsList.Invalidate();
-						m_SmsList.Update();
+						//m_SmsList.Update();
 						SetupToolbar();
 						return 0;
 					}
@@ -314,18 +318,20 @@ LRESULT Ui_ViewWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 						int nIndex = m_List.CalcIndexOfPos(x, y);
 						if(nIndex != -1){
 							SmsViewListKey_ptr pkey = m_List.GetListItem(nIndex);
-							UINT received = pkey->nReceive;
-							UINT sent = pkey->nSend;
-							UINT total = sent + received;
+							UINT received = 0;
+							UINT sent = 0;
+							UINT total = 0;
 							wchar_t strcount[128];
 							wchar_t strcount2[128];
-							wsprintf(strcount2,L"%d/%d",sent,received);
-							wsprintf(strcount,L"%d",total);
 							if(viewStatus == 0){
-								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_CONTACT + nIndex,nIndex == 0 ? L"联系人":L"日期",strcount,strcount2));
+                                g_pldb->GetSmsCount(pkey->nReceive,pkey->nSend);
+                                received = pkey->nReceive; sent = pkey->nSend; total = sent + received;
+							    wsprintf(strcount2,L"%d/%d",sent,received);
+							    wsprintf(strcount,L"%d",total);
+                                m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_CONTACT + nIndex,pkey->key,strcount,strcount2));
 								viewStatus = nIndex == 0 ? 1 : 0x10;
 							}else if(viewStatus == 0x1){
-								ldb.GetSmsContactCount(pkey->key ,pkey->nReceive,pkey->nSend);
+								g_pldb->GetSmsContactCount(pkey->key ,pkey->nReceive,pkey->nSend);
 								received = pkey->nReceive;
 								sent = pkey->nSend;
 								total = sent + received;
@@ -337,7 +343,7 @@ LRESULT Ui_ViewWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 								m_SmsList.SetupListName(pkey->key);
 							}else if(viewStatus == 0x10){
 								selectedYear = _wtoi(pkey->key);
-								ldb.GetSmsYearCount(selectedYear ,pkey->nReceive,pkey->nSend);
+								g_pldb->GetSmsYearCount(selectedYear ,pkey->nReceive,pkey->nSend);
 								received = pkey->nReceive;
 								sent = pkey->nSend;
 								total = sent + received;
@@ -347,7 +353,7 @@ LRESULT Ui_ViewWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 								viewStatus += 1;
 							}else if(viewStatus == 0x11){
 								selectedMonth = _wtoi(pkey->key);
-								ldb.GetSmsMonthCount(selectedYear, selectedMonth, pkey->nReceive,pkey->nSend);
+								g_pldb->GetSmsMonthCount(selectedYear, selectedMonth, pkey->nReceive,pkey->nSend);
 								received = pkey->nReceive;
 								sent = pkey->nSend;
 								total = sent + received;
@@ -357,7 +363,7 @@ LRESULT Ui_ViewWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 								viewStatus += 1;
 							}else if(viewStatus == 0x12){
 								selectedDay = _wtoi(pkey->key);
-								ldb.GetSmsDayCount(selectedYear, selectedMonth, selectedDay, pkey->nReceive,pkey->nSend);
+								g_pldb->GetSmsDayCount(selectedYear, selectedMonth, selectedDay, pkey->nReceive,pkey->nSend);
 								received = pkey->nReceive;
 								sent = pkey->nSend;
 								total = sent + received;
@@ -376,13 +382,13 @@ LRESULT Ui_ViewWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 				if (nID == MZ_IDC_SMS_LIST && nNotify == MZ_MN_MOUSEMOVE) {
 					m_SmsList.SetSelectedIndex(-1);
 					m_SmsList.Invalidate();
-					m_SmsList.Update();
+					//m_SmsList.Update();
 					return 0;
 				}
 				if (nID == MZ_IDC_LIST && nNotify == MZ_MN_MOUSEMOVE) {
 					m_List.SetSelectedIndex(-1);
 					m_List.Invalidate();
-					m_List.Update();
+					//m_List.Update();
 					return 0;
 				}
 			}
@@ -399,28 +405,28 @@ void UiKeyList::SetupList() {
         case 1:         //contact
 			plist_size = pldb->GetSmsContactList();
             if(plist_size > 0){
-                plistkey = new SmsViewListKey_t[plist_size];
+                plistkey = new SmsViewListKey_t[plist_size + 1];
                 plist_size = pldb->GetSmsContactList(plistkey);
             }
             break;
         case 2:
 			plist_size = pldb->GetSmsYearList();
             if(plist_size > 0){
-                plistkey = new SmsViewListKey_t[plist_size];
+                plistkey = new SmsViewListKey_t[plist_size + 1];
                 plist_size = pldb->GetSmsYearList(plistkey);
             }
             break;
         case 3:
             plist_size = pldb->GetSmsMonthList(syear);
             if(plist_size > 0){
-                plistkey = new SmsViewListKey_t[plist_size];
+                plistkey = new SmsViewListKey_t[plist_size + 1];
                 plist_size = pldb->GetSmsMonthList(syear,plistkey);
             }
             break;
 		case 4:
             plist_size = pldb->GetSmsDayList(syear,smonth);
             if(plist_size > 0){
-                plistkey = new SmsViewListKey_t[plist_size];
+                plistkey = new SmsViewListKey_t[plist_size + 1];
                 plist_size = pldb->GetSmsDayList(syear,smonth,plistkey);
             }
 			break;
@@ -429,9 +435,9 @@ void UiKeyList::SetupList() {
 			plistkey = new SmsViewListKey_t[plist_size];
 			C::newstrcpy(&plistkey->key, LOADSTRING(IDS_STR_VIEW_BY_CONTACT));
 			C::newstrcpy(&(plistkey+1)->key, LOADSTRING(IDS_STR_VIEW_BY_DATE));
-			pldb->GetSmsCount(plistkey->nReceive,plistkey->nSend);
-			(plistkey+1)->nReceive = plistkey->nReceive;
-			(plistkey+1)->nSend = plistkey->nSend;
+			//pldb->GetSmsCount(plistkey->nReceive,plistkey->nSend);
+			(plistkey+1)->nReceive = plistkey->nReceive = 0;
+			(plistkey+1)->nSend = plistkey->nSend = 0;
 			break;
         default:
             break;
@@ -444,10 +450,10 @@ void UiKeyList::SetupList() {
 void UiKeyList::ClearList(){
 	RemoveAll();
     if(plistkey && plist_size > 0){
-        for(UINT i = 0; i < plist_size; i++){
-            plistkey[i].Reset();
-        }
-        delete plistkey;
+        //for(UINT i = 0; i < plist_size; i++){
+        //    plistkey[i].Reset();
+        //}
+        delete [] plistkey;
         plistkey = 0;
         plist_size = 0;
     }
@@ -460,7 +466,7 @@ void UiKeyList::DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RE
         MzDrawSelectedBg(hdcDst, prcItem);
     }
 
-	SmsViewListKey_ptr pkey = plistkey + nIndex;
+    SmsViewListKey_ptr pkey = plistkey + nIndex;
     HFONT hf;
     COLORREF cr;
     

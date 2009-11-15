@@ -1,10 +1,11 @@
-#include "mz_commonfunc.h"
-using namespace MZ_CommonFunc;
+#include <MzCommon.h>
+using namespace MzCommon;
 
 #include "M8SmsMgr.h"
 #include "resource.h"
 #include "appconfigini.h"
 #include "ui_ProgressBar.h"
+#include "cmdline.h"
 
 // The global variable of the application.
 M8SmsMgr theApp;
@@ -12,7 +13,7 @@ HINSTANCE LangresHandle;
 HINSTANCE ImgresHandle;
 ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 ImagingHelper *imgArrow;
-AppConfigIni appconfig;
+SmsBackupConfig appconfig;
 
 extern wchar_t g_password[256];
 extern int g_password_len;
@@ -66,21 +67,19 @@ BOOL M8SmsMgr::Init() {
         return true; 
     }
 
+    //ºÏ≤È√¸¡Ó––
+    if(cmdline_run(GetCommandLine())){
+        PostQuitMessage(0);
+        return TRUE;
+    }
+
     // Create the main window
     RECT rcWork = MzGetWorkArea();
     m_MainWnd.Create(rcWork.left, rcWork.top, RECT_WIDTH(rcWork), RECT_HEIGHT(rcWork), 0, 0, 0);
     m_MainWnd.Show();
 
 	if(appconfig.IniRefreshWhileLoad.Get()){
-		WORD n;
-		if(appconfig.IniUseSimPhoneBook.Get()){
-			initUiCallbackRefreshContact();
-			n = refreshSIMContact(uiCallbackRefreshSIMContact);
-		}
-		initUiCallbackRefreshContact();
-		n = refreshContact(uiCallbackRefreshContact);
-		initUiCallbackRefreshSms();
-		n = refreshSms(uiCallbackRefreshSms);
+        cmdline_import(0);
 	}
     // return TRUE means init success.
     return TRUE;

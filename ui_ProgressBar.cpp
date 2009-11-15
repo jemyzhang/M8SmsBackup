@@ -1,12 +1,12 @@
 #include <Mzfc/MzProgressDialog.h> 
 #include "ui_ProgressBar.h"
-#include "mz_commonfunc.h"
-using namespace MZ_CommonFunc;
+#include <MzCommon.h>
+using namespace MzCommon;
 #include "resource.h"
 extern HINSTANCE LangresHandle;
 #include "appconfigini.h"
 
-extern AppConfigIni appconfig;
+extern SmsBackupConfig appconfig;
 static bool brangeSet = false;
 static bool bdlgshown = false;
 static MzProgressDialog m_Progressdlg;
@@ -117,7 +117,9 @@ bool uiCallbackRefreshSms(SmsData_ptr psms,WORD nCount,WORD nSize,WORD nSuccess)
 	wsprintf(infotext,LOADSTRING(IDS_STR_IMPORTED).C_Str(),nSuccess);
 	sImported = sImported + infotext;
 	m_Progressdlg.SetTitle(sImported.C_Str());
-	wsprintf(infotext,L"%s %s (%d/%d)",psms->SendReceiveFlag == 1 ? L"[¡û]": L"[¡ú]",psms->MobileNumber,nCount + 1,nSize);
+	wchar_t* pnumber = 0;
+	C::newstrcpy(&pnumber,psms->MobileNumber,30);
+	wsprintf(infotext,L"%s %s (%d/%d)",psms->SendReceiveFlag == 1 ? L"[¡û]": L"[¡ú]",pnumber,nCount + 1,nSize);
 	m_Progressdlg.SetInfo(infotext);
 	m_Progressdlg.SetCurValue(nCount+1);
 	m_Progressdlg.UpdateProgress();

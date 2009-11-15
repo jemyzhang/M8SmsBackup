@@ -3,6 +3,17 @@
 #include <mzfc_inc.h>
 #include "LocalDataBase.h"
 #include "UiSmsList.h"
+#include <UiWaitMessageDlg.h>
+
+class SearchWaitDlg : public Ui_WaitMessageDlgWnd{
+public:
+    SearchWaitDlg()
+      :Ui_WaitMessageDlgWnd(L"ËÑË÷ÖÐ£¬ÇëÉÔºò¡£"){
+          m_pSmsList = 0;
+      }
+    bool CallBackProcess();
+    UiSmsList *m_pSmsList;
+};
 
 // Main window derived from CMzWndEx
 class Ui_SearchWnd : public CMzWndEx {
@@ -31,7 +42,5 @@ protected:
 
     // override the MZFC command handler
     virtual void OnMzCommand(WPARAM wParam, LPARAM lParam);
-private:
-    LocalDataBase ldb;
 };
 

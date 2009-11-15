@@ -1,6 +1,6 @@
 #include "ui_search.h"
-#include "mz_commonfunc.h"
-using namespace MZ_CommonFunc;
+#include <MzCommon.h>
+using namespace MzCommon;
 #include "resource.h"
 
 extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
@@ -10,17 +10,13 @@ extern HINSTANCE LangresHandle;
 #define MZ_IDC_BUTTON_SEARCH 102
 
 #define MZ_IDC_SMS_LIST 121
-extern wchar_t g_password[256];
-extern int g_password_len;
+extern LocalDataBase *g_pldb;
 
 MZ_IMPLEMENT_DYNAMIC(Ui_SearchWnd)
 
 Ui_SearchWnd::Ui_SearchWnd(){
 	plistkey = 0;
 	plistSize = 0;
-	if(!ldb.checkpwd(g_password,g_password_len)){
-		return;
-	}
 }
 
 Ui_SearchWnd::~Ui_SearchWnd(){
@@ -50,7 +46,7 @@ BOOL Ui_SearchWnd::OnInitDialog() {
 	m_SmsList.SetPos(5, y, GetWidth() - 10, GetHeight() - y - MZM_HEIGHT_TEXT_TOOLBAR);
 	m_SmsList.SetID(MZ_IDC_SMS_LIST);
 	m_SmsList.EnableNotifyMessage(true);
-	m_SmsList.SetupDB(&ldb);
+	m_SmsList.SetupDB(g_pldb);
 	m_SmsList.SetupMode(2);
 	m_SmsList.SetItemHeight(80);
 	AddUiWin(&m_SmsList);
@@ -80,19 +76,26 @@ void Ui_SearchWnd::SetupToolbar(){
 		}
 	}
 	m_Toolbar.Invalidate();
-	m_Toolbar.Update();
+	//m_Toolbar.Update();
 }
 
 void Ui_SearchWnd::SetupList(){
 	m_SmsList.SetSelectedIndex(-1);
 	m_SmsList.RemoveAll();
 	m_SmsList.ScrollTo();
-	MzBeginWaitDlg(m_hWnd);
-	DateTime::waitms(2);
-	m_SmsList.reqUpdate();
-	MzEndWaitDlg();
+
+    SearchWaitDlg dlg;
+    RECT rcWork = MzGetWorkArea();
+    dlg.m_pSmsList = &m_SmsList;
+    dlg.Create(rcWork.left + 30, rcWork.top + 200, RECT_WIDTH(rcWork) - 60, RECT_HEIGHT(rcWork) - 400,
+        m_hWnd, 0, WS_POPUP);
+    // set the animation of the window
+    dlg.SetAnimateType_Show(MZ_ANIMTYPE_NONE);
+    dlg.SetAnimateType_Hide(MZ_ANIMTYPE_FADE);
+    dlg.DoModal();
+
 	m_SmsList.Invalidate();
-	m_SmsList.Update();
+	//m_SmsList.Update();
 	SetupToolbar();
 	return;
 }
@@ -109,7 +112,7 @@ void Ui_SearchWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 					}
 					m_SearchBox.SetFocus(false);
 					m_SearchBox.Invalidate();
-					m_SearchBox.Update();
+					//m_SearchBox.Update();
 					m_SmsList.SetupListContent(key.C_Str());
 					SetupList();
 				}
@@ -122,7 +125,7 @@ void Ui_SearchWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 					if(m_SmsList.GetSelectionMode()){
 						m_SmsList.ReverseSelect();
 						m_SmsList.Invalidate();
-						m_SmsList.Update();
+						//m_SmsList.Update();
 						SetupToolbar();
 					}else{
 						EndModal(ID_OK);
@@ -132,7 +135,7 @@ void Ui_SearchWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 				if(nIndex == 2){
 					m_SmsList.SetSelectionMode();
 					m_SmsList.Invalidate();
-					m_SmsList.Update();
+					//m_SmsList.Update();
 					SetupToolbar();
 				}
 				if(nIndex == 1){
@@ -142,7 +145,7 @@ void Ui_SearchWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 							m_SmsList.DeleteSelectedItems();
 							m_SmsList.reqUpdate();
 							m_SmsList.Invalidate();
-							m_SmsList.Update();
+							//m_SmsList.Update();
 					}
 				}
 			}
@@ -164,7 +167,7 @@ LRESULT Ui_SearchWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 						int nIndex = m_SmsList.CalcIndexOfPos(x, y);
 						m_SmsList.SetSelectedIndex(nIndex);
 						m_SmsList.Invalidate();
-						m_SmsList.Update();
+						//m_SmsList.Update();
 						SetupToolbar();
 						return 0;
 					}
@@ -172,10 +175,23 @@ LRESULT Ui_SearchWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 				if (nID == MZ_IDC_SMS_LIST && nNotify == MZ_MN_MOUSEMOVE) {
 					m_SmsList.SetSelectedIndex(-1);
 					m_SmsList.Invalidate();
-					m_SmsList.Update();
+					//m_SmsList.Update();
 					return 0;
 				}
 			}
 	}
 	return CMzWndEx::MzDefWndProc(message, wParam, lParam);
+}
+
+bool SearchWaitDlg::CallBackProcess(){
+    if(m_pSmsList){
+        m_pSmsList->reqUpdate();
+        if(m_pSmsList->GetItemCount() == 0){
+            m_Message.SetText(L"没有找到符合条件的短信。");
+            m_Message.Invalidate();
+            //m_Message.Update();
+            DateTime::waitms(10);
+        }
+    }
+    return true;
 }

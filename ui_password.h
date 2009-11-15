@@ -2,7 +2,7 @@
 
 // include the MZFC library header file
 #include <mzfc_inc.h>
-#include "mz_commonfunc.h"
+#include <MzCommon.h>
 #include "UiControlBackground.h"
 
 class Ui_PasswordWnd : public CMzWndEx 
@@ -16,7 +16,7 @@ public:
     UiSingleLineEdit m_EdtPassword;
 	UiControlBackground m_Background;
 public:
-	void getPassword(wchar_t* p,int* plen);
+	void getPassword(wchar_t** p,int* plen);
 	void setMode(int m) { _uiMode = m; }
 	virtual int DoModal(){
 		_isModal = true;

@@ -3,6 +3,9 @@
 #include "ui_SmsViewer.h"
 #include "ui_ProgressBar.h"
 
+#include <MzCommon.h>
+using namespace MzCommon;
+
 extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 
 void UiSmsList::SetupList() {
@@ -11,21 +14,21 @@ void UiSmsList::SetupList() {
         case 0:         //datetime
             plist_size = pldb->GetSmsByDate(syear,smonth,sday);
             if(plist_size > 0){
-                plist_record = new SmsSimpleData_t[plist_size];
+                plist_record = new SmsSimpleData_t[plist_size + 1];
                 plist_size = pldb->GetSmsByDate(syear,smonth,sday,plist_record);
             }
             break;
         case 1:
             plist_size = pldb->GetSmsByContact(sname);
             if(plist_size > 0){
-                plist_record = new SmsSimpleData_t[plist_size];
+                plist_record = new SmsSimpleData_t[plist_size + 1];
                 plist_size = pldb->GetSmsByContact(sname,plist_record);
             }
             break;
         case 2:
             plist_size = pldb->GetSmsByContent(scontent);
             if(plist_size > 0){
-                plist_record = new SmsSimpleData_t[plist_size];
+                plist_record = new SmsSimpleData_t[plist_size + 1];
                 plist_size = pldb->GetSmsByContent(scontent,plist_record);
             }
             break;
@@ -40,10 +43,7 @@ void UiSmsList::SetupList() {
 void UiSmsList::ClearList(){
 	RemoveAll();
     if(plist_record && plist_size > 0){
-        for(UINT i = 0; i < plist_size; i++){
-            plist_record[i].Reset();
-        }
-        delete plist_record;
+        delete [] plist_record;
         plist_record = 0;
         plist_size = 0;
     }
@@ -106,8 +106,11 @@ void UiSmsList::DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RE
     RECT rcContent = {prcItem->left + 40,prcItem->top + 45,prcItem->right - 10,prcItem->bottom};
     cr = RGB(0,0,0);
     ::SetTextColor( hdcDst , cr );
-    MzDrawText( hdcDst , prec->Content, &rcContent , DT_BOTTOM|DT_LEFT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
+	LPTSTR pmsg = 0;
+	C::newlinecpy(&pmsg,prec->Content,35);
+    MzDrawText( hdcDst , pmsg, &rcContent , DT_BOTTOM|DT_LEFT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
 	DeleteObject(hf);
+	delete pmsg;
 
 	if(bSelectionMode){
 		RECT rcSelection = {prcItem->right - 40,prcItem->top,prcItem->right,prcItem->bottom};

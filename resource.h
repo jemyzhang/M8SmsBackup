@@ -57,6 +57,10 @@
 #define IDS_STR_RESTORE                 153
 #define IDS_STR_WARN_RESTORE            154
 #define IDS_STR_RESTORE_S               155
+#define IDS_STR_OPTIMIZE                156
+#define IDS_STR_OPTIMIZE_DTL            157
+#define IDS_STR_CONTACT_CLEAR           158
+#define IDS_STR_CONTACT_CLEAR_DTL       159
 #define IDB_PNG_NAVI_BG                 201
 #define IDB_PNG_BEGIN                   201
 #define IDB_PNG_NAVI_BTN_BHL            202
@@ -65,9 +69,9 @@
 #define IDB_PNG_SMS_RECV                205
 #define IDB_PNG_SEARCH                  206
 #define IDB_PNG_LOGO                    207
-#define IDB_PNG_REPORT_SMS				208
-#define IDB_PNG_REPLY_SMS				209
-#define IDB_PNG_FORWARD_SMS				210
+#define IDB_PNG_REPORT_SMS              208
+#define IDB_PNG_REPLY_SMS               209
+#define IDB_PNG_FORWARD_SMS             210
 #define IDB_PNG_END                     210
 
 // Next default values for new objects

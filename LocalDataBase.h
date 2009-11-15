@@ -3,8 +3,10 @@
 #include <mzfc_inc.h>
 #include <windows.h>
 
+#include <sqlite3x.hpp>
+using namespace sqlite3x;
+
 #include <list>
-#include "sqlite3\sqlite3.h"
 using namespace std;
 
 #ifdef _DEBUG
@@ -26,8 +28,8 @@ TimeStamps datetime not null, SendReceive numeric not null, \
 Year text, Month text, Day text)"
 
 #define INSERT_CONTACT L"INSERT INTO '%s' (PhoneNumber,Name,Label) values('%s','%s',%d)"
-#define INSERT_SMS L"INSERT INTO '%s' (Name, PN,PhoneNumber,Content,TimeStamps,SendReceive,Year,Month,Day) \
-values('%s', '%s','%s','%s','%04d-%02d-%02d %02d:%02d:%02d',%d, '%02d','%02d','%02d')"
+#define INSERT_SMS L"INSERT INTO '%s' (Name,PN,PhoneNumber,Content,TimeStamps,SendReceive,Year,Month,Day) \
+values('%s','%s','%s',?,'%04d-%02d-%02d %02d:%02d:%02d',%d, '%02d','%02d','%02d')"
 
 #define CONTACT_EQU_CONDITION   L"where PhoneNumber='%s' and Name='%s' and Label=%d"
 #define COUNT_SELECT_CONTACT  L"select count(*) from '%s' "CONTACT_EQU_CONDITION
@@ -234,7 +236,7 @@ public:
     ~LocalDataBase();
 public:
 	bool connect();
-	bool disconnect() { return disconnectDatabase(); }
+	bool disconnect();
 	bool decrypt(wchar_t* pwd,int len);
 	bool encrypt(wchar_t* pwd,int len);
 
@@ -273,53 +275,23 @@ public:
 	//contact相关操作
 	UINT AppendContactRecord(ContactData_ptr);
 	bool RemoveContactRecord(ContactData_ptr);
+    void ClearContactTable();
 private:
     bool addContactRecord(LPWSTR number,LPWSTR name,TelLabel_t label);
 	bool isDuplicateContact(LPWSTR number,LPWSTR name,TelLabel_t label);
 	bool updateContact(LPWSTR number,LPWSTR name,TelLabel_t label);
-	LPWSTR getContactName(LPWSTR phonenumber);	//使用后，需要销毁返回值
+	bool getContactName(LPWSTR phonenumber,LPWSTR *ppname);	//使用后，需要销毁返回值
 private:
-    //sqlite operations
-    sqlite3* db;
-	sqlite3_stmt* pStmt;
-	const void* pzTail;
-	wchar_t sqlcmdw[512];
+	sqlite3_connection sqlconn;
     wchar_t db_path[MAX_PATH];
-	bool bconnected;
 protected:
     bool connectDatabase(const wchar_t*);
-    bool disconnectDatabase();
     void createDefaultDatabase();
-	bool decrytpDatabase(const char* pwd,int len);	//true: successful
-	bool setDatabasePassword(const char* pwd,int len);	//true: successful
 public:
-	int beginTrans(){
-		bool rc = false;
-		wsprintf(sqlcmdw,L"begin transaction;");
-		if (sqlite3_prepare16(db, sqlcmdw, -1, &pStmt, &pzTail) == SQLITE_OK) {
-			sqlite3_step(pStmt);
-		}
-		sqlite3_finalize(pStmt);
-		return rc;
-	}
-	int commitTrans(){
-		bool rc = false;
-		wsprintf(sqlcmdw,L"commit transaction;");
-		if (sqlite3_prepare16(db, sqlcmdw, -1, &pStmt, &pzTail) == SQLITE_OK) {
-			sqlite3_step(pStmt);
-		}
-		sqlite3_finalize(pStmt);
-		return rc;
-	}
-	bool reorgDatebase(){
-		bool rc = false;
-		wsprintf(sqlcmdw,L"VACUUM");
-		if (sqlite3_prepare16(db, sqlcmdw, -1, &pStmt, &pzTail) == SQLITE_OK) {
-			sqlite3_step(pStmt);
-		}
-		sqlite3_finalize(pStmt);
-		return rc;
-	}
+	bool beginTrans();
+	bool commitTrans();
+	bool reorgDatebase();
+	bool indexDatabase();
 //数据库升级
 private:
 	bool TableExists(wchar_t* tablename);	//检测表是否存在

@@ -137,6 +137,10 @@ BEGIN
     IDS_STR_RESTORE         "恢复"
     IDS_STR_WARN_RESTORE    "数据库恢复将会覆盖您现有的数据库，可能造成数据丢失等问题，是否继续？"
     IDS_STR_RESTORE_S       "恢复成功"
+    IDS_STR_OPTIMIZE        "优化数据库"
+    IDS_STR_OPTIMIZE_DTL    "加快短信查看查找速度"
+    IDS_STR_CONTACT_CLEAR   "重新导入联系人"
+    IDS_STR_CONTACT_CLEAR_DTL "修复发信人姓名显示"
 END
 
 #endif    // 中文(中华人民共和国) resources
