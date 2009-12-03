@@ -19,7 +19,11 @@ public:
 	UiButtonEx m_BtnSearch;		//≤È’“
 	UiButtonEx m_BtnRefresh;	//À¢–¬
 	UiButtonEx m_BtnConfig;		//…Ë÷√
+#ifdef USE_903SDK
 	UiMultiLineEdit m_TextAbout;
+#else
+	UiEdit m_TextAbout;
+#endif
 protected:
     // Initialization of the window (dialog)
     virtual BOOL OnInitDialog();
