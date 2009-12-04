@@ -19,8 +19,8 @@ using namespace MzCommon;
 #else
 #define BUILD_METHOD L"d"
 #endif
-#define VER_STRING L"1.61"BUILD_METHOD
-#define BUILD_STRING L"20091115"BUILD_CONFIG
+#define VER_STRING L"1.70"BUILD_METHOD
+#define BUILD_STRING L"20091204"BUILD_CONFIG
 
 extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 extern HINSTANCE LangresHandle;

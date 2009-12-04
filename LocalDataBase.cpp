@@ -3,16 +3,6 @@
 using namespace MzCommon;
 
 
-#ifdef _DEBUG
-#define db_out(s) printf("%s:%d: %s\n",__FUNCTION__, __LINE__, s)
-#else
-#define db_out(s)
-#endif
-
-#define TRY try
-#define CATCH catch
-
-
 LocalDataBase::LocalDataBase() {
     wchar_t currpath[MAX_PATH];
     bool ret = true;
@@ -245,10 +235,19 @@ bool LocalDataBase::AppendSmsRecord(SmsData_ptr psms){
 			smstm.wYear,smstm.wMonth,smstm.wDay,
 			smstm.wHour,smstm.wMinute,smstm.wSecond);
 		cmd.bind(5,timestamps,lstrlen(timestamps)*2);
+
 		cmd.bind(6,(int)psms->SendReceiveFlag);
-		cmd.bind(7,(int)smstm.wYear);
-		cmd.bind(8,(int)smstm.wMonth);
-		cmd.bind(9,(int)smstm.wDay);
+
+		wchar_t sDate[8];
+		wsprintf(sDate,L"%04d",smstm.wYear);
+		cmd.bind(7,sDate,lstrlen(sDate)*2);
+
+		wsprintf(sDate,L"%02d",smstm.wMonth);
+		cmd.bind(8,sDate,lstrlen(sDate)*2);
+
+		wsprintf(sDate,L"%02d",smstm.wDay);
+		cmd.bind(9,sDate,lstrlen(sDate)*2);
+
 		cmd.executenonquery();
 	}CATCH(exception &ex){
 		db_out(ex.what());
@@ -456,27 +455,18 @@ UINT LocalDataBase::GetSmsCount(UINT &received, UINT &sent){
 
 	TRY{	//获取总数
 		sqlite3_command cmd(this->sqlconn,
-			L"select count(*) from '"
+			L"select count(*),sum(sendreceive) from '"
 			TABLE_SMS
 			L"';");
-		total = cmd.executeint();
+		sqlite3_reader reader=cmd.executereader();
+		while(reader.read()){
+			total = reader.getint(0);
+			sent = reader.getint(1);
+			received = total - sent;
+		}
 	}CATCH(exception &ex){
 		db_out(ex.what());
 		bRet = false;
-	}
-
-    if(total != 0 && bRet){
-		TRY{	//获取发送数
-			sqlite3_command cmdcount(this->sqlconn,
-				L"select count(SendReceive) from '"
-				TABLE_SMS
-				L"';");
-			sent = cmdcount.executeint();
-			received = total - sent;
-		}CATCH(exception &ex){
-			db_out(ex.what());
-			bRet = false;
-		}
 	}
     return total;
 }

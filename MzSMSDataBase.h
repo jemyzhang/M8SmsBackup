@@ -35,7 +35,7 @@ public:
 	~MzSMSDataBase(void);
 protected:
     BOOL Open(const TCHAR *szSmsFileName);   //打开数据库
-    BOOL MzSMSDataBase::Close( void );      // 关闭数据库
+    BOOL Close( void );      // 关闭数据库
     void SetDataBaseTable(const TCHAR *szTableName); //设置要操作的表名
     WORD GetRecordCount();
 public:

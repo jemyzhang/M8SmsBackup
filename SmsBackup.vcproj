@@ -227,7 +227,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MzContactDataBaseV2.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MzSMSDataBase.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MzSMSDataBaseV2.cpp"
 				>
 			</File>
 			<File
@@ -309,7 +317,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MzContactDataBaseV2.h"
+				>
+			</File>
+			<File
 				RelativePath=".\MzSMSDataBase.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MzSMSDataBaseV2.h"
 				>
 			</File>
 			<File

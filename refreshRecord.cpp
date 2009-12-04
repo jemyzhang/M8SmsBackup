@@ -69,12 +69,30 @@ WORD refreshSIMContact(CallBackRefreshSIMContact callback){
 
 WORD refreshContact(CallBackRefreshContact callback){
     WORD nRet = 0;
-    MzContactDataBase dbcontact;
-    WORD count = dbcontact.GetContactCount();
+	list<CMzString> l;
+	BOOL bContactDatabaseV2 = MzSystem::requireVersion(0,9,5,0);
+
+	MzContactDataBase *pdb_v1 = NULL;
+	MzContactDataBaseV2 *pdb_v2 = NULL;
+	if(bContactDatabaseV2){
+		l.push_back(L"contacts.db");
+		File::BackupFiles(L"Documents and Settings\\",L"\\Disk\\",l);
+		pdb_v2 = new MzContactDataBaseV2(L"\\Disk\\contacts.db");
+	}else{
+		pdb_v1 = new MzContactDataBase;
+	}
+
+	ULONG count = bContactDatabaseV2 ? 
+		pdb_v2->GetContactCount() : pdb_v1->GetContactCount();
+	
     g_pldb->beginTrans();
     ContactData_t contact;
     for(WORD i = 0; i < count; i++){
-        dbcontact.GetContact(i,contact);
+ 		if(bContactDatabaseV2){
+			pdb_v2->GetContact(i,contact);
+		}else{
+			pdb_v1->GetContact(i,contact);
+		}
 		getridCountryCode(&contact);
         nRet += g_pldb->AppendContactRecord(&contact);
         if(callback){
@@ -88,16 +106,33 @@ WORD refreshContact(CallBackRefreshContact callback){
     if(callback){
         (*callback)(NULL,0,0,0);	//indicate end
     }
+	if(bContactDatabaseV2){
+		delete pdb_v2;
+	}else{
+		delete pdb_v1;
+	}
     return nRet;
 }
 
 WORD refreshSms(CallBackRefreshSms callback){
     WORD nRet = 0;
 	list<CMzString> l;
-	l.push_back(L"sms.edb");
-	File::BackupFiles(L"Documents and Settings\\",L"\\Disk\\",l);
-	MzSMSDataBase db(L"\\Disk\\sms.edb");
-	ULONG count = db.GetSmsCount();
+	BOOL bSmsDatabaseV2 = MzSystem::requireVersion(0,9,5,0);
+
+	MzSMSDataBase *pdb_v1 = NULL;
+	MzSMSDataBaseV2 *pdb_v2 = NULL;
+	if(bSmsDatabaseV2){
+		l.push_back(L"sms.db");
+		File::BackupFiles(L"Documents and Settings\\",L"\\Disk\\",l);
+		pdb_v2 = new MzSMSDataBaseV2(L"\\Disk\\sms.db");
+	}else{
+		l.push_back(L"sms.edb");
+		File::BackupFiles(L"Documents and Settings\\",L"\\Disk\\",l);
+		pdb_v1 = new MzSMSDataBase(L"\\Disk\\sms.edb");
+	}
+
+	ULONG count = bSmsDatabaseV2 ? 
+		pdb_v2->GetSmsCount() : pdb_v1->GetSmsCount();
 
 	SmsData_t sms;
     bool bfast = false;
@@ -109,7 +144,11 @@ WORD refreshSms(CallBackRefreshSms callback){
     g_pldb->beginTrans();
     for(int i = 0; i < count; i++){
         bool bomit = false; //ÊÇ·ñÌø¹ý
-	    db.GetSms(i,sms);
+		if(bSmsDatabaseV2){
+			pdb_v2->GetSms(i,sms);
+		}else{
+			pdb_v1->GetSms(i,sms);
+		}
         if(bfast){
             if(DateTime::compareDateTime(sms.TimeStamp,edt) <= 0 ){
                 bomit = true;
@@ -151,5 +190,10 @@ WORD refreshSms(CallBackRefreshSms callback){
     if(callback){
         (*callback)(NULL,0,0,0);	//indicate end
     }
+	if(bSmsDatabaseV2){
+		delete pdb_v2;
+	}else{
+		delete pdb_v1;
+	}
     return nRet;
 }

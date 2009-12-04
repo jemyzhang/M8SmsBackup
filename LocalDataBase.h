@@ -21,24 +21,15 @@ using namespace std;
 
 #define TABLE_SMS_OLD	L"sms_v1"
 
-#define CREATE_CONTACT_TBL L"CREATE TABLE IF NOT EXISTS '%s' (PhoneNumber text primary key,Name text NOT NULL,Label numeric NOT NULL)"
-#define CREATE_SMS_TBL L"CREATE TABLE IF NOT EXISTS  '%s' \
- (Name text not null, PN text not null, PhoneNumber text not null, Content text not null, \
-TimeStamps datetime not null, SendReceive numeric not null, \
-Year text, Month text, Day text)"
 
-#define INSERT_CONTACT L"INSERT INTO '%s' (PhoneNumber,Name,Label) values('%s','%s',%d)"
-#define INSERT_SMS L"INSERT INTO '%s' (Name,PN,PhoneNumber,Content,TimeStamps,SendReceive,Year,Month,Day) \
-values('%s','%s','%s',?,'%04d-%02d-%02d %02d:%02d:%02d',%d, '%02d','%02d','%02d')"
+#ifdef _DEBUG
+#define db_out(s) printf("%s:%d: %s\n",__FUNCTION__, __LINE__, s)
+#else
+#define db_out(s)
+#endif
 
-#define CONTACT_EQU_CONDITION   L"where PhoneNumber='%s' and Name='%s' and Label=%d"
-#define COUNT_SELECT_CONTACT  L"select count(*) from '%s' "CONTACT_EQU_CONDITION
-#define DELETE_SELECT_CONTACT  L"delete from '%s' "CONTACT_EQU_CONDITION
-#define UPDATE_SELECT_CONTACT	L"update '%s' set Name='%s',Label=%d where PhoneNumber='%s'"
-
-#define SMS_EQU_CONDITION   L"where PhoneNumber='%s' and TimeStamps='%04d-%02d-%02d %02d:%02d:%02d' and SendReceive=%d"
-#define COUNT_SELECT_SMS  L"select count(*) from '%s' "SMS_EQU_CONDITION
-#define DELETE_SELECT_SMS  L"delete from '%s' "SMS_EQU_CONDITION
+#define TRY try
+#define CATCH catch
 
 /* 按照姓名检索sms时
 //创建临时关联数据库
