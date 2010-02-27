@@ -2,7 +2,7 @@
 
 // include the MZFC library header file
 #include <mzfc_inc.h>
-#include <UiWaitMessageDlg.h>
+#include "UiWaitMessageDlg.h"
 
 class OptimizeWaitDlg : public Ui_WaitMessageDlgWnd{
 public:

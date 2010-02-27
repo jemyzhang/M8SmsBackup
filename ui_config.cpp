@@ -1,8 +1,8 @@
 #include "ui_config.h"
 #include "resource.h"
 #include "appconfigini.h"
-#include <MzCommon.h>
-using namespace MzCommon;
+#include <cMzCommon.h>
+using namespace cMzCommon;
 #include "ui_password.h"
 #include "ui_backup.h"
 #include "LocalDataBase.h"

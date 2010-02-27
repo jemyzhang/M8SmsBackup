@@ -1,5 +1,5 @@
-#include <MzCommon.h>
-using namespace MzCommon;
+#include <cMzCommon.h>
+using namespace cMzCommon;
 
 #include "M8SmsMgr.h"
 #include "resource.h"

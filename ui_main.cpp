@@ -1,7 +1,7 @@
 #include "ui_main.h"
 #include "ui_ProgressBar.h"
-#include <MzCommon.h>
-using namespace MzCommon;
+#include <cMzCommon.h>
+using namespace cMzCommon;
 #include "resource.h"
 #include "ui_view.h"
 #include "ui_search.h"

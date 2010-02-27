@@ -3,7 +3,7 @@
 
 // include the MZFC library header file
 #include <mzfc_inc.h>
-#include <UiImage.h>
+#include "UiImage.h"
 // Main window derived from CMzWndEx
 
 class Ui_MainWnd : public CMzWndEx {

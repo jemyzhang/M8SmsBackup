@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\MzCommon\include"
+				AdditionalIncludeDirectories="..\cMzCommon\include"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;DEBUG;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE"
 				MinimalRebuild="true"
 				RuntimeLibrary="1"
@@ -65,10 +65,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,6.00"
-				AdditionalDependencies="mzfc.lib PlatformApi.lib MzCommond.lib"
+				AdditionalDependencies="mzfc.lib PlatformApi.lib cMzCommond.lib"
 				OutputFile="$(OutDir)/SmsBackup.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\MzCommon\libs"
+				AdditionalLibraryDirectories="..\cMzCommon\libs"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile="$(OutDir)/SmsBackup.pdb"
@@ -132,7 +132,7 @@
 				ExecutionBucket="7"
 				Optimization="2"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\MzCommon\include"
+				AdditionalIncludeDirectories="..\cMzCommon\include"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
@@ -155,10 +155,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,6.00"
-				AdditionalDependencies="mzfc.lib PlatformApi.lib MzCommons.lib"
+				AdditionalDependencies="mzfc.lib PlatformApi.lib cMzCommon.lib"
 				OutputFile="$(OutDir)/SmsBackup.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\MzCommon\libs"
+				AdditionalLibraryDirectories="..\cMzCommon\libs"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="false"
 				ProgramDatabaseFile="$(OutDir)/SmsBackup.pdb"
@@ -283,11 +283,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\UiImage.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\UiNaviList.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\UiSmsList.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UiWaitMessageDlg.cpp"
 				>
 			</File>
 		</Filter>
@@ -377,11 +385,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\UiImage.h"
+				>
+			</File>
+			<File
 				RelativePath=".\UiNaviList.h"
 				>
 			</File>
 			<File
 				RelativePath=".\UiSmsList.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UiWaitMessageDlg.h"
 				>
 			</File>
 		</Filter>

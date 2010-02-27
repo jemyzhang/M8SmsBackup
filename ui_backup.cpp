@@ -1,7 +1,7 @@
 #include "ui_backup.h"
 #include <list>
-#include <MzCommon.h>
-using namespace MzCommon;
+#include <cMzCommon.h>
+using namespace cMzCommon;
 #include "resource.h"
 #include "LocalDataBase.h"
 

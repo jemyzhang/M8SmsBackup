@@ -2,7 +2,7 @@
 #include "LocalDataBase.h"
 #include "resource.h"
 
-using namespace MzCommon;
+using namespace cMzCommon;
 
 MZ_IMPLEMENT_DYNAMIC(Ui_PasswordWnd)
 

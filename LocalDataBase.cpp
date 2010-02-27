@@ -1,6 +1,6 @@
 #include "LocalDataBase.h"
-#include <MzCommon.h>
-using namespace MzCommon;
+#include <cMzCommon.h>
+using namespace cMzCommon;
 
 
 LocalDataBase::LocalDataBase() {

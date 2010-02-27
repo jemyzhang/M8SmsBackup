@@ -1,7 +1,7 @@
 #include "refreshRecord.h"
 #include "LocalDataBase.h"
-#include <MzCommon.h>
-using namespace MzCommon;
+#include <cMzCommon.h>
+using namespace cMzCommon;
 #include "appconfigini.h"
 
 extern SmsBackupConfig appconfig;

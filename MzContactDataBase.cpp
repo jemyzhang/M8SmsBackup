@@ -1,6 +1,6 @@
 #include "MzContactDataBase.h"
-#include <MzCommon.h>
-using namespace MzCommon;
+#include <cMzCommon.h>
+using namespace cMzCommon;
 
 #pragma comment(lib,"cellcore.lib")
 

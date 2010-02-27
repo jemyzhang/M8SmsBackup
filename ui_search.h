@@ -3,7 +3,7 @@
 #include <mzfc_inc.h>
 #include "LocalDataBase.h"
 #include "UiSmsList.h"
-#include <UiWaitMessageDlg.h>
+#include "UiWaitMessageDlg.h"
 
 class SearchWaitDlg : public Ui_WaitMessageDlgWnd{
 public:

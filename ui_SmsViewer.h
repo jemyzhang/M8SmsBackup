@@ -2,7 +2,7 @@
 // include the MZFC library header file
 #include <mzfc_inc.h>
 #include "LocalDataBase.h"
-#include <UiImage.h>
+#include "UiImage.h"
 #include "UiControlBackground.h"
 
 class UiSmsTitle : public UiStatic {

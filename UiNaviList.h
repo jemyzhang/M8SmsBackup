@@ -2,8 +2,8 @@
 // include the MZFC library header file
 #include <mzfc_inc.h>
 #include <list>
-#include <MzCommon.h>
-using namespace MzCommon;
+#include <cMzCommon.h>
+using namespace cMzCommon;
 
 //
 class UiNaviButton :

@@ -1,6 +1,6 @@
 #include "MzSMSDataBase.h"
-#include <MzCommon.h>
-using namespace MzCommon;
+#include <cMzCommon.h>
+using namespace cMzCommon;
 #include <winbase.h>
 extern "C"
 {

@@ -2,7 +2,7 @@
 
 // include the MZFC library header file
 #include <mzfc_inc.h>
-#include <MzCommon.h>
+#include <cMzCommon.h>
 #include "UiControlBackground.h"
 
 class Ui_PasswordWnd : public CMzWndEx 

@@ -3,8 +3,8 @@
 #include "ui_SmsViewer.h"
 #include "ui_ProgressBar.h"
 
-#include <MzCommon.h>
-using namespace MzCommon;
+#include <cMzCommon.h>
+using namespace cMzCommon;
 
 extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 

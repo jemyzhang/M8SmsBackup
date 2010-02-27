@@ -1,6 +1,6 @@
 #include "MzContactDataBaseV2.h"
-#include <MzCommon.h>
-using namespace MzCommon;
+#include <cMzCommon.h>
+using namespace cMzCommon;
 
 #define CONTACT_TABLE_NAME	L"ABPerson"
 #define CONTACT_TABLE_PHONE	L"ABPhones"

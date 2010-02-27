@@ -1,6 +1,6 @@
 #include "ui_SmsViewer.h"
-#include <MzCommon.h>
-using namespace MzCommon;
+#include <cMzCommon.h>
+using namespace cMzCommon;
 #include "resource.h"
 
 extern HINSTANCE LangresHandle;

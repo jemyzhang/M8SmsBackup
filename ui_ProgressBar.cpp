@@ -1,7 +1,7 @@
 #include <Mzfc/MzProgressDialog.h> 
 #include "ui_ProgressBar.h"
-#include <MzCommon.h>
-using namespace MzCommon;
+#include <cMzCommon.h>
+using namespace cMzCommon;
 #include "resource.h"
 extern HINSTANCE LangresHandle;
 #include "appconfigini.h"
