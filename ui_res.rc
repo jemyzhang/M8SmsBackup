@@ -57,7 +57,7 @@ IDB_PNG_NAVI_BTN_BHL    RCDATA                  "images\\NaviBar_Button_BottomLi
 IDB_PNG_NAVI_BTN_BNR    RCDATA                  "images\\NaviBar_Button_BottomLine_Normal.png"
 IDB_PNG_SMS_SEND        RCDATA                  "images\\SendSms.png"
 IDB_PNG_SMS_RECV        RCDATA                  "images\\ReceiveSms.png"
-IDB_PNG_SEARCH          RCDATA                  "images\\Search.png"
+//IDB_PNG_SEARCH          RCDATA                  "images\\Search.png"
 IDB_PNG_LOGO            RCDATA                  "images\\logo.png"
 IDB_PNG_REPORT_SMS      RCDATA                  "images\\ReportSpam.png"
 IDB_PNG_REPLY_SMS       RCDATA                  "images\\ReplySms.png"

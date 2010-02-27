@@ -29,6 +29,7 @@ public:
 	UiSingleLineEdit m_SearchBox;
 	UiButton_Image m_ButtonSearch;
     UiSmsList m_SmsList;
+	ImageContainer m_imgContainer;
 protected:
     //设置右边列表内容
     void SetupList();

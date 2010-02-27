@@ -67,12 +67,12 @@
 #define IDB_PNG_NAVI_BTN_BNR            203
 #define IDB_PNG_SMS_SEND                204
 #define IDB_PNG_SMS_RECV                205
-#define IDB_PNG_SEARCH                  206
-#define IDB_PNG_LOGO                    207
-#define IDB_PNG_REPORT_SMS              208
-#define IDB_PNG_REPLY_SMS               209
-#define IDB_PNG_FORWARD_SMS             210
-#define IDB_PNG_END                     210
+//#define IDB_PNG_SEARCH                  206
+#define IDB_PNG_LOGO                    206
+#define IDB_PNG_REPORT_SMS              207
+#define IDB_PNG_REPLY_SMS               208
+#define IDB_PNG_FORWARD_SMS             209
+#define IDB_PNG_END                     209
 
 // Next default values for new objects
 // 

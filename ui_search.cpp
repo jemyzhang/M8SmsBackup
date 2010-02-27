@@ -29,7 +29,7 @@ BOOL Ui_SearchWnd::OnInitDialog() {
 	}
 
 	// Then init the controls & other things in the window
-	int y = 0;
+	int y = 5;
 	m_SearchBox.SetPos(5, y, GetWidth() - 80, MZM_HEIGHT_SINGLELINE_EDIT);
 	m_SearchBox.SetTip(LOADSTRING(IDS_STR_KEYWORDS).C_Str());
 	m_SearchBox.SetSipMode(IM_SIP_MODE_GEL_PY,MZM_HEIGHT_TEXT_TOOLBAR);
@@ -38,8 +38,10 @@ BOOL Ui_SearchWnd::OnInitDialog() {
 	m_ButtonSearch.SetPos(GetWidth() - 75, y, 70,MZM_HEIGHT_SINGLELINE_EDIT);
 	m_ButtonSearch.SetID(MZ_IDC_BUTTON_SEARCH);
 	m_ButtonSearch.SetButtonType(MZC_BUTTON_NONE);
-	m_ButtonSearch.SetImage_Normal(pimg[IDB_PNG_SEARCH - IDB_PNG_BEGIN]);
-	m_ButtonSearch.SetImage_Pressed(pimg[IDB_PNG_SEARCH - IDB_PNG_BEGIN]);
+	m_ButtonSearch.SetImage_Normal(
+		m_imgContainer.LoadImage(GetMzResV2ModuleHandle(), MZRESV2_IDR_PNG_SEARCH_BTN, true));
+	m_ButtonSearch.SetImage_Pressed(
+		m_imgContainer.LoadImage(GetMzResV2ModuleHandle(), MZRESV2_IDR_PNG_SEARCH_BTN_PRESSED, true));
 	AddUiWin(&m_ButtonSearch);
 
 	y += MZM_HEIGHT_SINGLELINE_EDIT;
