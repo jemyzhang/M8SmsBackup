@@ -47,7 +47,7 @@ bool CheckPassword(HWND m_hWnd){
                     break;
                 }else{
                     MzMessageBoxV2(m_hWnd,
-						LOADSTRING(IDS_STR_EXP_FINISHED).C_Str(),MZV2_MB_OK,TRUE);
+						LOADSTRING(IDS_STR_PWD_INCORRECT).C_Str(),MZV2_MB_OK,TRUE);
                 }
             }
         }else{
