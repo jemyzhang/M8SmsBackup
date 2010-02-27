@@ -139,9 +139,9 @@ void Ui_SearchWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 					SetupToolbar();
 				}
 				if(nIndex == 1){
-					if(MzMessageBoxEx(m_hWnd,
+					if(MzMessageBoxV2(m_hWnd,
 						LOADSTRING(IDS_STR_DELETE_CONFIRM).C_Str(),
-						LOADSTRING(IDS_STR_OK).C_Str(),MZ_YESNO,false) == 1){
+						MZV2_MB_YESNO,TRUE) == 1){
 							m_SmsList.DeleteSelectedItems();
 							m_SmsList.reqUpdate();
 							m_SmsList.Invalidate();

@@ -46,13 +46,13 @@ bool CheckPassword(HWND m_hWnd){
                     g_password_len = len;
                     break;
                 }else{
-                    MzAutoMsgBoxEx(m_hWnd,LOADSTRING(IDS_STR_PWD_INCORRECT).C_Str(),2000);
+                    MzMessageAutoBoxV2(m_hWnd,LOADSTRING(IDS_STR_PWD_INCORRECT).C_Str(),MZV2_MB_NONE,2000,TRUE);
                 }
             }
         }else{
             nRet = true;
         }
-        if(0){//nRet){
+        if(nRet){
 	        //检查是否要升级数据库
 	        initUiCallbackUpdateDatabase();
 	        g_pldb->updateV2(uiCallBackUpdateDatabase);

@@ -70,7 +70,7 @@ WORD refreshSIMContact(CallBackRefreshSIMContact callback){
 WORD refreshContact(CallBackRefreshContact callback){
     WORD nRet = 0;
 	list<CMzString> l;
-	BOOL bContactDatabaseV2 = MzSystem::requireVersion(0,9,5,0);
+	BOOL bContactDatabaseV2 = MzSystem::requireVersion(0,9,6,0);
 
 	MzContactDataBase *pdb_v1 = NULL;
 	MzContactDataBaseV2 *pdb_v2 = NULL;
@@ -117,7 +117,7 @@ WORD refreshContact(CallBackRefreshContact callback){
 WORD refreshSms(CallBackRefreshSms callback){
     WORD nRet = 0;
 	list<CMzString> l;
-	BOOL bSmsDatabaseV2 = MzSystem::requireVersion(0,9,5,0);
+	BOOL bSmsDatabaseV2 = MzSystem::requireVersion(0,9,6,0);
 
 	MzSMSDataBase *pdb_v1 = NULL;
 	MzSMSDataBaseV2 *pdb_v2 = NULL;

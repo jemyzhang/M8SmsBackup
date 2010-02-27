@@ -96,7 +96,7 @@ void Ui_BackupWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 				int nID = ppm.DoModal();
 				if(nID == IDC_PPM_RECOVER){	//恢复
 					//弹出警告
-					if(MzMessageBoxEx(m_hWnd,LOADSTRING(IDS_STR_WARN_RESTORE).C_Str(),L"警告",MZ_YESNO) != 1){
+					if(MzMessageBoxV2(m_hWnd,LOADSTRING(IDS_STR_WARN_RESTORE).C_Str(),MZV2_MB_YESNO,TRUE) != 1){
 						return;
 					}
 					//恢复数据库
@@ -108,7 +108,7 @@ void Ui_BackupWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
                     BOOL nRet = brecover(m_List.GetItem(nIndex)->Text);
                     if(nRet){
                         //弹出警告
-                        MzAutoMsgBoxEx(m_hWnd,LOADSTRING(IDS_STR_RESTORE_S).C_Str());
+                        MzMessageAutoBoxV2(m_hWnd,LOADSTRING(IDS_STR_RESTORE_S).C_Str(),MZV2_MB_NONE,2000,TRUE);
                     }
                     EndModal(ID_OK);
 				}else if(nID == IDC_PPM_DEL){ //删除
@@ -117,7 +117,7 @@ void Ui_BackupWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 					if(nIndex == -1) return;
 					BOOL nRet = bdelete(m_List.GetItem(nIndex)->Text);
 					if(nRet){
-						MzAutoMsgBoxEx(m_hWnd,LOADSTRING(IDS_STR_DELETE_S).C_Str());
+						MzMessageAutoBoxV2(m_hWnd,LOADSTRING(IDS_STR_DELETE_S).C_Str(),MZV2_MB_NONE,2000,TRUE);
 						updateList();
 					}
 				}else{
@@ -127,7 +127,7 @@ void Ui_BackupWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
             if (nIndex == 2) { //备份
 				BOOL nRet = bbackup();
 				if (nRet) {
-					MzAutoMsgBoxEx(m_hWnd,LOADSTRING(IDS_STR_BACKUP_S).C_Str());
+					MzMessageAutoBoxV2(m_hWnd,LOADSTRING(IDS_STR_BACKUP_S).C_Str(),MZV2_MB_NONE,2000,TRUE);
 					updateList();
 				}
                 return;

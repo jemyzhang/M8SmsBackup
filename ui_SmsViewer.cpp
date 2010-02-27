@@ -127,6 +127,7 @@ BOOL Ui_SmsViewerWnd::OnInitDialog() {
 
 void Ui_SmsViewerWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 	UINT_PTR id = LOWORD(wParam);
+	BOOL bNewUi = MzSystem::requireVersion(0,9,6,0);
 	switch (id) {
 		case MZ_IDC_BUTTON_FORWARD:	//×ª·¢
 			{
@@ -136,8 +137,13 @@ void Ui_SmsViewerWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 				CMzString s = L"-n ";
 				s = s + L"¨ˆ";
 				s = s + pr->Content;
-				CreateProcess(L"\\windows\\sms.exe", 
-					s.C_Str() , NULL, NULL, FALSE, 0, NULL, NULL, NULL, &pi);
+				if(bNewUi){
+					CreateProcess(L"\\windows\\smsui.exe", 
+						s.C_Str() , NULL, NULL, FALSE, 0, NULL, NULL, NULL, &pi);
+				}else{
+					CreateProcess(L"\\windows\\sms.exe", 
+						s.C_Str() , NULL, NULL, FALSE, 0, NULL, NULL, NULL, &pi);
+				}
 				MzEndWaitDlg();
 				break;
 			}
@@ -149,8 +155,13 @@ void Ui_SmsViewerWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 				CMzString s = L"-n ";
 				s = s + pr->MobileNumber;
 				s = s + L"¨ˆ";
-				CreateProcess(L"\\windows\\sms.exe", 
-					s.C_Str() , NULL, NULL, FALSE, 0, NULL, NULL, NULL, &pi);
+				if(bNewUi){
+					CreateProcess(L"\\windows\\smsui.exe", 
+						s.C_Str() , NULL, NULL, FALSE, 0, NULL, NULL, NULL, &pi);
+				}else{
+					CreateProcess(L"\\windows\\sms.exe", 
+						s.C_Str() , NULL, NULL, FALSE, 0, NULL, NULL, NULL, &pi);
+				}
 				MzEndWaitDlg();
 				break;
 			}
@@ -165,8 +176,13 @@ void Ui_SmsViewerWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 				s = s + pr->MobileNumber;
 				s = s + L" ";
 				s = s + pr->Content;
-				CreateProcess(L"\\windows\\sms.exe", 
-					s.C_Str() , NULL, NULL, FALSE, 0, NULL, NULL, NULL, &pi);
+				if(bNewUi){
+					CreateProcess(L"\\windows\\smsui.exe", 
+						s.C_Str() , NULL, NULL, FALSE, 0, NULL, NULL, NULL, &pi);
+				}else{
+					CreateProcess(L"\\windows\\sms.exe", 
+						s.C_Str() , NULL, NULL, FALSE, 0, NULL, NULL, NULL, &pi);
+				}
 				MzEndWaitDlg();
 				break;
 			}
