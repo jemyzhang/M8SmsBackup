@@ -57,7 +57,6 @@ IDB_PNG_NAVI_BTN_BHL    RCDATA                  "images\\NaviBar_Button_BottomLi
 IDB_PNG_NAVI_BTN_BNR    RCDATA                  "images\\NaviBar_Button_BottomLine_Normal.png"
 IDB_PNG_SMS_SEND        RCDATA                  "images\\SendSms.png"
 IDB_PNG_SMS_RECV        RCDATA                  "images\\ReceiveSms.png"
-//IDB_PNG_SEARCH          RCDATA                  "images\\Search.png"
 IDB_PNG_LOGO            RCDATA                  "images\\logo.png"
 IDB_PNG_REPORT_SMS      RCDATA                  "images\\ReportSpam.png"
 IDB_PNG_REPLY_SMS       RCDATA                  "images\\ReplySms.png"
@@ -141,6 +140,13 @@ BEGIN
     IDS_STR_OPTIMIZE_DTL    "加快短信查看查找速度"
     IDS_STR_CONTACT_CLEAR   "重新导入联系人"
     IDS_STR_CONTACT_CLEAR_DTL "修复发信人姓名显示"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_STR_EXPCON          "导出联系人"
+    IDS_STR_EXPCON_DTL      "导出联系人为文本"
+    IDS_STR_EXP_FINISHED    "导出成功"
 END
 
 #endif    // 中文(中华人民共和国) resources

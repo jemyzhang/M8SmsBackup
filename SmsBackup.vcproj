@@ -283,6 +283,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\UiFileDialog.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\UiImage.cpp"
 				>
 			</File>
@@ -382,6 +386,10 @@
 			</File>
 			<File
 				RelativePath=".\UiControlBackground.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UiFileDialog.h"
 				>
 			</File>
 			<File

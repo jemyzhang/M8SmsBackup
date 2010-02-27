@@ -92,8 +92,8 @@ BOOL Ui_MainWnd::OnInitDialog() {
 	m_BtnConfig.SetTextMaxLen2(0);
 	AddUiWin(&m_BtnConfig);
 
-	y=GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR - MZM_HEIGHT_BUTTONEX*2;
-	m_TextAbout.SetPos(0, y, GetWidth(), GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR - y);
+	y=GetHeight() - MZM_HEIGHT_TOOLBARPRO - MZM_HEIGHT_BUTTONEX*2;
+	m_TextAbout.SetPos(0, y, GetWidth(), GetHeight() - MZM_HEIGHT_TOOLBARPRO - y);
 	m_TextAbout.SetEnable(false);
 	m_TextAbout.SetTextColor(RGB(128,128,128));
 	m_TextAbout.SetDrawTextFormat(DT_RIGHT);
@@ -111,7 +111,7 @@ BOOL Ui_MainWnd::OnInitDialog() {
 	m_TextAbout.SetText(sAbout.C_Str());
 	AddUiWin(&m_TextAbout);
 
-	m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR, GetWidth(), MZM_HEIGHT_TEXT_TOOLBAR);
+	m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TOOLBARPRO, GetWidth(), MZM_HEIGHT_TOOLBARPRO);
 	m_Toolbar.SetButton(1,true,true,LOADSTRING(IDS_STR_EXIT).C_Str());
 	m_Toolbar.SetID(MZ_IDC_TOOLBAR_MAIN);
 	AddUiWin(&m_Toolbar);

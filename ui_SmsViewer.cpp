@@ -73,7 +73,7 @@ BOOL Ui_SmsViewerWnd::OnInitDialog() {
 	}
 
 	// Then init the controls & other things in the window
-	m_Background.SetPos(0, 0, GetWidth(), GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR);
+	m_Background.SetPos(0, 0, GetWidth(), GetHeight() - MZM_HEIGHT_TOOLBARPRO);
 	AddUiWin(&m_Background);
 
 	int y = 10;
@@ -81,7 +81,7 @@ BOOL Ui_SmsViewerWnd::OnInitDialog() {
 	m_Background.AddChild(&m_Title);
 
 	y+=65;
-	m_Content.SetPos(10, y, GetWidth() - 20 - 48, GetHeight() - y - MZM_HEIGHT_TEXT_TOOLBAR);
+	m_Content.SetPos(10, y, GetWidth() - 20 - 48, GetHeight() - y - MZM_HEIGHT_TOOLBARPRO);
 	m_Content.SetReadOnly(true);
 #ifdef USE_903SDK
 	m_Content.SetInsideScroll(true);
@@ -114,7 +114,7 @@ BOOL Ui_SmsViewerWnd::OnInitDialog() {
 	m_ReportSms.SetImage_Pressed(pimg[IDB_PNG_REPORT_SMS - IDB_PNG_BEGIN]);
 	m_Background.AddChild(&m_ReportSms);
 
-	m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR, GetWidth(), MZM_HEIGHT_TEXT_TOOLBAR);
+	m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TOOLBARPRO, GetWidth(), MZM_HEIGHT_TOOLBARPRO);
 	m_Toolbar.SetButton(0,true,true,LOADSTRING(IDS_STR_PREVIOUS).C_Str());
 	m_Toolbar.SetButton(1,true,true,LOADSTRING(IDS_STR_RETURN).C_Str());
 	m_Toolbar.SetButton(2,true,true,LOADSTRING(IDS_STR_NEXT).C_Str());

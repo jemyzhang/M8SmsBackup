@@ -6,7 +6,7 @@
 #include <sqlite3x.hpp>
 using namespace sqlite3x;
 
-#include <list>
+#include <vector>
 using namespace std;
 
 #ifdef _DEBUG
@@ -58,7 +58,7 @@ select distinct strftime('%m',timestamps) from exec where strftime('%Y',timestam
 select distinct strftime('%d',timestamps) from exec where strftime('%Y%m',timestamps)='200912'
 */
 
-typedef list<LPWSTR> TelNumbers_t,*TelNumbers_ptr;
+typedef vector<LPWSTR> TelNumbers_t,*TelNumbers_ptr;
 typedef enum TelLabelType{
 	MOBILETEL	=	0,
 	WORKTEL		=	1,
@@ -75,47 +75,42 @@ typedef struct ContactData{
     TelNumbers_t    HomeTels;
     TelNumbers_t    HomeTel2s;
     void Reset(){    //清空，以便下次使用
-        if(Name){
-            delete [] Name;
-            Name = NULL;
-        }
-        if(FirstName){
-            delete [] FirstName;
-            FirstName = NULL;
-        }
-        if(LastName){
-            delete [] LastName;
-            LastName = NULL;
-        }
-        TelNumbers_t::iterator i;
-        if(MobileTels.size()){
-            for(i = MobileTels.begin(); i != MobileTels.end(); i ++){
-                LPWSTR strNum = *i;
-                if(strNum) delete [] strNum;
-            }
-            MobileTels.clear();
-        }
-        if(WorkTels.size()){
-            for(i = WorkTels.begin(); i != WorkTels.end(); i ++){
-                LPWSTR strNum = *i;
-                if(strNum) delete [] strNum;
-            }
-            WorkTels.clear();
-        }
-        if(HomeTels.size()){
-            for(i = HomeTels.begin(); i != HomeTels.end(); i ++){
-                LPWSTR strNum = *i;
-                if(strNum) delete [] strNum;
-            }
-            HomeTels.clear();
-        }
-        if(HomeTel2s.size()){
-            for(i = HomeTel2s.begin(); i != HomeTel2s.end(); i ++){
-                LPWSTR strNum = *i;
-                if(strNum) delete [] strNum;
-            }
-            HomeTel2s.clear();
-        }
+		if(Name){
+			delete [] Name;
+			Name = NULL;
+		}
+		if(FirstName){
+			delete [] FirstName;
+			FirstName = NULL;
+		}
+		if(LastName){
+			delete [] LastName;
+			LastName = NULL;
+		}
+
+		for(int i = 0; i < MobileTels.size(); i ++){
+			LPWSTR strNum = MobileTels.at(i);
+			if(strNum) delete [] strNum;
+		}
+		MobileTels.clear();
+
+		for(int i = 0; i < WorkTels.size(); i ++){
+			LPWSTR strNum = WorkTels.at(i);
+			if(strNum) delete [] strNum;
+		}
+		WorkTels.clear();
+
+		for(int i = 0; i < HomeTels.size(); i ++){
+			LPWSTR strNum = HomeTels.at(i);
+			if(strNum) delete [] strNum;
+		}
+		HomeTels.clear();
+
+		for(int i = 0; i < HomeTel2s.size(); i ++){
+			LPWSTR strNum = HomeTel2s.at(i);
+			if(strNum) delete [] strNum;
+		}
+		HomeTel2s.clear();
     }
 	ContactData(){
         Name = NULL;
@@ -267,6 +262,13 @@ public:
 	UINT AppendContactRecord(ContactData_ptr);
 	bool RemoveContactRecord(ContactData_ptr);
     void ClearContactTable();
+
+	void query_clear();
+	bool query_contacts();
+	int query_contact_size() { return query_contact_list.size(); }
+	ContactData_ptr query_contact_at(int i) { return query_contact_list.at(i); }
+private:
+	vector<ContactData_ptr> query_contact_list;
 private:
     bool addContactRecord(LPWSTR number,LPWSTR name,TelLabel_t label);
 	bool isDuplicateContact(LPWSTR number,LPWSTR name,TelLabel_t label);

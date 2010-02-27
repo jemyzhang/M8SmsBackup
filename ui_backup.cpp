@@ -41,13 +41,13 @@ BOOL Ui_BackupWnd::OnInitDialog() {
 	AddUiWin(&m_Caption1);
 
 	y+=MZM_HEIGHT_CAPTION;
-    m_List.SetPos(0, y, GetWidth(), GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR - MZM_HEIGHT_CAPTION);
+    m_List.SetPos(0, y, GetWidth(), GetHeight() - MZM_HEIGHT_TOOLBARPRO - MZM_HEIGHT_CAPTION);
     m_List.SetID(MZ_IDC_BACKUP_LIST);
     m_List.EnableScrollBarV(true);
     m_List.EnableNotifyMessage(true);
     AddUiWin(&m_List);
 
-    m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR, GetWidth(), MZM_HEIGHT_TEXT_TOOLBAR);
+    m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TOOLBARPRO, GetWidth(), MZM_HEIGHT_TOOLBARPRO);
     m_Toolbar.SetButton(0, true, true, LOADSTRING(IDS_STR_RETURN).C_Str());
     m_Toolbar.EnableLeftArrow(true);
 	m_Toolbar.SetButton(1, true, false, LOADSTRING(IDS_STR_OPERATE).C_Str());

@@ -48,6 +48,17 @@ void initProgressBar(LPWSTR title = NULL, WORD rmin = 0, WORD rmax = 100){
 	bdlgshown = false;
 }
 
+bool updateProgressBar(int nCount){
+	if(nCount == 0){
+		HideProgressBar();
+		return false;
+	}
+	ShowProgressBar();
+	m_Progressdlg.SetCurrentValue(nCount);
+	m_Progressdlg.UpdateProgress();
+	return true;
+}
+
 void initUiCallbackRefreshContact(){
 	initProgressBar(LOADSTRING(IDS_STR_UPDATE_CONTACT).C_Str());//L"更新联系人记录...");
 }

@@ -61,13 +61,15 @@
 #define IDS_STR_OPTIMIZE_DTL            157
 #define IDS_STR_CONTACT_CLEAR           158
 #define IDS_STR_CONTACT_CLEAR_DTL       159
+#define IDS_STR_EXPCON                  160
+#define IDS_STR_EXPCON_DTL              161
+#define IDS_STR_EXP_FINISHED            162
 #define IDB_PNG_NAVI_BG                 201
 #define IDB_PNG_BEGIN                   201
 #define IDB_PNG_NAVI_BTN_BHL            202
 #define IDB_PNG_NAVI_BTN_BNR            203
 #define IDB_PNG_SMS_SEND                204
 #define IDB_PNG_SMS_RECV                205
-//#define IDB_PNG_SEARCH                  206
 #define IDB_PNG_LOGO                    206
 #define IDB_PNG_REPORT_SMS              207
 #define IDB_PNG_REPLY_SMS               208

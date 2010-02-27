@@ -46,7 +46,8 @@ bool CheckPassword(HWND m_hWnd){
                     g_password_len = len;
                     break;
                 }else{
-                    MzMessageAutoBoxV2(m_hWnd,LOADSTRING(IDS_STR_PWD_INCORRECT).C_Str(),MZV2_MB_NONE,2000,TRUE);
+                    MzMessageBoxV2(m_hWnd,
+						LOADSTRING(IDS_STR_EXP_FINISHED).C_Str(),MZV2_MB_OK,TRUE);
                 }
             }
         }else{

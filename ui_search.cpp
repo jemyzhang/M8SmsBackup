@@ -32,7 +32,7 @@ BOOL Ui_SearchWnd::OnInitDialog() {
 	int y = 5;
 	m_SearchBox.SetPos(5, y, GetWidth() - 80, MZM_HEIGHT_SINGLELINE_EDIT);
 	m_SearchBox.SetTip(LOADSTRING(IDS_STR_KEYWORDS).C_Str());
-	m_SearchBox.SetSipMode(IM_SIP_MODE_GEL_PY,MZM_HEIGHT_TEXT_TOOLBAR);
+	m_SearchBox.SetSipMode(IM_SIP_MODE_GEL_PY,MZM_HEIGHT_TOOLBARPRO);
 	AddUiWin(&m_SearchBox);
 
 	m_ButtonSearch.SetPos(GetWidth() - 75, y, 70,MZM_HEIGHT_SINGLELINE_EDIT);
@@ -45,7 +45,7 @@ BOOL Ui_SearchWnd::OnInitDialog() {
 	AddUiWin(&m_ButtonSearch);
 
 	y += MZM_HEIGHT_SINGLELINE_EDIT;
-	m_SmsList.SetPos(5, y, GetWidth() - 10, GetHeight() - y - MZM_HEIGHT_TEXT_TOOLBAR);
+	m_SmsList.SetPos(5, y, GetWidth() - 10, GetHeight() - y - MZM_HEIGHT_TOOLBARPRO);
 	m_SmsList.SetID(MZ_IDC_SMS_LIST);
 	m_SmsList.EnableNotifyMessage(true);
 	m_SmsList.SetupDB(g_pldb);
@@ -53,7 +53,7 @@ BOOL Ui_SearchWnd::OnInitDialog() {
 	m_SmsList.SetItemHeight(80);
 	AddUiWin(&m_SmsList);
 
-	m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR, GetWidth(), MZM_HEIGHT_TEXT_TOOLBAR);
+	m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TOOLBARPRO, GetWidth(), MZM_HEIGHT_TOOLBARPRO);
 	m_Toolbar.SetButton(0,true,true,LOADSTRING(IDS_STR_RETURN).C_Str());
 	m_Toolbar.SetID(MZ_IDC_TOOLBAR_MAIN);
 	AddUiWin(&m_Toolbar);

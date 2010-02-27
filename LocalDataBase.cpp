@@ -288,6 +288,75 @@ bool LocalDataBase::isDuplicateSms(SmsData_ptr psms){
 }
 //////////////////////////////////////
 //contact操作
+void LocalDataBase::query_clear(){
+	for(int i = 0; i < query_contact_list.size(); i++){
+		delete query_contact_list.at(i);
+	}
+	query_contact_list.clear();
+}
+
+bool LocalDataBase::query_contacts(){
+    bool bRet = true;
+
+	query_clear();
+
+	TRY{
+		sqlite3_command cmd(this->sqlconn,
+		L"select * from '"
+		TABLE_CONTACT
+		L"' order by NAME collate pinyin;");
+//PhoneNumber text primary key,Name text NOT NULL,Label numeric NOT NULL
+		ContactData_ptr pcontact = 0;
+		sqlite3_reader reader=cmd.executereader();
+		TelLabel_t t;
+		while(reader.read()){
+			bool samecontact = false;
+			wchar_t* pname = 0;
+			//getstring后结果会销毁，所以必须保存
+			C::newstrcpy(&pname, reader.getstring16(1).c_str());	
+			if(pcontact == 0){
+				pcontact = new ContactData;
+				C::newstrcpy(&pcontact->Name,pname);
+			}else{
+				if(wcscmp(pcontact->Name,pname) == 0){
+					samecontact = true;
+				}else{
+					pcontact = new ContactData;
+					C::newstrcpy(&pcontact->Name,pname);
+				}
+			}
+			delete pname;
+			t = (TelLabel_t)reader.getint(2);
+			LPWSTR pn = 0;
+			C::newstrcpy(&pn,reader.getstring16(0).c_str());
+			switch(t){
+				case MOBILETEL:
+					pcontact->MobileTels.push_back(pn);
+					break;
+				case WORKTEL:
+					pcontact->WorkTels.push_back(pn);
+					break;
+				case HOMETEL:
+					pcontact->HomeTels.push_back(pn);
+					break;
+				case HOMETEL2:
+					pcontact->HomeTel2s.push_back(pn);
+					break;
+				default:
+					break;
+			}
+			if(!samecontact){
+				query_contact_list.push_back(pcontact);
+			}
+		}
+	}CATCH(exception &ex){
+		db_out(ex.what());
+		bRet = false;
+	}
+
+    return bRet;
+}
+
 bool LocalDataBase::isDuplicateContact(LPWSTR number,LPWSTR name,TelLabel_t label){
     bool bRet = true;
     if(number == NULL || name == NULL) return false;

@@ -45,12 +45,12 @@ BOOL Ui_PasswordWnd::OnInitDialog() {
 
     // Then init the controls & other things in the window
     int y = 10;
-	m_Background.SetPos(0, 0, GetWidth(), GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR);
+	m_Background.SetPos(0, 0, GetWidth(), GetHeight() - MZM_HEIGHT_TOOLBARPRO);
 	AddUiWin(&m_Background);
 
 	m_EdtPassword.SetPos(5, y, GetWidth() - 10, MZM_HEIGHT_SINGLELINE_EDIT);
     m_EdtPassword.SetMaxChars(32);
-    m_EdtPassword.SetSipMode(IM_SIP_MODE_GEL_LETTER, MZM_HEIGHT_TEXT_TOOLBAR);
+    m_EdtPassword.SetSipMode(IM_SIP_MODE_GEL_LETTER, MZM_HEIGHT_TOOLBARPRO);
 	if(!_uiMode){
 		m_EdtPassword.EnablePassWord();
 	}
@@ -61,7 +61,7 @@ BOOL Ui_PasswordWnd::OnInitDialog() {
 	}
     m_Background.AddChild(&m_EdtPassword);
 
-    m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR, GetWidth(), MZM_HEIGHT_TEXT_TOOLBAR);
+    m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TOOLBARPRO, GetWidth(), MZM_HEIGHT_TOOLBARPRO);
     m_Toolbar.SetButton(0, true, true, LOADSTRING(IDS_STR_CANCEL).C_Str());
     m_Toolbar.SetButton(2, true, true, LOADSTRING(IDS_STR_OK).C_Str());
     m_Toolbar.SetID(MZ_IDC_TOOLBAR_CALENDAR);

@@ -36,18 +36,18 @@ BOOL Ui_ViewWnd::OnInitDialog() {
 
 	// Then init the controls & other things in the window
 	int y = 0;
-	m_Navibar.SetPos(0, y, 108, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR);
+	m_Navibar.SetPos(0, y, 108, GetHeight() - MZM_HEIGHT_TOOLBARPRO);
 	m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_MAIN_VIEW,LOADSTRING(IDS_STR_VIEW_SMS).C_Str()));
 	AddUiWin(&m_Navibar);
 
-	m_List.SetPos(108, y, GetWidth() - 108, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR);
+	m_List.SetPos(108, y, GetWidth() - 108, GetHeight() - MZM_HEIGHT_TOOLBARPRO);
 	m_List.SetID(MZ_IDC_LIST);
 	m_List.SetupDB(g_pldb);
 	m_List.EnableNotifyMessage(true);
 	m_List.SetItemHeight(50);
 	AddUiWin(&m_List);
 
-	m_SmsList.SetPos(108, y, GetWidth() - 108, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR);
+	m_SmsList.SetPos(108, y, GetWidth() - 108, GetHeight() - MZM_HEIGHT_TOOLBARPRO);
 	m_SmsList.SetID(MZ_IDC_SMS_LIST);
 	m_SmsList.EnableNotifyMessage(true);
 	m_SmsList.SetVisible(false);
@@ -55,7 +55,7 @@ BOOL Ui_ViewWnd::OnInitDialog() {
 	m_SmsList.SetItemHeight(80);
 	AddUiWin(&m_SmsList);
 
-	m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR, GetWidth(), MZM_HEIGHT_TEXT_TOOLBAR);
+	m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TOOLBARPRO, GetWidth(), MZM_HEIGHT_TOOLBARPRO);
 	m_Toolbar.SetID(MZ_IDC_TOOLBAR_MAIN);
 	AddUiWin(&m_Toolbar);
 

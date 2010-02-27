@@ -3,6 +3,7 @@
 #include "appconfigini.h"
 #include "ui_ProgressBar.h"
 #include "ui_backup.h"
+#include <list>
 
 extern LocalDataBase *g_pldb;
 extern SmsBackupConfig appconfig;

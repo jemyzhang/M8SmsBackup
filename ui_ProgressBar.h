@@ -1,6 +1,9 @@
 #pragma once
 #include "refreshRecord.h"
 
+void initProgressBar(LPWSTR title, WORD rmin, WORD rmax);
+bool updateProgressBar(int nCount);
+
 void initUiCallbackRefreshContact();
 void initUiCallbackRefreshSms();
 void initUiCallbackDeleteSms();

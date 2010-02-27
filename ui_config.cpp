@@ -7,6 +7,10 @@ using namespace cMzCommon;
 #include "ui_backup.h"
 #include "LocalDataBase.h"
 #include "ui_ProgressBar.h"
+#include "UiFileDialog.h"
+
+#include <fstream>
+using namespace std;
 
 extern HINSTANCE LangresHandle;
 extern SmsBackupConfig appconfig;
@@ -24,6 +28,7 @@ MZ_IMPLEMENT_DYNAMIC(Ui_ConfigWnd)
 #define MZ_IDC_BTN_SETUP_BACKUP     106
 #define MZ_IDC_BTN_SETUP_OPTIMIZE   107
 #define MZ_IDC_BTN_SETUP_CONTACT_CLEAR  108
+#define MZ_IDC_BTN_SETUP_CONTACT_EXPORT	109
 //////
 
 Ui_ConfigWnd::Ui_ConfigWnd(void)
@@ -117,7 +122,16 @@ BOOL Ui_ConfigWnd::OnInitDialog() {
     m_BtnClearContact.SetID(MZ_IDC_BTN_SETUP_CONTACT_CLEAR);
     AddUiWin(&m_BtnClearContact);
 
-    m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TEXT_TOOLBAR, GetWidth(), MZM_HEIGHT_TEXT_TOOLBAR);
+    y+=MZM_HEIGHT_BUTTONEX;
+	m_BtnExpContact.SetPos(0,y, GetWidth(), MZM_HEIGHT_BUTTONEX);
+	m_BtnExpContact.SetText(LOADSTRING(IDS_STR_EXPCON).C_Str());
+	m_BtnExpContact.SetText2(LOADSTRING(IDS_STR_EXPCON_DTL).C_Str());
+    m_BtnExpContact.SetButtonType(MZC_BUTTON_LINE_BOTTOM);
+	m_BtnExpContact.SetTextMaxLen(0);
+    m_BtnExpContact.SetID(MZ_IDC_BTN_SETUP_CONTACT_EXPORT);
+    AddUiWin(&m_BtnExpContact);
+
+	m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TOOLBARPRO, GetWidth(), MZM_HEIGHT_TOOLBARPRO);
     m_Toolbar.EnableLeftArrow(true);
     m_Toolbar.SetButton(0, true, true, LOADSTRING(IDS_STR_RETURN).C_Str());
     m_Toolbar.SetID(MZ_IDC_TOOLBAR_CONFIG);
@@ -273,6 +287,88 @@ void Ui_ConfigWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
             refreshContact(uiCallbackRefreshContact);
             break;
         }
+		case MZ_IDC_BTN_SETUP_CONTACT_EXPORT:
+		{
+			UiFileDialog dlg;
+			dlg.SetTitle(L"请设置导出文件名");
+			dlg.SetInitFileName(L"contact");
+			dlg.SetInitFileSuffix(L".txt");
+			dlg.SetInitFolder(L"\\Disk");
+			RECT rcWork = MzGetWorkArea();
+			dlg.Create(rcWork.left, rcWork.top, RECT_WIDTH(rcWork), RECT_HEIGHT(rcWork),
+				m_hWnd, 0, WS_POPUP);
+			if( dlg.DoModal() == ID_OK ) {
+				wofstream file;
+				file.open(dlg.GetFullFileName(),  ios::out);
+				if (file.is_open())
+				{
+					if(g_pldb->query_contacts()){
+						initProgressBar(L"导出联系人中...",0,g_pldb->query_contact_size());
+						for(int i = 0; i < g_pldb->query_contact_size(); i++){
+							ContactData_ptr c = g_pldb->query_contact_at(i);
+							file << c->Name << endl;
+							int pnsz = c->MobileTels.size();
+							if(pnsz){
+								file << L"手机: ";
+								for(int j = 0; j < pnsz; j++){
+									file << c->MobileTels.at(j);
+									if(j == pnsz - 1){
+										file << endl;
+									}else{
+										file << L",";
+									}
+								}
+							}
+							pnsz = c->WorkTels.size();
+							if(pnsz){
+								file << L"工作: ";
+								for(int j = 0; j < pnsz; j++){
+									file << c->WorkTels.at(j);
+									if(j == pnsz - 1){
+										file << endl;
+									}else{
+										file << L",";
+									}
+								}
+							}
+
+							pnsz = c->HomeTels.size();
+							if(pnsz){
+								file << L"家庭: ";
+								for(int j = 0; j < pnsz; j++){
+									file << c->HomeTels.at(j);
+									if(j == pnsz - 1){
+										file << endl;
+									}else{
+										file << L",";
+									}
+								}
+							}
+
+							pnsz = c->HomeTel2s.size();
+							if(pnsz){
+								file << L"其他: ";
+								for(int j = 0; j < pnsz; j++){
+									file << c->HomeTel2s.at(j);
+									if(j == pnsz - 1){
+										file << endl;
+									}else{
+										file << L",";
+									}
+								}
+							}
+							file << endl;
+							if(!updateProgressBar(i+1)){
+								break;
+							}
+						}
+					}
+				}
+				file.close();
+				MzMessageAutoBoxV2(m_hWnd,LOADSTRING(IDS_STR_EXP_FINISHED).C_Str(),MZV2_MB_NONE,2000,TRUE);
+			}
+			break;
+		}
 	}
 }
 
