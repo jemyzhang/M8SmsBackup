@@ -150,7 +150,9 @@ void UiSmsList::DeleteSelectedItems(){
 	for(UINT i = 0; i < plist_size; i++){
 		if(plist_record[i].SelectionFlag){
 			nDeleted += (pldb->RemoveSmsRecord(plist_record+i) ? 1 : 0);
-			uiCallbackDeleteSms(plist_record+i,nCount,nDeleting,nDeleted);
+			if(uiCallbackDeleteSms(plist_record+i,nCount,nDeleting,nDeleted)){
+				break;
+			}
 			nCount++;
 		}
 	}

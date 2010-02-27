@@ -9,15 +9,15 @@ extern HINSTANCE LangresHandle;
 extern SmsBackupConfig appconfig;
 static bool brangeSet = false;
 static bool bdlgshown = false;
-static MzProgressDialog m_Progressdlg;
+static MzPopupProgress m_Progressdlg;
 
 void SetProgressBarTitle(LPWSTR t){
 	if(t == NULL){
-		m_Progressdlg.SetShowTitle(false);
+		//m_Progressdlg.SetShowTitle(false);
 		return;
 	}
-	m_Progressdlg.SetTitle(t);
-	m_Progressdlg.SetShowTitle(true);
+	m_Progressdlg.SetTitleText(t);
+	//m_Progressdlg.SetShowTitle(true);
 }
 void SetProgressBarRange(WORD rmin, WORD rmax){
 	if(brangeSet) return;
@@ -31,19 +31,19 @@ void SetProgressBarRange(WORD rmin, WORD rmax){
 }
 void ShowProgressBar(){
 	if(!bdlgshown){
-		m_Progressdlg.BeginProgress(0);
+		m_Progressdlg.StartProgress(0,FALSE,FALSE,TRUE);
 		bdlgshown = true;
 	}
 }
 void HideProgressBar(){
-	m_Progressdlg.EndProgress();
+	m_Progressdlg.KillProgress();
 	bdlgshown = false;
 }
 
 void initProgressBar(LPWSTR title = NULL, WORD rmin = 0, WORD rmax = 100){
 	SetProgressBarTitle(title);
 	SetProgressBarRange(rmin,rmax);
-	m_Progressdlg.SetShowInfo(true);
+	//m_Progressdlg.SetShowInfo(true);
 	brangeSet = false;
 	bdlgshown = false;
 }
@@ -71,10 +71,10 @@ bool uiCallbackRefreshContact(ContactData_ptr pcontact,WORD nCount,WORD nSize,WO
 	wchar_t infotext[256];
 	wsprintf(infotext,LOADSTRING(IDS_STR_IMPORTED).C_Str(),nSuccess);
 	sImported = sImported + infotext;
-	m_Progressdlg.SetTitle(sImported.C_Str());
+	m_Progressdlg.SetTitleText(sImported.C_Str());
 	wsprintf(infotext,L"%s (%d/%d)",pcontact->Name,nCount + 1,nSize);
-	m_Progressdlg.SetInfo(infotext);
-	m_Progressdlg.SetCurValue(nCount+1);
+	m_Progressdlg.SetNoteText(infotext);
+	m_Progressdlg.SetCurrentValue(nCount+1);
 	m_Progressdlg.UpdateProgress();
 	//DateTime::waitms(0);
 	return true;
@@ -91,10 +91,10 @@ bool uiCallbackRefreshSIMContact(ContactData_ptr pcontact,WORD nCount,WORD nSize
 	wchar_t infotext[256];
 	wsprintf(infotext,LOADSTRING(IDS_STR_IMPORTED).C_Str(),nSuccess);
 	sImported = sImported + infotext;
-	m_Progressdlg.SetTitle(sImported.C_Str());
+	m_Progressdlg.SetTitleText(sImported.C_Str());
 	wsprintf(infotext,L"%s (%d/%d)",pcontact->Name,nCount + 1,nSize);
-	m_Progressdlg.SetInfo(infotext);
-	m_Progressdlg.SetCurValue(nCount+1);
+	m_Progressdlg.SetNoteText(infotext);
+	m_Progressdlg.SetCurrentValue(nCount+1);
 	m_Progressdlg.UpdateProgress();
 	//DateTime::waitms(0);
 	return true;
@@ -116,12 +116,12 @@ bool uiCallbackRefreshSms(SmsData_ptr psms,WORD nCount,WORD nSize,WORD nSuccess)
 	wchar_t infotext[256];
 	wsprintf(infotext,LOADSTRING(IDS_STR_IMPORTED).C_Str(),nSuccess);
 	sImported = sImported + infotext;
-	m_Progressdlg.SetTitle(sImported.C_Str());
+	m_Progressdlg.SetTitleText(sImported.C_Str());
 	wchar_t* pnumber = 0;
 	C::newstrcpy(&pnumber,psms->MobileNumber,30);
 	wsprintf(infotext,L"%s %s (%d/%d)",psms->SendReceiveFlag == 1 ? L"[¡û]": L"[¡ú]",pnumber,nCount + 1,nSize);
-	m_Progressdlg.SetInfo(infotext);
-	m_Progressdlg.SetCurValue(nCount+1);
+	m_Progressdlg.SetNoteText(infotext);
+	m_Progressdlg.SetCurrentValue(nCount+1);
 	m_Progressdlg.UpdateProgress();
 	//DateTime::waitms(0);
 	return true;
@@ -138,10 +138,10 @@ bool uiCallbackDeleteSms(SmsSimpleData_ptr psms,WORD nCount,WORD nSize,WORD nSuc
 	wchar_t infotext[256];
 	wsprintf(infotext,L"%d",nSuccess);
 	sImported = sImported + infotext;
-	m_Progressdlg.SetTitle(sImported.C_Str());
+	m_Progressdlg.SetTitleText(sImported.C_Str());
 	wsprintf(infotext,L"%s %s (%d/%d)",psms->SendReceiveFlag == 1 ? L"[¡û]": L"[¡ú]",psms->MobileNumber,nCount + 1,nSize);
-	m_Progressdlg.SetInfo(infotext);
-	m_Progressdlg.SetCurValue(nCount+1);
+	m_Progressdlg.SetNoteText(infotext);
+	m_Progressdlg.SetCurrentValue(nCount+1);
 	m_Progressdlg.UpdateProgress();
 	//DateTime::waitms(0);
 	return true;
@@ -158,12 +158,12 @@ void uiCallBackUpdateDatabase(LPWSTR title = NULL,LPWSTR msg = NULL, UINT progre
 	ShowProgressBar();
 	SetProgressBarRange(0,100);
 	if(title){
-		m_Progressdlg.SetTitle(title);
+		m_Progressdlg.SetTitleText(title);
 	}
 	if(msg){
-		m_Progressdlg.SetInfo(msg);
+		m_Progressdlg.SetNoteText(msg);
 	}
-	m_Progressdlg.SetCurValue(progress);
+	m_Progressdlg.SetCurrentValue(progress);
 	m_Progressdlg.UpdateProgress();
 	return;
 }
