@@ -66,6 +66,9 @@
 #define IDS_STR_EXP_FINISHED            162
 #define IDS_STR_MENU_TOOLS              163
 #define IDS_STR_MENU_TOOLS_TIP          164
+#define IDS_STR_EXPSMS                  165
+#define IDS_STR_EXPSMS_TIP              166
+#define IDS_STR_EXPSMS_WARNING          167
 #define IDB_PNG_NAVI_BG                 201
 #define IDB_PNG_BEGIN                   201
 #define IDB_PNG_NAVI_BTN_BHL            202

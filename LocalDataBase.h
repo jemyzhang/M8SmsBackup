@@ -258,6 +258,13 @@ private:
     //插入记录前检查是否有重复sms
     bool isDuplicateSms(SmsData_ptr);
 public:
+	void query_sms_clear();
+	bool query_sms();
+	int query_sms_size() { return query_sms_list.size(); }
+	SmsSimpleData_ptr query_sms_at(int i) { return query_sms_list.at(i); }
+private:
+	vector<SmsSimpleData_ptr> query_sms_list;
+public:
 	//contact相关操作
 	UINT AppendContactRecord(ContactData_ptr);
 	bool RemoveContactRecord(ContactData_ptr);

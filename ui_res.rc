@@ -149,6 +149,9 @@ BEGIN
     IDS_STR_EXP_FINISHED    "导出成功"
     IDS_STR_MENU_TOOLS      "工具"
     IDS_STR_MENU_TOOLS_TIP  "相关工具集"
+    IDS_STR_EXPSMS          "导出短信"
+    IDS_STR_EXPSMS_TIP      "导出短信为文本"
+    IDS_STR_EXPSMS_WARNING  "当短信数量很多时，导出短信可能会比较久，是否继续？"
 END
 
 #endif    // 中文(中华人民共和国) resources

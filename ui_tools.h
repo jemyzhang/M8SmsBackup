@@ -16,6 +16,7 @@ public:
 	UiButtonEx m_BtnOptimize;	//优化数据库，创建索引
 	UiButtonEx m_BtnClearContact;	//重新导入联系人
 	UiButtonEx m_BtnExpContact;	//导出联系人为文本
+	UiButtonEx m_BtnExpSms;	//导出短信为文本
 protected:
     // Initialization of the window (dialog)
     virtual BOOL OnInitDialog();

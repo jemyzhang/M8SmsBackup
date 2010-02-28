@@ -2,6 +2,9 @@
 #include <cMzCommon.h>
 using namespace cMzCommon;
 
+#ifndef _DEBUG
+#pragma warning(disable:4101)
+#endif
 
 LocalDataBase::LocalDataBase() {
     wchar_t currpath[MAX_PATH];
@@ -1102,4 +1105,42 @@ void LocalDataBase::ClearContactTable(){
 	}CATCH(exception &ex){
 		db_out(ex.what());
 	}
+}
+
+
+void LocalDataBase::query_sms_clear(){
+	for(int i = 0; i < query_sms_list.size(); i++){
+		delete query_sms_list.at(i);
+	}
+	query_sms_list.clear();
+}
+
+bool LocalDataBase::query_sms(){
+    bool bRet = true;
+
+	query_sms_clear();
+
+	TRY{
+		sqlite3_command cmd(this->sqlconn,
+			L"select name,phonenumber,content,strftime('%Y-%m-%d %H:%M:%S',timestamps),sendreceive from '"
+			TABLE_SMS
+			L"' order by name,timestamps;");
+
+		sqlite3_reader reader=cmd.executereader();
+		SmsSimpleData_ptr pi;
+		while(reader.read()){
+			pi = new SmsSimpleData;
+			C::newstrcpy(&pi->ContactName,reader.getstring16(0).c_str());
+			C::newstrcpy(&pi->MobileNumber,reader.getstring16(1).c_str());
+			C::newstrcpy(&pi->Content,reader.getstring16(2).c_str());
+			C::newstrcpy(&pi->TimeStamp,reader.getstring16(3).c_str());
+			pi->SendReceiveFlag = reader.getint(4);
+			query_sms_list.push_back(pi);
+		}
+	}CATCH(exception &ex){
+		db_out(ex.what());
+		bRet = false;
+	}
+
+    return bRet;
 }
