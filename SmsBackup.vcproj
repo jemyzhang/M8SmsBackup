@@ -275,6 +275,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ui_tools.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ui_view.cpp"
 				>
 			</File>
@@ -378,6 +382,10 @@
 			</File>
 			<File
 				RelativePath=".\ui_SmsViewer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ui_tools.h"
 				>
 			</File>
 			<File

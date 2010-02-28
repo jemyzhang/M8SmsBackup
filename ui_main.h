@@ -19,6 +19,7 @@ public:
 	UiButtonEx m_BtnSearch;		//查找
 	UiButtonEx m_BtnRefresh;	//刷新
 	UiButtonEx m_BtnConfig;		//设置
+	UiButtonEx m_BtnTools;		//工具
 #ifdef USE_903SDK
 	UiMultiLineEdit m_TextAbout;
 #else

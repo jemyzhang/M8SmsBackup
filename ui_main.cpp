@@ -7,6 +7,7 @@ using namespace cMzCommon;
 #include "ui_search.h"
 #include "appconfigini.h"
 #include "ui_config.h"
+#include "ui_tools.h"
 #include "passwordDlg.h"
 
 #ifdef DEBUG
@@ -19,8 +20,8 @@ using namespace cMzCommon;
 #else
 #define BUILD_METHOD L"d"
 #endif
-#define VER_STRING L"1.80"BUILD_METHOD
-#define BUILD_STRING L"20100227"BUILD_CONFIG
+#define VER_STRING L"1.81"BUILD_METHOD
+#define BUILD_STRING L"20100228"BUILD_CONFIG
 
 extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 extern HINSTANCE LangresHandle;
@@ -31,6 +32,7 @@ extern SmsBackupConfig appconfig;
 #define MZ_IDC_BUTTON_REFRESH 104
 #define MZ_IDC_BUTTON_CONFIG 105
 #define MZ_IDC_BUTTON_SEARCH 106
+#define MZ_IDC_BUTTON_TOOLS	107
 
 MZ_IMPLEMENT_DYNAMIC(Ui_MainWnd)
 
@@ -49,6 +51,7 @@ BOOL Ui_MainWnd::OnInitDialog() {
 		return FALSE;
 	}
 
+	SetWindowText(L"¶ÌÐÅ±¸·Ý");
 	// Then init the controls & other things in the window
 	int y = 0;
 	m_Logo.SetPos(0,y,GetWidth(),MZM_HEIGHT_CAPTION*3);
@@ -92,6 +95,15 @@ BOOL Ui_MainWnd::OnInitDialog() {
 	m_BtnConfig.SetTextMaxLen2(0);
 	AddUiWin(&m_BtnConfig);
 
+	y+=MZM_HEIGHT_BUTTONEX;
+	m_BtnTools.SetPos(0, y, GetWidth(), MZM_HEIGHT_BUTTONEX);
+	m_BtnTools.SetID(MZ_IDC_BUTTON_TOOLS);
+	m_BtnTools.SetText(LOADSTRING(IDS_STR_MENU_TOOLS).C_Str());
+	m_BtnTools.SetButtonType(MZC_BUTTON_LINE_BOTTOM);
+	m_BtnTools.SetText2(LOADSTRING(IDS_STR_MENU_TOOLS_TIP).C_Str());
+	m_BtnTools.SetTextMaxLen2(0);
+	AddUiWin(&m_BtnTools);
+
 	y=GetHeight() - MZM_HEIGHT_TOOLBARPRO - MZM_HEIGHT_BUTTONEX*2;
 	m_TextAbout.SetPos(0, y, GetWidth(), GetHeight() - MZM_HEIGHT_TOOLBARPRO - y);
 	m_TextAbout.SetEnable(false);
@@ -121,7 +133,7 @@ BOOL Ui_MainWnd::OnInitDialog() {
 
 void Ui_MainWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 	UINT_PTR id = LOWORD(wParam);
-    if(id >= MZ_IDC_BUTTON_VIEW && id <= MZ_IDC_BUTTON_SEARCH){
+    if(id >= MZ_IDC_BUTTON_VIEW && id <= MZ_IDC_BUTTON_TOOLS){
         if(!CheckPassword(m_hWnd)){
             return;
         }
@@ -167,6 +179,18 @@ void Ui_MainWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 		case MZ_IDC_BUTTON_CONFIG:
 			{
 				Ui_ConfigWnd dlg;
+				RECT rcWork = MzGetWorkArea();
+				dlg.Create(rcWork.left, rcWork.top, RECT_WIDTH(rcWork), RECT_HEIGHT(rcWork),
+					m_hWnd, 0, WS_POPUP);
+				// set the animation of the window
+				dlg.SetAnimateType_Show(MZ_ANIMTYPE_SCROLL_RIGHT_TO_LEFT_2);
+				dlg.SetAnimateType_Hide(MZ_ANIMTYPE_SCROLL_LEFT_TO_RIGHT_1);
+				dlg.DoModal();
+				break;
+			}
+		case MZ_IDC_BUTTON_TOOLS:
+			{
+				Ui_ToolWnd dlg;
 				RECT rcWork = MzGetWorkArea();
 				dlg.Create(rcWork.left, rcWork.top, RECT_WIDTH(rcWork), RECT_HEIGHT(rcWork),
 					m_hWnd, 0, WS_POPUP);
