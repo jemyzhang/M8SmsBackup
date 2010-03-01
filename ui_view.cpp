@@ -149,6 +149,7 @@ void Ui_ViewWnd::SetupList(){
 		m_List.reqUpdate();
 		MzEndWaitDlg();
 
+        m_List.SetSelectedIndex(0);
 		m_List.ScrollTo();
 		//m_List.Invalidate();
 		//m_List.Update();
@@ -317,6 +318,9 @@ LRESULT Ui_ViewWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 					if (!m_List.IsMouseDownAtScrolling() && !m_List.IsMouseMoved()) {
 						int nIndex = m_List.CalcIndexOfPos(x, y);
 						if(nIndex != -1){
+                            m_List.SetSelectedIndex(nIndex);
+                            m_List.Invalidate();
+                            DateTime::waitms(1);
 							SmsViewListKey_ptr pkey = m_List.GetListItem(nIndex);
 							UINT received = 0;
 							UINT sent = 0;
