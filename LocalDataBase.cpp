@@ -1037,7 +1037,7 @@ void LocalDataBase::MigrateSmsData(){
 			TABLE_SMS
 			L"' (name,PN,phonenumber,content,timestamps,sendreceive,year,month,day)"
 			L" select contacts_v1.Name, sms_v1.PN, sms_v1.PhoneNumber, sms_v1.content,sms_v1.timestamps,sms_v1.sendreceive,"
-			L" strftime('%%Y',sms_v1.timestamps),strftime('%%m',sms_v1.timestamps),strftime('%%d',sms_v1.timestamps)"
+			L" strftime('%Y',sms_v1.timestamps),strftime('%m',sms_v1.timestamps),strftime('%d',sms_v1.timestamps)"
 			L" from contacts_v1,sms_v1 where (contacts_v1.PhoneNumber =  sms_v1.PN);");
 		cmd.executenonquery();
 	}CATCH(exception &ex){
@@ -1050,7 +1050,7 @@ void LocalDataBase::MigrateSmsData(){
 			TABLE_SMS
 			L"' (name,PN,phonenumber,content,timestamps,sendreceive,year,month,day)"
 			L" select PN as name,PN, PhoneNumber, content,timestamps,sendreceive,"
-			L" strftime('%%Y',timestamps),strftime('%%m',timestamps),strftime('%%d',timestamps)"
+			L" strftime('%Y',timestamps),strftime('%m',timestamps),strftime('%d',timestamps)"
 			L" from sms_v1 where PN not in (select PhoneNumber from contacts_v1);");
 		cmd.executenonquery();
 	}CATCH(exception &ex){
