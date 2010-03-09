@@ -4,6 +4,8 @@
 using namespace cMzCommon;
 #include "appconfigini.h"
 
+#include "logout.h"
+
 extern SmsBackupConfig appconfig;
 extern LocalDataBase *g_pldb;
 
@@ -13,25 +15,32 @@ extern LocalDataBase *g_pldb;
 void getridCountryCode(ContactData_ptr pcontact){
     if(pcontact == NULL) return;
 
-    TelNumbers_t::iterator i;
-    if(pcontact->MobileTels.size()){
-        for( i = pcontact->MobileTels.begin(); i != pcontact->MobileTels.end(); i++){
-			C::removeSpecStr(*i,L"+86");
+    int i;
+    int size = pcontact->MobileTels.size();
+    if(size > 0){
+        for( i = 0; i < size; i++){
+            C::removeSpecStr(pcontact->MobileTels.at(i),L"+86");
         }
     }
-    if(pcontact->WorkTels.size()){
-        for( i = pcontact->WorkTels.begin(); i != pcontact->WorkTels.end(); i++){
-			C::removeSpecStr(*i,L"+86");            
+
+    size = pcontact->WorkTels.size();
+    if(size > 0){
+        for( i = 0; i < size; i++){
+			C::removeSpecStr(pcontact->WorkTels.at(i),L"+86");            
         }
     }
-    if(pcontact->HomeTels.size()){
-        for( i = pcontact->HomeTels.begin(); i != pcontact->HomeTels.end(); i++){
-			C::removeSpecStr(*i,L"+86");       
+
+    size = pcontact->HomeTels.size();
+    if(size > 0){
+        for(i = 0; i < size; i++){
+			C::removeSpecStr(pcontact->HomeTels.at(i),L"+86");       
         }
     }
-    if(pcontact->HomeTel2s.size()){
-        for( i = pcontact->HomeTel2s.begin(); i != pcontact->HomeTel2s.end(); i++){
-			C::removeSpecStr(*i,L"+86");            
+
+    size = pcontact->HomeTel2s.size();
+    if(size > 0){
+        for(i = 0; i < size; i++){
+			C::removeSpecStr(pcontact->HomeTel2s.at(i),L"+86");            
         }
     }
     return;
@@ -72,29 +81,40 @@ WORD refreshContact(CallBackRefreshContact callback){
 	list<CMzString> l;
 	BOOL bContactDatabaseV2 = MzSystem::requireVersion(0,9,6,0);
 
+    ::logout(L"Begin Refresh Contacts[%s]....",
+        bContactDatabaseV2 ? L"v2" : L"v1");
+
 	MzContactDataBase *pdb_v1 = NULL;
 	MzContactDataBaseV2 *pdb_v2 = NULL;
+    File::DirectoryExists_New(L"\\Disk\\Temp\\");   //检查文件夹是否存在
 	if(bContactDatabaseV2){
 		l.push_back(L"contacts.db");
-		File::BackupFiles(L"Documents and Settings\\",L"\\Disk\\",l);
-		pdb_v2 = new MzContactDataBaseV2(L"\\Disk\\contacts.db");
+		File::BackupFiles(L"Documents and Settings\\",L"\\Disk\\Temp\\",l);
+		pdb_v2 = new MzContactDataBaseV2(L"\\Disk\\Temp\\contacts.db");
 	}else{
 		pdb_v1 = new MzContactDataBase;
 	}
 
 	ULONG count = bContactDatabaseV2 ? 
 		pdb_v2->GetContactCount() : pdb_v1->GetContactCount();
+
+    ::logout(L"Contact size = %d",
+        count);
 	
     g_pldb->beginTrans();
     ContactData_t contact;
+
     for(WORD i = 0; i < count; i++){
  		if(bContactDatabaseV2){
 			pdb_v2->GetContact(i,contact);
 		}else{
 			pdb_v1->GetContact(i,contact);
 		}
+        ::logout(L"Got Contact#%d",i+1);
 		getridCountryCode(&contact);
+        ::logout(L"Appending Contact...");
         nRet += g_pldb->AppendContactRecord(&contact);
+        ::logout(L"Append contact finished.");
         if(callback){
             if(!(*callback)(&contact,i,count,nRet)){
                 break;
@@ -121,14 +141,16 @@ WORD refreshSms(CallBackRefreshSms callback){
 
 	MzSMSDataBase *pdb_v1 = NULL;
 	MzSMSDataBaseV2 *pdb_v2 = NULL;
+
+    File::DirectoryExists_New(L"\\Disk\\Temp\\");   //检查文件夹是否存在
 	if(bSmsDatabaseV2){
 		l.push_back(L"sms.db");
-		File::BackupFiles(L"Documents and Settings\\",L"\\Disk\\",l);
-		pdb_v2 = new MzSMSDataBaseV2(L"\\Disk\\sms.db");
+		File::BackupFiles(L"Documents and Settings\\",L"\\Disk\\Temp\\",l);
+		pdb_v2 = new MzSMSDataBaseV2(L"\\Disk\\Temp\\sms.db");
 	}else{
 		l.push_back(L"sms.edb");
-		File::BackupFiles(L"Documents and Settings\\",L"\\Disk\\",l);
-		pdb_v1 = new MzSMSDataBase(L"\\Disk\\sms.edb");
+		File::BackupFiles(L"Documents and Settings\\",L"\\Disk\\Temp\\",l);
+		pdb_v1 = new MzSMSDataBase(L"\\Disk\\Temp\\sms.edb");
 	}
 
 	ULONG count = bSmsDatabaseV2 ? 

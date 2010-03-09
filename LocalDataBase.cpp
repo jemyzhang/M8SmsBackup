@@ -2,6 +2,8 @@
 #include <cMzCommon.h>
 using namespace cMzCommon;
 
+#include "logout.h"
+
 #ifndef _DEBUG
 #pragma warning(disable:4101)
 #endif
@@ -379,6 +381,8 @@ bool LocalDataBase::isDuplicateContact(LPWSTR number,LPWSTR name,TelLabel_t labe
 		bRet = false;
 	}
 
+    ::logout(L"Contact %s: %s %s",name,number,bRet ? L"exists" : L"not exsits");
+
     return bRet;
 }
 
@@ -410,6 +414,7 @@ bool LocalDataBase::addContactRecord(LPWSTR number,LPWSTR name,TelLabel_t label)
     //检查记录是否已存在
     if(isDuplicateContact(number,name,label)) return false;
 
+    ::logout(L"Inserting Contact %s: %s",name,number);
 	TRY{
 		sqlite3_command cmd(this->sqlconn,
 		L"insert into '"
@@ -428,6 +433,7 @@ bool LocalDataBase::addContactRecord(LPWSTR number,LPWSTR name,TelLabel_t label)
 	//添加记录不成功时尝试更新记录
     if(bRet == false){
         bRet = updateContact(number,name,label);
+        ::logout(L"Update Contact %s: %s=%d",name,number,bRet);
 	}
     
     if(bRet){
@@ -456,6 +462,7 @@ bool LocalDataBase::addContactRecord(LPWSTR number,LPWSTR name,TelLabel_t label)
 		TRY{
 			sqlite3_command updatecmd(this->sqlconn,sqlcmdw);
 			updatecmd.executenonquery();
+            ::logout(L"SmsTable Updated");
 		}CATCH(exception &ex){
 			db_out(ex.what());
 			bRet = false;
@@ -473,6 +480,7 @@ UINT LocalDataBase::AppendContactRecord(ContactData_ptr pcontact){
 
     if(size > 0){
         for( i = 0; i < size; i++){
+            ::logout(L"Append MobileTels#%d : %s",i+1,pcontact->MobileTels.at(i));
             if(addContactRecord(pcontact->MobileTels.at(i),pcontact->Name,MOBILETEL)) nRet++;
         }
     }
@@ -480,6 +488,7 @@ UINT LocalDataBase::AppendContactRecord(ContactData_ptr pcontact){
     size = pcontact->WorkTels.size();
     if(size > 0){
         for( i = 0; i < size; i++){
+            ::logout(L"Append WorkTels#%d : %s",i+1,pcontact->WorkTels.at(i));
             if(addContactRecord(pcontact->WorkTels.at(i),pcontact->Name,WORKTEL)) nRet++;
         }
     }
@@ -487,6 +496,7 @@ UINT LocalDataBase::AppendContactRecord(ContactData_ptr pcontact){
     size = pcontact->HomeTels.size();
     if(size > 0){
         for( i = 0; i < size; i++){
+            ::logout(L"Append HomeTels#%d : %s",i+1,pcontact->HomeTels.at(i));
             if(addContactRecord(pcontact->HomeTels.at(i),pcontact->Name,HOMETEL)) nRet++;
         }
     }
@@ -494,6 +504,7 @@ UINT LocalDataBase::AppendContactRecord(ContactData_ptr pcontact){
     size = pcontact->HomeTel2s.size();
     if(size > 0){
         for( i = 0; i < size; i++){
+            ::logout(L"Append OtherTels#%d : %s",i+1,pcontact->HomeTel2s.at(i));
             if(addContactRecord(pcontact->HomeTel2s.at(i),pcontact->Name,HOMETEL2)) nRet++;
         }
     }

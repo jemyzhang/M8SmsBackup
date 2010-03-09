@@ -25,7 +25,7 @@ using namespace std;
 #ifdef _DEBUG
 #define db_out(s) printf("%s:%d: %s\n",__FUNCTION__, __LINE__, s)
 #else
-#define db_out(s)
+#define db_out(s) db_logout(s)
 #endif
 
 #define TRY try
