@@ -468,25 +468,33 @@ UINT LocalDataBase::AppendContactRecord(ContactData_ptr pcontact){
     UINT nRet = 0;
     if(pcontact == NULL) return nRet;
 
-    TelNumbers_t::iterator i;
-    if(pcontact->MobileTels.size()){
-        for( i = pcontact->MobileTels.begin(); i != pcontact->MobileTels.end(); i++){
-            if(addContactRecord(*i,pcontact->Name,MOBILETEL)) nRet++;
+    int size = pcontact->MobileTels.size();
+    int i = 0;
+
+    if(size > 0){
+        for( i = 0; i < size; i++){
+            if(addContactRecord(pcontact->MobileTels.at(i),pcontact->Name,MOBILETEL)) nRet++;
         }
     }
-    if(pcontact->WorkTels.size()){
-        for( i = pcontact->WorkTels.begin(); i != pcontact->WorkTels.end(); i++){
-            if(addContactRecord(*i,pcontact->Name,WORKTEL)) nRet++;
+    
+    size = pcontact->WorkTels.size();
+    if(size > 0){
+        for( i = 0; i < size; i++){
+            if(addContactRecord(pcontact->WorkTels.at(i),pcontact->Name,WORKTEL)) nRet++;
         }
     }
-    if(pcontact->HomeTels.size()){
-        for( i = pcontact->HomeTels.begin(); i != pcontact->HomeTels.end(); i++){
-            if(addContactRecord(*i,pcontact->Name,HOMETEL)) nRet++;
+
+    size = pcontact->HomeTels.size();
+    if(size > 0){
+        for( i = 0; i < size; i++){
+            if(addContactRecord(pcontact->HomeTels.at(i),pcontact->Name,HOMETEL)) nRet++;
         }
     }
-    if(pcontact->HomeTel2s.size()){
-        for( i = pcontact->HomeTel2s.begin(); i != pcontact->HomeTel2s.end(); i++){
-            if(addContactRecord(*i,pcontact->Name,HOMETEL2)) nRet++;
+
+    size = pcontact->HomeTel2s.size();
+    if(size > 0){
+        for( i = 0; i < size; i++){
+            if(addContactRecord(pcontact->HomeTel2s.at(i),pcontact->Name,HOMETEL2)) nRet++;
         }
     }
     return nRet;
