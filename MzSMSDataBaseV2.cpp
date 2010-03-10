@@ -2,6 +2,8 @@
 #include <cMzCommon.h>
 using namespace cMzCommon;
 
+#include "logout.h"
+
 #define SMS_TABLE_NAME	L"sms"
 
 MzSMSDataBaseV2::MzSMSDataBaseV2(const TCHAR *szSmsFileName)

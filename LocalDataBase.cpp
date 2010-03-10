@@ -1143,7 +1143,7 @@ bool LocalDataBase::query_sms(){
 		sqlite3_command cmd(this->sqlconn,
 			L"select name,phonenumber,content,strftime('%Y-%m-%d %H:%M:%S',timestamps),sendreceive from '"
 			TABLE_SMS
-			L"' order by name,timestamps;");
+			L"' order by name collate pinyin,timestamps;");
 
 		sqlite3_reader reader=cmd.executereader();
 		SmsSimpleData_ptr pi;

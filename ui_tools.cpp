@@ -276,13 +276,13 @@ void Ui_ToolWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 							if(sname == 0 ||
 								wcscmp(sname,c->ContactName) != 0){
 								if(sname != 0) file << endl;
-								file << L"[" << c->ContactName << L"]" << endl;
+								file << L"[==========" << c->ContactName << L"==========]" << endl;
 								sname = c->ContactName;
 							}
 							if(c->SendReceiveFlag){
-								file << L"<∑¢>";
+                                file << L">Œ“ ";
 							}else{
-								file << L"< ’>";
+                                file << L">" << c->ContactName << L" ";
 							}
 							file << c->TimeStamp << L" " << c->MobileNumber << endl;
 							file << c->Content << endl;

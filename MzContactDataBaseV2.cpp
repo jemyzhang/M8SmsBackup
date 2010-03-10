@@ -2,6 +2,8 @@
 #include <cMzCommon.h>
 using namespace cMzCommon;
 
+#include "logout.h"
+
 #define CONTACT_TABLE_NAME	L"ABPerson"
 #define CONTACT_TABLE_PHONE	L"ABPhones"
 
