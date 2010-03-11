@@ -40,7 +40,7 @@ void UiSmsTitle::PaintWin(HDC hdcDst, RECT* prcWin, RECT* prcUpdate){
 	//ºÅÂë
 	hf = FontHelper::GetFont( 20 );
 	SelectObject( hdcDst , hf );
-	RECT rcNumber = {prcWin->right - 200,prcWin->top,prcWin->right - 5,rcName.bottom - 20};
+	RECT rcNumber = {prcWin->right - 250,prcWin->top,prcWin->right - 5,rcName.bottom - 20};
 	cr = RGB(128,128,128);
 	::SetTextColor( hdcDst , cr );
 	MzDrawText( hdcDst , precord->MobileNumber, &rcNumber , DT_BOTTOM|DT_RIGHT|DT_SINGLELINE|DT_WORD_ELLIPSIS );

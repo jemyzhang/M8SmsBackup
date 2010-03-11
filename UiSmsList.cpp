@@ -86,7 +86,7 @@ void UiSmsList::DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RE
     //ºÅÂë
     hf = FontHelper::GetFont( 17 );
     SelectObject( hdcDst , hf );
-    RECT rcNumber = {prcItem->right - 160,prcItem->top,prcItem->right - 5,rcName.bottom - 20};
+    RECT rcNumber = {prcItem->right - 180,prcItem->top,prcItem->right - 5,rcName.bottom - 20};
     cr = RGB(128,128,128);
     ::SetTextColor( hdcDst , cr );
     MzDrawText( hdcDst , prec->MobileNumber, &rcNumber , DT_BOTTOM|DT_RIGHT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
