@@ -537,12 +537,10 @@ bool LocalDataBase::getContactName(LPWSTR phonenumber,LPWSTR *ppname){
 	return bRet;
 }
 
-UINT LocalDataBase::GetSmsCount(UINT &received, UINT &sent){
-    UINT total = 0;
+bool LocalDataBase::GetSmsCount(UINT &received, UINT &sent){
+	bool bRet = true;
     received = 0;
     sent = 0;
-
-	bool bRet = true;
 
 	TRY{	//获取总数
 		sqlite3_command cmd(this->sqlconn,
@@ -551,273 +549,133 @@ UINT LocalDataBase::GetSmsCount(UINT &received, UINT &sent){
 			L"';");
 		sqlite3_reader reader=cmd.executereader();
 		while(reader.read()){
-			total = reader.getint(0);
 			sent = reader.getint(1);
-			received = total - sent;
+			received = reader.getint(0) - sent;
 		}
 	}CATCH(exception &ex){
 		db_out(ex.what());
 		bRet = false;
 	}
-    return total;
+    return bRet;
 }
 
-UINT LocalDataBase::GetSmsContactList(SmsViewListKey_ptr plist){
-    UINT nSize = 0;
+void LocalDataBase::ClearSmsKeyList(){
+    for(int i = 0; i < keys.size(); i++){
+        SmsViewListKey_ptr pkey = keys.at(i);
+        delete pkey;
+    }
+    keys.clear();
+}
 
-	TRY{	//获取总数
-		sqlite3_command cmd(this->sqlconn,
-			L"select count(distinct name) from '"
-			TABLE_SMS
-			L"';");
-		nSize = cmd.executeint();
-	}CATCH(exception &ex){
-		db_out(ex.what());
-	}
+bool LocalDataBase::GetSmsKeyList(sqlite3_command &cmd){
+    bool bRet = false;
+    ClearSmsKeyList();
 
-    if(plist == NULL || nSize == 0) return nSize;
+    TRY{
+        sqlite3_reader reader=cmd.executereader();
+		while(reader.read()){
+            SmsViewListKey_ptr pkey = new SmsViewListKey;
+			C::newstrcpy(&pkey->key,reader.getstring16(0).c_str());
+            pkey->nSend = reader.getint(2);
+            pkey->nReceive = reader.getint(1) - pkey->nSend;
+            keys.push_back(pkey);
+		}
+        bRet = true;
+    }CATCH(exception &ex){
+        db_out(ex.what());
+    }
+    return bRet;
+}
 
-    SmsViewListKey_ptr pkey = plist;
+#include "resource.h"
+extern HINSTANCE LangresHandle;
+
+bool LocalDataBase::GetMainList(){
+    bool bRet = false;
+    ClearSmsKeyList();
+
+    int maintid[] = {IDS_STR_VIEW_BY_CONTACT, IDS_STR_VIEW_BY_DATE};
+
+    UINT r,s;
+    GetSmsCount(r,s);
+
+    for(int i = 0; i < sizeof(maintid)/sizeof(maintid[0]); i++){
+        SmsViewListKey_ptr pkey = new SmsViewListKey;
+        C::newstrcpy(&pkey->key, LOADSTRING(maintid[i]));
+        pkey->nReceive = r;
+        pkey->nSend = s;
+        keys.push_back(pkey);
+    }
+    return bRet;
+}
+
+bool LocalDataBase::GetSmsContactList(){
+    bool bRet = false;
 	TRY{	//获取列表
 		sqlite3_command cmd(this->sqlconn,
-			L"select distinct name from '"
+			L"select name,count(*),sum(sendreceive) from '"
 			TABLE_SMS
-			L"' order by name collate pinyin");
-		sqlite3_reader reader=cmd.executereader();
-		while(reader.read()){
-			C::newstrcpy(&(pkey++)->key,reader.getstring16(0).c_str());
-		}
+			L"' group by name order by name collate pinyin");
+        bRet = GetSmsKeyList(cmd);
 	}CATCH(exception &ex){
 		db_out(ex.what());
 	}
-
-    return nSize;
+    return bRet;
 }
 
-UINT LocalDataBase::GetSmsYearList(SmsViewListKey_ptr plist){
-    UINT nSize = 0;
-
+bool LocalDataBase::GetSmsYearList(){
+    bool bRet = false;
 	TRY{	//获取总数
 		sqlite3_command cmd(this->sqlconn,
-			L"select count(distinct year) from '"
+			L"select year, count(*), sum(sendreceive) from '"
 			TABLE_SMS
-			L"';");
-		nSize = cmd.executeint();
+			L"' group by year order by year desc;");
+        bRet = GetSmsKeyList(cmd);
 	}CATCH(exception &ex){
 		db_out(ex.what());
 	}
-
-    if(plist == NULL || nSize == 0) return nSize;
-
-    SmsViewListKey_ptr pkey = plist;
-	TRY{	//获取列表
-		sqlite3_command cmd(this->sqlconn,
-			L"select distinct year from '"
-			TABLE_SMS
-			L"' order by year DESC");
-		sqlite3_reader reader=cmd.executereader();
-		while(reader.read()){
-			C::newstrcpy(&(pkey++)->key,reader.getstring16(0).c_str());
-		}
-	}CATCH(exception &ex){
-		db_out(ex.what());
-	}
-
-    return nSize;
+    return bRet;
 }
 
-UINT LocalDataBase::GetSmsMonthList(WORD year, SmsViewListKey_ptr plist){
-    UINT nSize = 0;
-
+bool LocalDataBase::GetSmsMonthList(WORD year){
+    bool bRet = false;
 	wchar_t sYear[8];
 	wsprintf(sYear,L"%04d",year);
-	TRY{	//获取总数
+
+    TRY{	//获取列表
 		sqlite3_command cmd(this->sqlconn,
-			L"select count(distinct month) from '"
+			L"select month, count(*), sum(sendreceive) from '"
 			TABLE_SMS
-			L"' where year=?;");
+			L"' where year=? group by month order by month DESC");
 		cmd.bind(1,sYear,lstrlen(sYear)*2);
-		nSize = cmd.executeint();
+        bRet = GetSmsKeyList(cmd);
 	}CATCH(exception &ex){
 		db_out(ex.what());
 	}
-
-    if(plist == NULL || nSize == 0) return nSize;
-
-    SmsViewListKey_ptr pkey = plist;
-	TRY{	//获取列表
-		sqlite3_command cmd(this->sqlconn,
-			L"select distinct month from '"
-			TABLE_SMS
-			L"' where year=? order by month DESC");
-		cmd.bind(1,sYear,lstrlen(sYear)*2);
-		sqlite3_reader reader=cmd.executereader();
-		while(reader.read()){
-			C::newstrcpy(&(pkey++)->key,reader.getstring16(0).c_str());
-		}
-	}CATCH(exception &ex){
-		db_out(ex.what());
-	}
-
-    return nSize;
+    return bRet;
 }
 
-UINT LocalDataBase::GetSmsDayList(WORD year, WORD month,SmsViewListKey_ptr plist){
-    UINT nSize = 0;
-
-	wchar_t sYear[8];
-	wchar_t sMonth[6];
-	wsprintf(sYear,L"%04d",year);
-	wsprintf(sMonth,L"%02d",month);
-	TRY{	//获取总数
-		sqlite3_command cmd(this->sqlconn,
-			L"select count(distinct day) from '"
-			TABLE_SMS
-			L"' where year=? and month=?;");
-		cmd.bind(1,sYear,lstrlen(sYear)*2);
-		cmd.bind(2,sMonth,lstrlen(sMonth)*2);
-		nSize = cmd.executeint();
-	}CATCH(exception &ex){
-		db_out(ex.what());
-	}
-
-    if(plist == NULL || nSize == 0) return nSize;
-
-    SmsViewListKey_ptr pkey = plist;
-	TRY{	//获取列表
-		sqlite3_command cmd(this->sqlconn,
-			L"select distinct day from '"
-			TABLE_SMS
-			L"' where year=? and month=? order by day DESC");
-		cmd.bind(1,sYear,lstrlen(sYear)*2);
-		cmd.bind(2,sMonth,lstrlen(sMonth)*2);
-		sqlite3_reader reader=cmd.executereader();
-		while(reader.read()){
-			C::newstrcpy(&(pkey++)->key,reader.getstring16(0).c_str());
-		}
-	}CATCH(exception &ex){
-		db_out(ex.what());
-	}
-
-    return nSize;
-}
-////////////////////////////////////////////////////////////////
-UINT LocalDataBase::GetSmsYearCount(WORD year, UINT &received, UINT &sent){
-    UINT total = 0;
-    received = 0;
-    sent = 0;
-	wchar_t sYear[8];
-	wsprintf(sYear,L"%04d",year);
-	TRY{	//获取总数
-		sqlite3_command cmd(this->sqlconn,
-			L"select count(*),sum(sendreceive) from '"
-			TABLE_SMS
-			L"' where year=?;");
-		cmd.bind(1,sYear,lstrlen(sYear)*2);
-
-		sqlite3_reader reader=cmd.executereader();
-		while(reader.read()){
-			total = reader.getint(0);
-			sent = reader.getint(1);
-		}
-	}CATCH(exception &ex){
-		db_out(ex.what());
-	}
-
-	received = total - sent;
-
-    return total;
-}
-
-UINT LocalDataBase::GetSmsMonthCount(WORD year, WORD month, UINT &received, UINT &sent){
-    UINT total = 0;
-    received = 0;
-    sent = 0;
-
+bool LocalDataBase::GetSmsDayList(WORD year, WORD month){
+    bool bRet = false;
 	wchar_t sYear[8];
 	wchar_t sMonth[6];
 	wsprintf(sYear,L"%04d",year);
 	wsprintf(sMonth,L"%02d",month);
 
-	TRY{	//获取总数
+	TRY{	//获取列表
 		sqlite3_command cmd(this->sqlconn,
-			L"select count(*),sum(sendreceive) from '"
+			L"select day, count(*), sum(sendreceive) from '"
 			TABLE_SMS
-			L"' where year=? and month=?;");
+			L"' where year=? and month=? group by day order by day DESC");
 		cmd.bind(1,sYear,lstrlen(sYear)*2);
 		cmd.bind(2,sMonth,lstrlen(sMonth)*2);
-
-		sqlite3_reader reader=cmd.executereader();
-		while(reader.read()){
-			total = reader.getint(0);
-			sent = reader.getint(1);
-		}
+        bRet = GetSmsKeyList(cmd);
 	}CATCH(exception &ex){
 		db_out(ex.what());
 	}
-    received = total - sent;
-
-    return total;
+    return bRet;
 }
 
-UINT LocalDataBase::GetSmsDayCount(WORD year, WORD month,WORD day, UINT &received, UINT &sent){
-    UINT total = 0;
-    received = 0;
-    sent = 0;
-
-	wchar_t sYear[8];
-	wchar_t sMonth[6];
-	wchar_t sDay[6];
-	wsprintf(sYear,L"%04d",year);
-	wsprintf(sMonth,L"%02d",month);
-	wsprintf(sDay,L"%02d",day);
-
-	TRY{	//获取总数
-		sqlite3_command cmd(this->sqlconn,
-			L"select count(*),sum(sendreceive) from '"
-			TABLE_SMS
-			L"' where year=? and month=? and day=?;");
-		cmd.bind(1,sYear,lstrlen(sYear)*2);
-		cmd.bind(2,sMonth,lstrlen(sMonth)*2);
-		cmd.bind(3,sDay,lstrlen(sDay)*2);
-
-		sqlite3_reader reader=cmd.executereader();
-		while(reader.read()){
-			total = reader.getint(0);
-			sent = reader.getint(1);
-		}
-	}CATCH(exception &ex){
-		db_out(ex.what());
-	}
-    received = total - sent;
-    return total;
-}
-
-UINT LocalDataBase::GetSmsContactCount(LPWSTR name,UINT &received, UINT &sent){
-    if(name == NULL) return 0;
-
-    UINT total = 0;
-    received = 0;
-    sent = 0;
-
-	TRY{	//获取总数
-		sqlite3_command cmd(this->sqlconn,
-			L"select count(*),sum(sendreceive) from '"
-			TABLE_SMS
-			L"' where name=?;");
-		cmd.bind(1,name,lstrlen(name)*2);
-
-		sqlite3_reader reader=cmd.executereader();
-		while(reader.read()){
-			total = reader.getint(0);
-			sent = reader.getint(1);
-		}
-	}CATCH(exception &ex){
-		db_out(ex.what());
-	}
-    received = total - sent;
-    return total;
-}
 //////////////////////////////////////////////////////
 UINT LocalDataBase::GetSmsByDate(WORD year, WORD month, WORD day,SmsSimpleData_ptr plist){
     if(year == 0) return 0; //年份错误

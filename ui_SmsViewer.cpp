@@ -49,7 +49,7 @@ void UiSmsTitle::PaintWin(HDC hdcDst, RECT* prcWin, RECT* prcUpdate){
 	//ÈÕÆÚ
 	hf = FontHelper::GetFont( 20 );
 	SelectObject( hdcDst , hf );
-	RECT rcDate = {prcWin->right - 200,rcNumber.bottom,prcWin->right - 5,rcNumber.bottom + 20};
+	RECT rcDate = {prcWin->right - 220,rcNumber.bottom,prcWin->right - 5,rcNumber.bottom + 20};
 	cr = RGB(128,128,128);
 	::SetTextColor( hdcDst , cr );
 	MzDrawText( hdcDst , precord->TimeStamp, &rcDate , DT_BOTTOM|DT_RIGHT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
@@ -76,7 +76,7 @@ BOOL Ui_SmsViewerWnd::OnInitDialog() {
 	m_Background.SetPos(0, 0, GetWidth(), GetHeight() - MZM_HEIGHT_TOOLBARPRO);
 	AddUiWin(&m_Background);
 
-	int y = 10;
+	int y = 5;
 	m_Title.SetPos(10, y, GetWidth() - 20, 60);
 	m_Background.AddChild(&m_Title);
 

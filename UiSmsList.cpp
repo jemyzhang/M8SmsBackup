@@ -75,12 +75,12 @@ void UiSmsList::DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RE
     pimg[SmsResID]->Draw(hdcDst,&rcSendReceive);
     
     //ÐÕÃû
-    hf = FontHelper::GetFont( 25 );
+    hf = FontHelper::GetFont( 23 );
     SelectObject( hdcDst , hf );
     RECT rcName = {rcSendReceive.right,prcItem->top,rcSendReceive.right + 180,rcSendReceive.bottom};
     cr = RGB(0,0,0);
     ::SetTextColor( hdcDst , cr );
-    MzDrawText( hdcDst , prec->ContactName, &rcName , DT_BOTTOM|DT_LEFT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
+    MzDrawText( hdcDst , prec->ContactName, &rcName , DT_VCENTER|DT_LEFT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
 	DeleteObject(hf);
 
     //ºÅÂë
@@ -95,7 +95,7 @@ void UiSmsList::DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RE
     //ÈÕÆÚ
     hf = FontHelper::GetFont( 17 );
     SelectObject( hdcDst , hf );
-    RECT rcDate = {prcItem->right - 160,rcNumber.bottom,prcItem->right - 5,rcNumber.bottom + 20};
+    RECT rcDate = {prcItem->right - 180,rcNumber.bottom,prcItem->right - 5,rcNumber.bottom + 20};
     cr = RGB(128,128,128);
     ::SetTextColor( hdcDst , cr );
     MzDrawText( hdcDst , prec->TimeStamp, &rcDate , DT_BOTTOM|DT_RIGHT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
@@ -108,7 +108,7 @@ void UiSmsList::DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RE
     ::SetTextColor( hdcDst , cr );
 	LPTSTR pmsg = 0;
 	C::newlinecpy(&pmsg,prec->Content,35);
-    MzDrawText( hdcDst , pmsg, &rcContent , DT_BOTTOM|DT_LEFT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
+    MzDrawText( hdcDst , pmsg, &rcContent , DT_VCENTER|DT_LEFT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
 	DeleteObject(hf);
 	delete pmsg;
 

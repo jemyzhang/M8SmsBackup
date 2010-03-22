@@ -233,18 +233,25 @@ public:
 	bool AppendSmsRecord(SmsData_ptr);
 	bool RemoveSmsRecord(SmsData_ptr);
 	bool RemoveSmsRecord(SmsSimpleData_ptr);
-	//联系人列表, in = NULL时返回key数量
-	UINT GetSmsContactList(SmsViewListKey_ptr = NULL);
-	//时间列表, in = NULL时返回key数量
-	UINT GetSmsYearList(SmsViewListKey_ptr = NULL);
-	UINT GetSmsMonthList(WORD year, SmsViewListKey_ptr = NULL);
-	UINT GetSmsDayList(WORD year, WORD month,SmsViewListKey_ptr = NULL);
+public:// get title list
+    bool GetMainList();
+	bool GetSmsContactList();
+	bool GetSmsYearList();
+	bool GetSmsMonthList(WORD year);
+	bool GetSmsDayList(WORD year, WORD month);
+    int query_list_size() { return keys.size(); }
+    SmsViewListKey_ptr query_list_item(int idx) {
+        if(idx >= keys.size()) return 0;
+        return keys.at(idx);
+    }
+protected:
+    void ClearSmsKeyList();
+    bool GetSmsKeyList(sqlite3_command &cmd);
+private:
+    vector<SmsViewListKey_ptr> keys;
+public:
     //获取短信数量
-    UINT GetSmsCount(UINT &received, UINT &sent);
-    UINT GetSmsYearCount(WORD year, UINT &received, UINT &sent);
-    UINT GetSmsMonthCount(WORD year, WORD month, UINT &received, UINT &sent);
-    UINT GetSmsDayCount(WORD year, WORD month,WORD day, UINT &received, UINT &sent);
-    UINT GetSmsContactCount(LPWSTR name,UINT &received, UINT &sent);
+    bool GetSmsCount(UINT &received, UINT &sent);
     //获取短信条目
     //根据日期获取短信条目，0：表示任意
     UINT GetSmsByDate(WORD year, WORD month, WORD day,SmsSimpleData_ptr = NULL);

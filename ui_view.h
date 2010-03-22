@@ -8,7 +8,7 @@
 class UiKeyList : public UiList {
 public:
 	UiKeyList(){
-		plistkey = 0; plist_size = 0; smode = 0;
+		smode = 0;
 		syear = 0; smonth = 0;
 		pldb = 0;
         EnableScrollBarV(true);
@@ -33,18 +33,10 @@ public:
     void SetupDB(LocalDataBase *pl){
         pldb = pl;
     }
-	SmsViewListKey_ptr GetListItem(int nIndex){
-		if(plistkey == NULL || nIndex >= plist_size){
-			return NULL;
-		}
-		return (plistkey+nIndex);
-	}
 protected:
 	void ClearList();
 	void SetupList();
 private:
-    SmsViewListKey_ptr plistkey;
-    UINT plist_size;
 	UINT smode; //0: main 1: contact 2: year 3: month 4: day 
 	UINT syear;	//查询时需要year
 	UINT smonth;

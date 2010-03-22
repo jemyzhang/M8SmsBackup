@@ -19,6 +19,7 @@ extern HINSTANCE LangresHandle;
 
 MZ_IMPLEMENT_DYNAMIC(Ui_ViewWnd)
 extern LocalDataBase *g_pldb;
+extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 
 Ui_ViewWnd::Ui_ViewWnd(){
 	viewStatusSavedBeforeView = 0;
@@ -110,10 +111,10 @@ void Ui_ViewWnd::SetupList(){
 		m_SmsList.SetVisible(true);
 		m_SmsList.SetSelectedIndex(-1);
 		m_SmsList.RemoveAll();
-		MzBeginWaitDlg(m_hWnd);
+		MzBeginWaitDlg(m_hWnd,NULL,TRUE);
 		m_SmsList.reqUpdate();
 		MzEndWaitDlg();
-		m_SmsList.Invalidate();
+		//m_SmsList.Invalidate();
 		//m_SmsList.Update();
 		m_SmsList.ScrollTo();
 	}else{
@@ -144,8 +145,8 @@ void Ui_ViewWnd::SetupList(){
 				m_List.SetListMode(4);
 			}
 		}
-		MzBeginWaitDlg(m_hWnd);
-		DateTime::waitms(2);
+		MzBeginWaitDlg(m_hWnd,NULL,TRUE);
+		//DateTime::waitms(2);
 		m_List.reqUpdate();
 		MzEndWaitDlg();
 
@@ -321,58 +322,34 @@ LRESULT Ui_ViewWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
                             m_List.SetSelectedIndex(nIndex);
                             m_List.Invalidate();
                             DateTime::waitms(1);
-							SmsViewListKey_ptr pkey = m_List.GetListItem(nIndex);
+                            SmsViewListKey_ptr pkey = g_pldb->query_list_item(nIndex);
 							UINT received = 0;
 							UINT sent = 0;
 							UINT total = 0;
 							wchar_t strcount[128];
 							wchar_t strcount2[128];
-							if(viewStatus == 0){
-                                g_pldb->GetSmsCount(pkey->nReceive,pkey->nSend);
-                                received = pkey->nReceive; sent = pkey->nSend; total = sent + received;
-							    wsprintf(strcount2,L"%d/%d",sent,received);
-							    wsprintf(strcount,L"%d",total);
+                            received = pkey->nReceive; sent = pkey->nSend; total = sent + received;
+						    wsprintf(strcount2,L"%d/%d",sent,received);
+						    wsprintf(strcount,L"%d",total);
+
+                            if(viewStatus == 0){
                                 m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_CONTACT + nIndex,pkey->key,strcount,strcount2));
 								viewStatus = nIndex == 0 ? 1 : 0x10;
 							}else if(viewStatus == 0x1){
-								g_pldb->GetSmsContactCount(pkey->key ,pkey->nReceive,pkey->nSend);
-								received = pkey->nReceive;
-								sent = pkey->nSend;
-								total = sent + received;
-								wsprintf(strcount2,L"%d/%d",sent,received);
-								wsprintf(strcount,L"%d",total);
 								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_CONTACT_NAME,pkey->key,strcount,strcount2));
 								viewStatus = 3;
 								m_SmsList.SetupMode(1);
 								m_SmsList.SetupListName(pkey->key);
 							}else if(viewStatus == 0x10){
 								selectedYear = _wtoi(pkey->key);
-								g_pldb->GetSmsYearCount(selectedYear ,pkey->nReceive,pkey->nSend);
-								received = pkey->nReceive;
-								sent = pkey->nSend;
-								total = sent + received;
-								wsprintf(strcount2,L"%d/%d",sent,received);
-								wsprintf(strcount,L"%d",total);
 								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_DATE_YEAR,pkey->key,strcount,strcount2));
 								viewStatus += 1;
 							}else if(viewStatus == 0x11){
 								selectedMonth = _wtoi(pkey->key);
-								g_pldb->GetSmsMonthCount(selectedYear, selectedMonth, pkey->nReceive,pkey->nSend);
-								received = pkey->nReceive;
-								sent = pkey->nSend;
-								total = sent + received;
-								wsprintf(strcount2,L"%d/%d",sent,received);
-								wsprintf(strcount,L"%d",total);
 								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_DATE_MONTH,pkey->key,strcount,strcount2));
 								viewStatus += 1;
 							}else if(viewStatus == 0x12){
 								selectedDay = _wtoi(pkey->key);
-								g_pldb->GetSmsDayCount(selectedYear, selectedMonth, selectedDay, pkey->nReceive,pkey->nSend);
-								received = pkey->nReceive;
-								sent = pkey->nSend;
-								total = sent + received;
-								wsprintf(strcount2,L"%d/%d",sent,received);
-								wsprintf(strcount,L"%d",total);
 								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_DATE_DAY,pkey->key,strcount,strcount2));
 								viewStatus += 1;
 								m_SmsList.SetupMode(0);
@@ -407,70 +384,41 @@ void UiKeyList::SetupList() {
 
     switch(smode){
         case 1:         //contact
-			plist_size = pldb->GetSmsContactList();
-            if(plist_size > 0){
-                plistkey = new SmsViewListKey_t[plist_size + 1];
-                plist_size = pldb->GetSmsContactList(plistkey);
-            }
+            pldb->GetSmsContactList();
             break;
         case 2:
-			plist_size = pldb->GetSmsYearList();
-            if(plist_size > 0){
-                plistkey = new SmsViewListKey_t[plist_size + 1];
-                plist_size = pldb->GetSmsYearList(plistkey);
-            }
+			pldb->GetSmsYearList();
             break;
         case 3:
-            plist_size = pldb->GetSmsMonthList(syear);
-            if(plist_size > 0){
-                plistkey = new SmsViewListKey_t[plist_size + 1];
-                plist_size = pldb->GetSmsMonthList(syear,plistkey);
-            }
+            pldb->GetSmsMonthList(syear);
             break;
 		case 4:
-            plist_size = pldb->GetSmsDayList(syear,smonth);
-            if(plist_size > 0){
-                plistkey = new SmsViewListKey_t[plist_size + 1];
-                plist_size = pldb->GetSmsDayList(syear,smonth,plistkey);
-            }
+            pldb->GetSmsDayList(syear,smonth);
 			break;
 		case 0:
-			plist_size = 2;
-			plistkey = new SmsViewListKey_t[plist_size];
-			C::newstrcpy(&plistkey->key, LOADSTRING(IDS_STR_VIEW_BY_CONTACT));
-			C::newstrcpy(&(plistkey+1)->key, LOADSTRING(IDS_STR_VIEW_BY_DATE));
-			//pldb->GetSmsCount(plistkey->nReceive,plistkey->nSend);
-			(plistkey+1)->nReceive = plistkey->nReceive = 0;
-			(plistkey+1)->nSend = plistkey->nSend = 0;
+            pldb->GetMainList();
 			break;
         default:
             break;
     }
-    for(UINT i = 0; i < plist_size; i++){
+    for(UINT i = 0; i < pldb->query_list_size(); i++){
         ListItem li;
         AddItem(li);
     }
 }
 void UiKeyList::ClearList(){
 	RemoveAll();
-    if(plistkey && plist_size > 0){
-        //for(UINT i = 0; i < plist_size; i++){
-        //    plistkey[i].Reset();
-        //}
-        delete [] plistkey;
-        plistkey = 0;
-        plist_size = 0;
-    }
 }
 
 void UiKeyList::DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RECT *prcUpdate) {
-	if(plistkey == NULL || plist_size == 0) return;
 	// draw the high-light background for the selected item
     if (nIndex == GetSelectedIndex()) {
         MzDrawSelectedBg(hdcDst, prcItem);
     }
 
-    SmsViewListKey_ptr pkey = plistkey + nIndex;
+    SmsViewListKey_ptr pkey = pldb->query_list_item(nIndex);
+    if(pkey == 0) return;
+
     HFONT hf;
     COLORREF cr;
     
@@ -497,17 +445,36 @@ void UiKeyList::DrawItem(HDC hdcDst, int nIndex, RECT* prcItem, RECT *prcWin, RE
 	::SetTextColor( hdcDst , cr );
 	MzDrawText( hdcDst , str, &rc1 , DT_VCENTER|(smode == 0 ? DT_CENTER : DT_LEFT)|DT_SINGLELINE|DT_WORD_ELLIPSIS );
 	DeleteObject(hf);
-#if 0
-	if(smode != 0){
-		wsprintf(str,L"%d+%d=%d",pkey->nSend,pkey->nReceive,pkey->nReceive+pkey->nSend);
+
+    if(smode != 0){
+        wsprintf(str,L"%d",pkey->nSend);
 		//으커2
-		hf = FontHelper::GetFont( 20 );
+		hf = FontHelper::GetFont( 18 );
 		SelectObject( hdcDst , hf );
-		RECT rc2 = {prcItem->right - 150,prcItem->top,prcItem->right - 5,prcItem->bottom};
+		RECT rc2 = {prcItem->right - 180,prcItem->top,prcItem->right - 140,prcItem->bottom};
+		//cr = RGB(128,192,128);
+		//::SetTextColor( hdcDst , cr );
+		//MzDrawText( hdcDst, L"∧", &rc2 , DT_VCENTER|DT_LEFT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
+        pimg[IDB_PNG_SMS_SEND - IDB_PNG_BEGIN]->Draw(hdcDst,&rc2);
+
+        rc2.left = rc2.right; rc2.right = prcItem->right - 90;
+		cr = RGB(128,128,128);
+		::SetTextColor( hdcDst , cr );
+		MzDrawText( hdcDst, str, &rc2 , DT_VCENTER|DT_LEFT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
+
+        wsprintf(str,L"%d",pkey->nReceive);
+		//으커3
+        rc2.left = rc2.right; rc2.right = rc2.right + 40;
+		//cr = RGB(192,128,128);
+		//::SetTextColor( hdcDst , cr );
+		//MzDrawText( hdcDst, L"∨", &rc2 , DT_VCENTER|DT_LEFT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
+        pimg[IDB_PNG_SMS_RECV - IDB_PNG_BEGIN]->Draw(hdcDst,&rc2);
+
+        rc2.left = rc2.right; rc2.right = prcItem->right - 5;
 		cr = RGB(128,128,128);
 		::SetTextColor( hdcDst , cr );
 		MzDrawText( hdcDst, str, &rc2 , DT_VCENTER|DT_LEFT|DT_SINGLELINE|DT_WORD_ELLIPSIS );
 		DeleteObject(hf);
-	}
-#endif
+    }
+
 }
