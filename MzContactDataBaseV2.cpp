@@ -6,6 +6,7 @@ using namespace cMzCommon;
 
 #define CONTACT_TABLE_NAME	L"ABPerson"
 #define CONTACT_TABLE_PHONE	L"ABPhones"
+#define GROUPMEMBER_TABLE L"ABGroupMembers"
 
 MzContactDataBaseV2::MzContactDataBaseV2(const TCHAR *szContactFileName)
 {
@@ -56,7 +57,10 @@ WORD MzContactDataBaseV2::GetRecordCount()
 		sqlite3_command cmd(this->sqlconn,
 		L"select count(*) from '"
 		CONTACT_TABLE_PHONE
-		L"'");
+		L"' as a where a.record_id not in(select member_id from '"
+		GROUPMEMBER_TABLE
+		L"' where group_id=1)"
+		);
 		nRet = cmd.executeint();
 	}CATCH(exception &ex){
 		db_out(ex.what());
@@ -76,6 +80,9 @@ BOOL MzContactDataBaseV2::GetContact(WORD dwRecordID,ContactData_t &contact){
 		L"' as a,'"
 		CONTACT_TABLE_NAME
 		L"' as b where a.record_id=b.rowid"
+		L" and a.record_id not in(select member_id from '"
+		GROUPMEMBER_TABLE
+		L"' where group_id=1)"
 		L" limit 1 offset ?");
 
 		cmd.bind(1,(int)dwRecordID);
