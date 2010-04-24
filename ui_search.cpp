@@ -189,9 +189,7 @@ bool SearchWaitDlg::CallBackProcess(){
     if(m_pSmsList){
         m_pSmsList->reqUpdate();
         if(m_pSmsList->GetItemCount() == 0){
-            m_Message.SetText(L"没有找到符合条件的短信。");
-            m_Message.Invalidate();
-            //m_Message.Update();
+            setMessage(L"没有找到符合条件的短信。");
             DateTime::waitms(10);
         }
     }

@@ -251,21 +251,19 @@ bool SetPasswordWaitDlg::CallBackProcess(){
 
     if(pWd == NULL || len == 0){
         if(g_pldb->encrypt(defaultpwd,6)){
-            m_Message.SetText(LOADSTRING(IDS_STR_PWD_CLEAR_S).C_Str());
+            setMessage(LOADSTRING(IDS_STR_PWD_CLEAR_S).C_Str());
             g_password_len = 0;
         }else{
-            m_Message.SetText(LOADSTRING(IDS_STR_PWD_CLEAR_F).C_Str());
+            setMessage(LOADSTRING(IDS_STR_PWD_CLEAR_F).C_Str());
         }
     }else{
         if(g_pldb->encrypt(pWd,len)){
-            m_Message.SetText(LOADSTRING(IDS_STR_PWD_SET_S).C_Str());
+            setMessage(LOADSTRING(IDS_STR_PWD_SET_S).C_Str());
             g_password_len = 0;
         }else{
-            m_Message.SetText(LOADSTRING(IDS_STR_PWD_SET_F).C_Str());
+            setMessage(LOADSTRING(IDS_STR_PWD_SET_F).C_Str());
         }
     }
-    m_Message.Invalidate();
-    //m_Message.Update();
 
     //销毁数据库连接
     delete g_pldb;

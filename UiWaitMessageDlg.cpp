@@ -24,20 +24,12 @@ BOOL Ui_WaitMessageDlgWnd::OnInitDialog(){
     if (!CMzWndEx::OnInitDialog()) {
         return FALSE;
     }
-    m_Bg.SetPos(0,0,GetWidth(),GetHeight());
-    AddUiWin(&m_Bg);
-
-    m_Message.SetPos(10,0,GetWidth() - 20,GetHeight());
-    m_Message.SetTextSize(30);
-    m_Message.SetText(m_messageText);
-    m_Message.SetTextColor(RGB(255,255,255));
-    m_Message.SetDrawTextFormat(DT_VCENTER|DT_CENTER);
-    AddUiWin(&m_Message);
-
+	m_progress.EnableCancelButton(FALSE);
     return TRUE;
 }
 
 int Ui_WaitMessageDlgWnd::DoModal(){
+	m_progress.BeginWaitDialog(m_hWnd,m_messageText,TRUE);
     SetTimer(m_hWnd,0x1001,100,NULL);
     return CMzWndEx::DoModal();
 }
@@ -50,6 +42,7 @@ void Ui_WaitMessageDlgWnd::OnTimer(UINT nIDEvent){
             nRet = CallBackProcess();
             break;
         case 0x1002:
+			m_progress.EndWaitDialog();
             EndModal(nRet ? ID_OK : ID_CANCEL);
             break;
     }
@@ -61,4 +54,5 @@ void Ui_WaitMessageDlgWnd::setMessage(LPTSTR msg){
     }else{
         C::newstrcpy(&m_messageText,L"«Î…‘µ»...");
     }
+	m_progress.ResetTipText(m_messageText,TRUE);
 }

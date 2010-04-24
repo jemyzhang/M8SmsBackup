@@ -20,20 +20,18 @@ public:
 	UiButtonEx m_BtnRefresh;	//刷新
 	UiButtonEx m_BtnConfig;		//设置
 	UiButtonEx m_BtnTools;		//工具
-#ifdef USE_903SDK
-	UiMultiLineEdit m_TextAbout;
-#else
 	UiEdit m_TextAbout;
-#endif
 protected:
     // Initialization of the window (dialog)
     virtual BOOL OnInitDialog();
 
     // override the MZFC window messages handler
-//    LRESULT MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam);
+    LRESULT MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam);
 
     // override the MZFC command handler
     virtual void OnMzCommand(WPARAM wParam, LPARAM lParam);
+private:
+	UINT UsbNotifyMsg;
 };
 
 

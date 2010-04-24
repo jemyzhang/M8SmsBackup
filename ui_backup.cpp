@@ -36,21 +36,26 @@ BOOL Ui_BackupWnd::OnInitDialog() {
 
     // Then init the controls & other things in the window
 	int y = 0;
-	m_Caption1.SetPos(0,y,GetWidth(),MZM_HEIGHT_CAPTION);
+	m_Caption1.SetPos(0,y,GetWidth(),MZM_HEIGHT_HEADINGBAR);
 	m_Caption1.SetText(LOADSTRING(IDS_STR_BACKUP_RESTORE).C_Str());
 	AddUiWin(&m_Caption1);
 
-	y+=MZM_HEIGHT_CAPTION;
+	y+=MZM_HEIGHT_HEADINGBAR;
     m_List.SetPos(0, y, GetWidth(), GetHeight() - MZM_HEIGHT_TOOLBARPRO - MZM_HEIGHT_CAPTION);
     m_List.SetID(MZ_IDC_BACKUP_LIST);
-    m_List.EnableScrollBarV(true);
+	m_List.EnableInsideScroll(true);
+	m_List.SetItemHeight(60);
+	m_List.SetItemAttribute(UILISTEX_ITEMTYPE_BROWSER);
+	m_List.SetSplitLineMode(UILISTEX_SPLITLINE_LEFT);
+	m_List.EnableSelectBg(TRUE);
+    m_List.EnableDragModeH(true);
     m_List.EnableNotifyMessage(true);
+	m_List.UpdateItemAttribute_Del();
     AddUiWin(&m_List);
 
     m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TOOLBARPRO, GetWidth(), MZM_HEIGHT_TOOLBARPRO);
     m_Toolbar.SetButton(0, true, true, LOADSTRING(IDS_STR_RETURN).C_Str());
     m_Toolbar.EnableLeftArrow(true);
-	m_Toolbar.SetButton(1, true, false, LOADSTRING(IDS_STR_OPERATE).C_Str());
 	m_Toolbar.SetButton(2, true, true, LOADSTRING(IDS_STR_BACKUP).C_Str());
     m_Toolbar.SetID(MZ_IDC_TOOLBAR_ACCOUNTS);
     AddUiWin(&m_Toolbar);
@@ -70,60 +75,6 @@ void Ui_BackupWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
                 EndModal(ID_CANCEL);
                 return;
             }
-			if (nIndex == 1) { //操作
-				// pop out a PopupMenu:
-				CPopupMenu ppm;
-				struct PopupMenuItemProp pmip;      
-
-				pmip.itemCr = MZC_BUTTON_PELLUCID;
-				pmip.itemRetID = IDC_PPM_CANCEL;
-				pmip.str = LOADSTRING(IDS_STR_CANCEL).C_Str();
-				ppm.AddItem(pmip);  
-
-				pmip.itemCr = MZC_BUTTON_PELLUCID;
-				pmip.itemRetID = IDC_PPM_DEL;
-				pmip.str = LOADSTRING(IDS_STR_DELETE).C_Str();
-				ppm.AddItem(pmip);  
-
-				pmip.itemCr = MZC_BUTTON_PELLUCID;
-				pmip.itemRetID = IDC_PPM_RECOVER;
-				pmip.str = LOADSTRING(IDS_STR_RESTORE).C_Str();
-				ppm.AddItem(pmip);
-
-				RECT rc = MzGetWorkArea();      
-				rc.top = rc.bottom - ppm.GetHeight();
-				ppm.Create(rc.left,rc.top,RECT_WIDTH(rc),RECT_HEIGHT(rc),m_hWnd,0,WS_POPUP);      
-				int nID = ppm.DoModal();
-				if(nID == IDC_PPM_RECOVER){	//恢复
-					//弹出警告
-					if(MzMessageBoxV2(m_hWnd,LOADSTRING(IDS_STR_WARN_RESTORE).C_Str(),MZV2_MB_YESNO,TRUE) != 1){
-						return;
-					}
-					//恢复数据库
-                    //恢复前断开数据库
-                    delete g_pldb; g_pldb = 0;
-
-                    int nIndex = m_List.GetSelectedIndex();
-                    if(nIndex == -1) return;
-                    BOOL nRet = brecover(m_List.GetItem(nIndex)->Text);
-                    if(nRet){
-                        //弹出警告
-                        MzMessageAutoBoxV2(m_hWnd,LOADSTRING(IDS_STR_RESTORE_S).C_Str(),MZV2_MB_NONE,2000,TRUE);
-                    }
-                    EndModal(ID_OK);
-				}else if(nID == IDC_PPM_DEL){ //删除
-					//删除目录
-					int nIndex = m_List.GetSelectedIndex();
-					if(nIndex == -1) return;
-					BOOL nRet = bdelete(m_List.GetItem(nIndex)->Text);
-					if(nRet){
-						MzMessageAutoBoxV2(m_hWnd,LOADSTRING(IDS_STR_DELETE_S).C_Str(),MZV2_MB_NONE,2000,TRUE);
-						updateList();
-					}
-				}else{
-					return;
-				}
-			}
             if (nIndex == 2) { //备份
 				BOOL nRet = bbackup();
 				if (nRet) {
@@ -137,7 +88,55 @@ void Ui_BackupWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 }
 
 LRESULT Ui_BackupWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
-    switch (message) {
+	switch (message) {
+        case MZ_WM_ITEM_ONREMOVE:
+            {
+                int index = lParam;
+                ListItemEx* pItem = m_List.GetItem(index);
+                if (pItem)
+                {
+					if(MzMessageBoxEx(m_hWnd,
+						L"确实要删除选定备份？",
+						LOADSTRING(IDS_STR_OK).C_Str(),MZ_YESNO,false) == 1){
+							BOOL nRet = bdelete(pItem->m_textTitle);
+							if(nRet){
+								MzMessageAutoBoxV2(m_hWnd,LOADSTRING(IDS_STR_DELETE_S).C_Str(),MZV2_MB_NONE,2000,TRUE);
+							}
+					}else{	//uilistex fixup
+						ListItemEx* p = new ListItemEx;
+						p->m_textTitle = pItem->m_textTitle;
+						p->m_enableDragDelete = true;
+						p->m_pImgFirst = 
+							m_imgContainer.LoadImage(GetMzResV2ModuleHandle(), MZRESV2_IDR_PNG_REFRESH, true);
+						p->m_pImgFirst_pressed = 
+							m_imgContainer.LoadImage(GetMzResV2ModuleHandle(), MZRESV2_IDR_PNG_REFRESH_PRESSED, true);
+						m_List.InsertItem(p,index);
+					}
+                }
+            }
+            break;
+		case MZ_WM_UILIST_LBUTTONUP_SELECT:
+			if(wParam == MZ_IDC_BACKUP_LIST){
+                int index = LOWORD(lParam);
+                int area = HIWORD(lParam);
+                if(area == 2){
+					//弹出警告
+					if(MzMessageBoxV2(m_hWnd,LOADSTRING(IDS_STR_WARN_RESTORE).C_Str(),MZV2_MB_YESNO,TRUE) != 1){
+						return 0;
+					}
+					//恢复数据库
+					//恢复前断开数据库
+					delete g_pldb; g_pldb = 0;
+
+					BOOL nRet = brecover(m_List.GetItem(index)->m_textTitle);
+					if(nRet){
+						//弹出警告
+						MzMessageAutoBoxV2(m_hWnd,LOADSTRING(IDS_STR_RESTORE_S).C_Str(),MZV2_MB_NONE,2000,TRUE);
+					}
+					EndModal(ID_OK);
+				}
+			}
+			break;
         case MZ_WM_MOUSE_NOTIFY:
         {
             int nID = LOWORD(wParam);
@@ -147,23 +146,10 @@ LRESULT Ui_BackupWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
             if (nID == MZ_IDC_BACKUP_LIST && nNotify == MZ_MN_LBUTTONDOWN) {
                 if (!m_List.IsMouseDownAtScrolling() && !m_List.IsMouseMoved()) {
                     int nIndex = m_List.CalcIndexOfPos(x, y);
-                    m_List.SetSelectedIndex(nIndex);
-                    m_List.Invalidate();
-                    //m_List.Update();
-			 		m_Toolbar.SetButton(1, true, true, LOADSTRING(IDS_STR_OPERATE).C_Str());
-					m_Toolbar.Invalidate();
-					//m_Toolbar.Update();
+					if(nIndex != -1){
+					}
                 }
                 return 0;
-            }
-            if (nID == MZ_IDC_BACKUP_LIST && nNotify == MZ_MN_MOUSEMOVE) {
-                m_List.SetSelectedIndex(-1);
-                m_List.Invalidate();
-                //m_List.Update();
-			 	m_Toolbar.SetButton(1, true, false, LOADSTRING(IDS_STR_OPERATE).C_Str());
-				m_Toolbar.Invalidate();
-				//m_Toolbar.Update();
-               return 0;
             }
        }
     }
@@ -175,18 +161,23 @@ void Ui_BackupWnd::updateList(){
 
     m_List.RemoveAll();
 
-    ListItem li;
 	list<SYSTEMTIME>::iterator it = dirtimes.begin();
+	int i = 0;
 	for(; it != dirtimes.end(); it++){
 		SYSTEMTIME tm = *it;
 		wchar_t dispname[128];
 		wsprintf(dispname,L"%04d-%02d-%02d %02d:%02d:%02d",
 			tm.wYear,tm.wMonth,tm.wDay,tm.wHour,tm.wMinute,tm.wSecond);
-		li.Text = dispname;
-		m_List.AddItem(li);
+	    ListItemEx *pli = new ListItemEx;
+		pli->m_textTitle = dispname;
+		pli->m_enableDragDelete = true;
+		pli->m_pImgFirst = 
+			m_imgContainer.LoadImage(GetMzResV2ModuleHandle(), MZRESV2_IDR_PNG_REFRESH, true);
+		pli->m_pImgFirst_pressed = 
+			m_imgContainer.LoadImage(GetMzResV2ModuleHandle(), MZRESV2_IDR_PNG_REFRESH_PRESSED, true);
+		m_List.AddItem(pli);
 	}
 	m_List.Invalidate();
-	//m_List.Update();
 }
 
 void Ui_BackupWnd::getbackuplist(){
@@ -291,3 +282,13 @@ BOOL Ui_BackupWnd::bbackup(){
 	nRet = File::BackupFiles(currpath,dir,s);
 	return nRet;
 }
+
+//int UiBackupList::OnLButtonDown_DelControl(int index, UINT fwKeys, int xPos, int yPos){
+//void UiBackupList::OnRemoveItem(int nIndex){
+//	if(MzMessageBoxEx(GetParentWnd(),
+//		L"确实要删除选定备份？",
+//		LOADSTRING(IDS_STR_OK).C_Str(),MZ_YESNO,false) == 1){
+//		return UiListEx::OnRemoveItem(nIndex);//, fwKeys, xPos, yPos);
+//	}
+//	return;
+//}

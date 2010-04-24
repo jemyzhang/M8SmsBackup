@@ -3,6 +3,11 @@
 
 // include the MZFC library header file
 #include <mzfc_inc.h>
+class UiBackupList : public UiListEx {
+public:
+	//void OnRemoveItem(int nIndex);
+	//int OnLButtonDown_DelControl(int index, UINT fwKeys, int xPos, int yPos);
+};
 
 class Ui_BackupWnd : public CMzWndEx {
     MZ_DECLARE_DYNAMIC(Ui_BackupWnd);
@@ -10,8 +15,9 @@ public:
     Ui_BackupWnd() { }
 protected:
     UiToolbar_Text m_Toolbar;
-    UiCaption m_Caption1;
-    UiList m_List;
+    UiHeadingBar m_Caption1;
+    UiBackupList m_List;
+	ImageContainer m_imgContainer;
 
     // Initialization of the window (dialog)
     virtual BOOL OnInitDialog();

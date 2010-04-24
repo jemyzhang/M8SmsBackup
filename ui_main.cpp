@@ -9,19 +9,20 @@ using namespace cMzCommon;
 #include "ui_config.h"
 #include "ui_tools.h"
 #include "passwordDlg.h"
+#include <UsbNotifyApi.h>
 
 #ifdef DEBUG
 #define BUILD_CONFIG	L"D"
 #else
-#define BUILD_CONFIG	L"R"
+#define BUILD_CONFIG
 #endif
 #ifdef MZFC_STATIC
 #define BUILD_METHOD L"s"
 #else
-#define BUILD_METHOD L"d"
+#define BUILD_METHOD
 #endif
-#define VER_STRING L"1.84"BUILD_METHOD
-#define BUILD_STRING L"20100322"BUILD_CONFIG
+#define VER_STRING L"1.85"BUILD_METHOD
+#define BUILD_STRING L"20100424.071"BUILD_CONFIG
 
 extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 extern HINSTANCE LangresHandle;
@@ -109,7 +110,7 @@ BOOL Ui_MainWnd::OnInitDialog() {
 	m_TextAbout.SetEnable(false);
 	m_TextAbout.SetTextColor(RGB(128,128,128));
 	m_TextAbout.SetDrawTextFormat(DT_RIGHT);
-	m_TextAbout.SetTextSize(20);
+	m_TextAbout.SetTextSize(18);
 	CMzString sAbout;
 	wchar_t sa[256];
 	wsprintf(sa,LOADSTRING(IDS_STR_APPAUTHOR).C_Str(),L"JEMYZHANG");
@@ -119,7 +120,7 @@ BOOL Ui_MainWnd::OnInitDialog() {
 	sAbout = sAbout + sa;
 	sAbout = sAbout + L"\n";
 	sAbout = sAbout + L"Email: jemy.zhang@gmail.com\n";
-	sAbout = sAbout + L"(C)2009 JEMYZHANG  保留所有权利";
+	sAbout = sAbout + L"CopyRight(C)2009-2010 JEMYZHANG  保留所有权利";
 	m_TextAbout.SetText(sAbout.C_Str());
 	AddUiWin(&m_TextAbout);
 
@@ -128,6 +129,8 @@ BOOL Ui_MainWnd::OnInitDialog() {
 	m_Toolbar.SetID(MZ_IDC_TOOLBAR_MAIN);
 	AddUiWin(&m_Toolbar);
 
+    //获取USB消息
+    UsbNotifyMsg = RegisterUsbNotifyMsg();
 	return TRUE;
 }
 
@@ -210,4 +213,16 @@ void Ui_MainWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 			}
 			break;
 	}
+}
+
+LRESULT Ui_MainWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
+    if(message == UsbNotifyMsg){
+        INT eventType = (INT)wParam;
+        switch(eventType){
+            case USB_MASSSTORAGE_ATTACH:
+                ::PostQuitMessage(-1);
+                break;
+        }
+    }
+    return CMzWndEx::MzDefWndProc(message, wParam, lParam);
 }
