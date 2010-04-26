@@ -19,7 +19,7 @@ public:
 		HANDLE m_hCHDle = CreateMutex(NULL,true,L"M8SmsMgr");
 		if(GetLastError() == ERROR_ALREADY_EXISTS)
 		{
-			HWND pWnd=0;//FindWindow(m_MainWnd.GetMzClassName(),NULL);
+			HWND pWnd = FindWindow(m_MainWnd.GetMzClassName(),NULL);
 			return pWnd; 
 		}
 		return 0;
