@@ -2,6 +2,7 @@
 
 // include the MZFC library header file
 #include <mzfc_inc.h>
+#include "UiSwitchOption.h"
 
 //过滤器设置界面
 class Ui_ConfigWnd : public CMzWndEx 
@@ -19,14 +20,15 @@ private:
 		updateBootUpdate();
         updateUpdateMethod();
 	}
+    LPCTSTR SetPassword(wchar_t *pWd, int len);
 public:
     UiToolbar_Text m_Toolbar;	//确定
-	UiButtonEx m_BtnUseSimPhoneBook;		//使用SIM联系人
-	UiButtonEx m_BtnUseSimPhoneBookSW;	//使用SIM联系人 ON/OFF
-	UiButtonEx m_BtnBootUpdate;		//启动时自动更新
-	UiButtonEx m_BtnBootUpdateSW;	//启动时自动更新 ON/OFF
+	UiSwitchOption m_BtnUseSimPhoneBook;		//使用SIM联系人
+	UiSwitchOption m_BtnBootUpdate;		//启动时自动更新
 	UiButtonEx m_BtnUpdateMethod;	//更新方式
     UiButtonEx m_BtnSetupPassword;
+
+    CMzPopupWaitDialog m_progress;
 protected:
     // Initialization of the window (dialog)
     virtual BOOL OnInitDialog();

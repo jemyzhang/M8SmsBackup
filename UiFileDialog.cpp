@@ -32,6 +32,7 @@ BOOL UiFileDialog::OnInitDialog(){
 		m_FileName.SetText(_filename);
 	}
 	m_FileName.SetRightInvalid(60);
+    m_FileName.SetSipMode(IM_SIP_MODE_GEL_PY,MZM_HEIGHT_TOOLBARPRO);
 	AddUiWin(&m_FileName);
 
 	y += MZM_HEIGHT_SINGLELINE_EDIT;

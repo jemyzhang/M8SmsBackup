@@ -22,7 +22,7 @@ using namespace cMzCommon;
 #define BUILD_METHOD
 #endif
 #define VER_STRING L"1.85"BUILD_METHOD
-#define BUILD_STRING L"20100426.072"BUILD_CONFIG
+#define BUILD_STRING L"20100429.076"BUILD_CONFIG
 
 extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 extern HINSTANCE LangresHandle;
@@ -120,7 +120,7 @@ BOOL Ui_MainWnd::OnInitDialog() {
 	sAbout = sAbout + sa;
 	sAbout = sAbout + L"\n";
 	sAbout = sAbout + L"Email: jemy.zhang@gmail.com\n";
-	sAbout = sAbout + L"CopyRight(C)2009-2010 JEMYZHANG  保留所有权利";
+	sAbout = sAbout + L"Copyright(C)2009-2010 JEMYZHANG  保留所有权利";
 	m_TextAbout.SetText(sAbout.C_Str());
 	AddUiWin(&m_TextAbout);
 

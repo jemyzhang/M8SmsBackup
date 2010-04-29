@@ -12,18 +12,6 @@ using namespace cMzCommon;
 #include <fstream>
 using namespace std;
 
-#include "UiWaitMessageDlg.h"
-
-class OptimizeWaitDlg : public Ui_WaitMessageDlgWnd{
-public:
-    OptimizeWaitDlg()
-        :Ui_WaitMessageDlgWnd(L"数据库优化中，请稍候。"){
-    }
-public:
-    bool CallBackProcess();
-};
-
-
 extern HINSTANCE LangresHandle;
 extern SmsBackupConfig appconfig;
 extern int g_password_len;
@@ -141,14 +129,14 @@ void Ui_ToolWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 		}
         case MZ_IDC_BTN_SETUP_OPTIMIZE:
         {
-            OptimizeWaitDlg dlg;
-            RECT rcWork = MzGetWorkArea();
-            dlg.Create(rcWork.left + 30, rcWork.top + 200, RECT_WIDTH(rcWork) - 60, RECT_HEIGHT(rcWork) - 400,
-                m_hWnd, 0, WS_POPUP);
-            // set the animation of the window
-            dlg.SetAnimateType_Show(MZ_ANIMTYPE_NONE);
-            dlg.SetAnimateType_Hide(MZ_ANIMTYPE_FADE);
-            dlg.DoModal();
+            CMzPopupWaitDialog m_progress;
+            m_progress.EnableCancelButton(FALSE);
+            m_progress.BeginWaitDialog(m_hWnd,L"数据库优化中，请稍候。",TRUE);
+            if(g_pldb != 0){
+                g_pldb->indexDatabase();
+                g_pldb->reorgDatebase();
+            }
+            m_progress.EndWaitDialog();
             return;
         }
         case MZ_IDC_BTN_SETUP_CONTACT_CLEAR:
@@ -304,9 +292,3 @@ LRESULT Ui_ToolWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
     return CMzWndEx::MzDefWndProc(message, wParam, lParam);
 }
 
-bool OptimizeWaitDlg::CallBackProcess(){
-    if(g_pldb == 0) return false;
-    g_pldb->indexDatabase();
-    g_pldb->reorgDatebase();
-    return true;
-}

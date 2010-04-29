@@ -308,7 +308,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\UiWaitMessageDlg.cpp"
+				RelativePath=".\UiSwitchOption.cpp"
 				>
 			</File>
 		</Filter>
@@ -422,7 +422,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\UiWaitMessageDlg.h"
+				RelativePath=".\UiSwitchOption.h"
 				>
 			</File>
 		</Filter>

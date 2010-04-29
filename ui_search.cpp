@@ -86,16 +86,14 @@ void Ui_SearchWnd::SetupList(){
 	m_SmsList.RemoveAll();
 	m_SmsList.ScrollTo();
 
-    SearchWaitDlg dlg;
-    RECT rcWork = MzGetWorkArea();
-    dlg.m_pSmsList = &m_SmsList;
-    dlg.Create(rcWork.left + 30, rcWork.top + 200, RECT_WIDTH(rcWork) - 60, RECT_HEIGHT(rcWork) - 400,
-        m_hWnd, 0, WS_POPUP);
-    // set the animation of the window
-    dlg.SetAnimateType_Show(MZ_ANIMTYPE_NONE);
-    dlg.SetAnimateType_Hide(MZ_ANIMTYPE_FADE);
-    dlg.DoModal();
-
+    CMzPopupWaitDialog m_progress;
+    m_progress.EnableCancelButton(FALSE);
+    m_progress.BeginWaitDialog(m_hWnd,L"搜索中，请稍候。",TRUE);
+    m_SmsList.reqUpdate();
+    m_progress.EndWaitDialog();
+    if(m_SmsList.GetItemCount() == 0){
+        MzMessageAutoBoxV2(m_hWnd,L"没有找到符合条件的短信。");
+    }
 	m_SmsList.Invalidate();
 	//m_SmsList.Update();
 	SetupToolbar();
@@ -185,13 +183,3 @@ LRESULT Ui_SearchWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 	return CMzWndEx::MzDefWndProc(message, wParam, lParam);
 }
 
-bool SearchWaitDlg::CallBackProcess(){
-    if(m_pSmsList){
-        m_pSmsList->reqUpdate();
-        if(m_pSmsList->GetItemCount() == 0){
-            setMessage(L"没有找到符合条件的短信。");
-            DateTime::waitms(10);
-        }
-    }
-    return true;
-}
