@@ -12,7 +12,7 @@ public:
 	Ui_MainWnd();
 	~Ui_MainWnd();
 public:
-    UiToolbar_Text m_Toolbar;
+    UiToolBarPro m_Toolbar;
 
 	UiImage	m_Logo;
 	UiButtonEx m_BtnView;		//²é¿´

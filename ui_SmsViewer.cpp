@@ -115,9 +115,9 @@ BOOL Ui_SmsViewerWnd::OnInitDialog() {
 	m_Background.AddChild(&m_ReportSms);
 
 	m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TOOLBARPRO, GetWidth(), MZM_HEIGHT_TOOLBARPRO);
-	m_Toolbar.SetButton(0,true,true,LOADSTRING(IDS_STR_PREVIOUS).C_Str());
-	m_Toolbar.SetButton(1,true,true,LOADSTRING(IDS_STR_RETURN).C_Str());
-	m_Toolbar.SetButton(2,true,true,LOADSTRING(IDS_STR_NEXT).C_Str());
+	m_Toolbar.SetButton(TOOLBARPRO_LEFT_TEXTBUTTON,true,true,LOADSTRING(IDS_STR_PREVIOUS).C_Str());
+	m_Toolbar.SetMiddleButton(true,true,LOADSTRING(IDS_STR_RETURN).C_Str(),NULL,NULL,NULL);
+	m_Toolbar.SetButton(TOOLBARPRO_RIGHT_TEXTBUTTON,true,true,LOADSTRING(IDS_STR_NEXT).C_Str());
 	m_Toolbar.SetID(MZ_IDC_TOOLBAR_MAIN);
 	AddUiWin(&m_Toolbar);
 
@@ -189,16 +189,16 @@ void Ui_SmsViewerWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 		case MZ_IDC_TOOLBAR_MAIN:
 			{
 				int nIndex = lParam;
-				if (nIndex == 1) {
+				if (nIndex == TOOLBARPRO_MIDDLE_TEXTBUTTON) {
 					EndModal(ID_OK);
 					return;
 				}
-				if (nIndex == 0) {
+				if (nIndex == TOOLBARPRO_LEFT_TEXTBUTTON) {
 					viewIndex--;
 					UpdateSms();
 					return;
 				}
-				if (nIndex == 2) {
+				if (nIndex == TOOLBARPRO_RIGHT_TEXTBUTTON) {
 					viewIndex++;
 					UpdateSms();
 					return;

@@ -54,7 +54,7 @@ BOOL Ui_SearchWnd::OnInitDialog() {
 	AddUiWin(&m_SmsList);
 
 	m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TOOLBARPRO, GetWidth(), MZM_HEIGHT_TOOLBARPRO);
-	m_Toolbar.SetButton(0,true,true,LOADSTRING(IDS_STR_RETURN).C_Str());
+	m_Toolbar.SetButton(TOOLBARPRO_LEFT_TEXTBUTTON,true,true,LOADSTRING(IDS_STR_RETURN).C_Str());
 	m_Toolbar.SetID(MZ_IDC_TOOLBAR_MAIN);
 	AddUiWin(&m_Toolbar);
 
@@ -63,18 +63,18 @@ BOOL Ui_SearchWnd::OnInitDialog() {
 
 void Ui_SearchWnd::SetupToolbar(){
 	if(m_SmsList.GetSelectionMode()){
-				m_Toolbar.SetButton(0,true,true,LOADSTRING(IDS_STR_REVERSE_SELECT).C_Str());
-				m_Toolbar.SetButton(1,true,m_SmsList.GetSelectedCount() > 0,LOADSTRING(IDS_STR_DELETE).C_Str());
-				m_Toolbar.SetButton(2,true,true,LOADSTRING(IDS_STR_FINISHED).C_Str());
+				m_Toolbar.SetButton(TOOLBARPRO_LEFT_TEXTBUTTON,true,true,LOADSTRING(IDS_STR_REVERSE_SELECT).C_Str());
+				m_Toolbar.SetMiddleButton(true,m_SmsList.GetSelectedCount() > 0,LOADSTRING(IDS_STR_DELETE).C_Str(),NULL,NULL,NULL);
+				m_Toolbar.SetButton(TOOLBARPRO_RIGHT_TEXTBUTTON,true,true,LOADSTRING(IDS_STR_FINISHED).C_Str());
 	}else{
 		if(m_SmsList.GetItemCount() == 0){
-				m_Toolbar.SetButton(0,true,true,LOADSTRING(IDS_STR_RETURN).C_Str());
-				m_Toolbar.SetButton(1,false,false,NULL);
-				m_Toolbar.SetButton(2,false,false,NULL);
+				m_Toolbar.SetButton(TOOLBARPRO_LEFT_TEXTBUTTON,true,true,LOADSTRING(IDS_STR_RETURN).C_Str());
+				m_Toolbar.ShowButton(TOOLBARPRO_MIDDLE_TEXTBUTTON,false);
+				m_Toolbar.ShowButton(TOOLBARPRO_RIGHT_TEXTBUTTON,false);
 		}else{
-				m_Toolbar.SetButton(0,true,true,LOADSTRING(IDS_STR_RETURN).C_Str());
-				m_Toolbar.SetButton(2,true,true,LOADSTRING(IDS_STR_SELECT).C_Str());
-				m_Toolbar.SetButton(1,false,false,NULL);
+				m_Toolbar.SetButton(TOOLBARPRO_LEFT_TEXTBUTTON,true,true,LOADSTRING(IDS_STR_RETURN).C_Str());
+				m_Toolbar.SetButton(TOOLBARPRO_RIGHT_TEXTBUTTON,true,true,LOADSTRING(IDS_STR_SELECT).C_Str());
+				m_Toolbar.ShowButton(TOOLBARPRO_MIDDLE_TEXTBUTTON,false);
 		}
 	}
 	m_Toolbar.Invalidate();
@@ -121,7 +121,7 @@ void Ui_SearchWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 		case MZ_IDC_TOOLBAR_MAIN:
 			{
 				int nIndex = lParam;
-				if (nIndex == 0) {
+				if (nIndex == TOOLBARPRO_LEFT_TEXTBUTTON) {
 					if(m_SmsList.GetSelectionMode()){
 						m_SmsList.ReverseSelect();
 						m_SmsList.Invalidate();
@@ -132,13 +132,13 @@ void Ui_SearchWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 						return;
 					}
 				}
-				if(nIndex == 2){
+				if(nIndex == TOOLBARPRO_RIGHT_TEXTBUTTON){
 					m_SmsList.SetSelectionMode();
 					m_SmsList.Invalidate();
 					//m_SmsList.Update();
 					SetupToolbar();
 				}
-				if(nIndex == 1){
+				if(nIndex == TOOLBARPRO_MIDDLE_TEXTBUTTON){
 					if(MzMessageBoxV2(m_hWnd,
 						LOADSTRING(IDS_STR_DELETE_CONFIRM).C_Str(),
 						MZV2_MB_YESNO,TRUE) == 1){

@@ -14,7 +14,7 @@ class Ui_BackupWnd : public CMzWndEx {
 public:
     Ui_BackupWnd() { }
 protected:
-    UiToolbar_Text m_Toolbar;
+    UiToolBarPro m_Toolbar;
     UiHeadingBar m_Caption1;
     UiBackupList m_List;
 	ImageContainer m_imgContainer;

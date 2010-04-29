@@ -12,7 +12,7 @@ public:
 	Ui_PasswordWnd(void);
 	~Ui_PasswordWnd(void);
 public:
-    UiToolbar_Text m_Toolbar;
+    UiToolBarPro m_Toolbar;
     UiSingleLineEdit m_EdtPassword;
 	UiControlBackground m_Background;
 public:

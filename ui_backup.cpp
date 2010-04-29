@@ -54,9 +54,8 @@ BOOL Ui_BackupWnd::OnInitDialog() {
     AddUiWin(&m_List);
 
     m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TOOLBARPRO, GetWidth(), MZM_HEIGHT_TOOLBARPRO);
-    m_Toolbar.SetButton(0, true, true, LOADSTRING(IDS_STR_RETURN).C_Str());
-    m_Toolbar.EnableLeftArrow(true);
-	m_Toolbar.SetButton(2, true, true, LOADSTRING(IDS_STR_BACKUP).C_Str());
+    m_Toolbar.SetButton(TOOLBARPRO_LEFT_TEXTBUTTON, true, true, LOADSTRING(IDS_STR_RETURN).C_Str());
+	m_Toolbar.SetButton(TOOLBARPRO_RIGHT_TEXTBUTTON, true, true, LOADSTRING(IDS_STR_BACKUP).C_Str());
     m_Toolbar.SetID(MZ_IDC_TOOLBAR_ACCOUNTS);
     AddUiWin(&m_Toolbar);
 
@@ -70,15 +69,15 @@ void Ui_BackupWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
         case MZ_IDC_TOOLBAR_ACCOUNTS:
         {
             int nIndex = lParam;
-            if (nIndex == 0) { //返回
+            if (nIndex == TOOLBARPRO_LEFT_TEXTBUTTON) { //返回
                 // exit the modal dialog
                 EndModal(ID_CANCEL);
                 return;
             }
-            if (nIndex == 2) { //备份
+            if (nIndex == TOOLBARPRO_RIGHT_TEXTBUTTON) { //备份
 				BOOL nRet = bbackup();
 				if (nRet) {
-					MzMessageAutoBoxV2(m_hWnd,LOADSTRING(IDS_STR_BACKUP_S).C_Str(),MZV2_MB_NONE,2000,TRUE);
+					MzMessageAutoBoxV2(m_hWnd,LOADSTRING(IDS_STR_BACKUP_S).C_Str(),MZV2_MB_NONE,1000,TRUE);
 					updateList();
 				}
                 return;
@@ -100,7 +99,7 @@ LRESULT Ui_BackupWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 						LOADSTRING(IDS_STR_OK).C_Str(),MZ_YESNO,false) == 1){
 							BOOL nRet = bdelete(pItem->m_textTitle);
 							if(nRet){
-								MzMessageAutoBoxV2(m_hWnd,LOADSTRING(IDS_STR_DELETE_S).C_Str(),MZV2_MB_NONE,2000,TRUE);
+								MzMessageAutoBoxV2(m_hWnd,LOADSTRING(IDS_STR_DELETE_S).C_Str(),MZV2_MB_NONE,1000,TRUE);
 							}
 					}else{	//uilistex fixup
 						ListItemEx* p = new ListItemEx;
@@ -131,7 +130,7 @@ LRESULT Ui_BackupWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 					BOOL nRet = brecover(m_List.GetItem(index)->m_textTitle);
 					if(nRet){
 						//弹出警告
-						MzMessageAutoBoxV2(m_hWnd,LOADSTRING(IDS_STR_RESTORE_S).C_Str(),MZV2_MB_NONE,2000,TRUE);
+						MzMessageAutoBoxV2(m_hWnd,LOADSTRING(IDS_STR_RESTORE_S).C_Str(),MZV2_MB_NONE,1000,TRUE);
 					}
 					EndModal(ID_OK);
 				}

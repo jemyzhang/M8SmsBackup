@@ -60,7 +60,7 @@ public:
 	~Ui_ViewWnd();
     void OnTimer(UINT nIDEvent);
 public:
-    UiToolbar_Text m_Toolbar;
+    UiToolBarPro m_Toolbar;
     UiNaviList m_Navibar;
     UiKeyList m_List;
     UiSmsList m_SmsList;

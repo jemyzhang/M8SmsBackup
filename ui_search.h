@@ -14,7 +14,7 @@ public:
 	Ui_SearchWnd();
 	~Ui_SearchWnd();
 public:
-    UiToolbar_Text m_Toolbar;
+    UiToolBarPro m_Toolbar;
 	UiSingleLineEdit m_SearchBox;
 	UiButton_Image m_ButtonSearch;
     UiSmsList m_SmsList;

@@ -11,7 +11,7 @@ public:
 	Ui_ToolWnd(void);
 	~Ui_ToolWnd(void);
 public:
-    UiToolbar_Text m_Toolbar;	//确定
+    UiToolBarPro m_Toolbar;	//确定
 	UiButtonEx m_BtnBackup;	//备份数据库
 	UiButtonEx m_BtnOptimize;	//优化数据库，创建索引
 	UiButtonEx m_BtnClearContact;	//重新导入联系人

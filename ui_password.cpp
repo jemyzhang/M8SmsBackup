@@ -62,8 +62,8 @@ BOOL Ui_PasswordWnd::OnInitDialog() {
     m_Background.AddChild(&m_EdtPassword);
 
     m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TOOLBARPRO, GetWidth(), MZM_HEIGHT_TOOLBARPRO);
-    m_Toolbar.SetButton(0, true, true, LOADSTRING(IDS_STR_CANCEL).C_Str());
-    m_Toolbar.SetButton(2, true, true, LOADSTRING(IDS_STR_OK).C_Str());
+    m_Toolbar.SetButton(TOOLBARPRO_LEFT_TEXTBUTTON, true, true, LOADSTRING(IDS_STR_CANCEL).C_Str());
+    m_Toolbar.SetButton(TOOLBARPRO_RIGHT_TEXTBUTTON, true, true, LOADSTRING(IDS_STR_OK).C_Str());
     m_Toolbar.SetID(MZ_IDC_TOOLBAR_CALENDAR);
     AddUiWin(&m_Toolbar);
 
@@ -77,7 +77,7 @@ void Ui_PasswordWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
         case MZ_IDC_TOOLBAR_CALENDAR:
         {
             int nIndex = lParam;
-			if(nIndex == 0){	//取消
+			if(nIndex == TOOLBARPRO_LEFT_TEXTBUTTON){	//取消
 				if(_uiMode){
 					if(_isModal){
 						EndModal(ID_CANCEL);
@@ -92,7 +92,7 @@ void Ui_PasswordWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 				}
 				return;
 			}
-			if(nIndex == 2){	//确定
+			if(nIndex == TOOLBARPRO_RIGHT_TEXTBUTTON){	//确定
 				if(_isModal){
 					EndModal(ID_OK);
 				}else{

@@ -22,7 +22,7 @@ using namespace cMzCommon;
 #define BUILD_METHOD
 #endif
 #define VER_STRING L"1.85"BUILD_METHOD
-#define BUILD_STRING L"20100429.076"BUILD_CONFIG
+#define BUILD_STRING L"20100429.077"BUILD_CONFIG
 
 extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 extern HINSTANCE LangresHandle;
@@ -125,7 +125,7 @@ BOOL Ui_MainWnd::OnInitDialog() {
 	AddUiWin(&m_TextAbout);
 
 	m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TOOLBARPRO, GetWidth(), MZM_HEIGHT_TOOLBARPRO);
-	m_Toolbar.SetButton(1,true,true,LOADSTRING(IDS_STR_EXIT).C_Str());
+	m_Toolbar.SetMiddleButton(true,true,LOADSTRING(IDS_STR_EXIT).C_Str(),NULL,NULL,NULL);
 	m_Toolbar.SetID(MZ_IDC_TOOLBAR_MAIN);
 	AddUiWin(&m_Toolbar);
 
@@ -206,7 +206,7 @@ void Ui_MainWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 		case MZ_IDC_TOOLBAR_MAIN:
 			{
 				int nIndex = lParam;
-				if (nIndex == 1) {
+				if (nIndex == TOOLBARPRO_MIDDLE_TEXTBUTTON) {
 					PostQuitMessage(0);
 					return;
 				}

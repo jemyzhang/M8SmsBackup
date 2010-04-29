@@ -22,7 +22,7 @@ private:
 	}
     LPCTSTR SetPassword(wchar_t *pWd, int len);
 public:
-    UiToolbar_Text m_Toolbar;	//确定
+    UiToolBarPro m_Toolbar;	//确定
 	UiSwitchOption m_BtnUseSimPhoneBook;		//使用SIM联系人
 	UiSwitchOption m_BtnBootUpdate;		//启动时自动更新
 	UiButtonEx m_BtnUpdateMethod;	//更新方式

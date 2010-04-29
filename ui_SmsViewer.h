@@ -27,7 +27,7 @@ public:
 	Ui_SmsViewerWnd();
 	~Ui_SmsViewerWnd();
 public:
-	UiToolbar_Text m_Toolbar;
+	UiToolBarPro m_Toolbar;
 #ifdef USE_903SDK
 	UiMultiLineEdit m_Content;
 #else

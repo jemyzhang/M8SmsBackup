@@ -91,8 +91,7 @@ BOOL Ui_ToolWnd::OnInitDialog() {
     AddUiWin(&m_BtnExpSms);
 
 	m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TOOLBARPRO, GetWidth(), MZM_HEIGHT_TOOLBARPRO);
-    m_Toolbar.EnableLeftArrow(true);
-    m_Toolbar.SetButton(0, true, true, LOADSTRING(IDS_STR_RETURN).C_Str());
+    m_Toolbar.SetButton(TOOLBARPRO_LEFT_TEXTBUTTON, true, true, LOADSTRING(IDS_STR_RETURN).C_Str());
     m_Toolbar.SetID(MZ_IDC_TOOLBAR_CONFIG);
     AddUiWin(&m_Toolbar);
     return TRUE;
@@ -120,7 +119,7 @@ void Ui_ToolWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
         case MZ_IDC_TOOLBAR_CONFIG:
         {
             int nIndex = lParam;
-			if(nIndex == 0){	//取消
+			if(nIndex == TOOLBARPRO_LEFT_TEXTBUTTON){	//取消
 				EndModal(ID_OK);
 				SetWindowText(L"短信备份");
 				return;
