@@ -303,57 +303,12 @@ void LocalDataBase::query_clear(){
 bool LocalDataBase::query_contacts(){
     bool bRet = true;
 
-	query_clear();
-
 	TRY{
 		sqlite3_command cmd(this->sqlconn,
 		L"select * from '"
 		TABLE_CONTACT
 		L"' order by NAME collate pinyin;");
-//PhoneNumber text primary key,Name text NOT NULL,Label numeric NOT NULL
-		ContactData_ptr pcontact = 0;
-		sqlite3_reader reader=cmd.executereader();
-		TelLabel_t t;
-		while(reader.read()){
-			bool samecontact = false;
-			wchar_t* pname = 0;
-			//getstring后结果会销毁，所以必须保存
-			C::newstrcpy(&pname, reader.getstring16(1).c_str());	
-			if(pcontact == 0){
-				pcontact = new ContactData;
-				C::newstrcpy(&pcontact->Name,pname);
-			}else{
-				if(wcscmp(pcontact->Name,pname) == 0){
-					samecontact = true;
-				}else{
-					pcontact = new ContactData;
-					C::newstrcpy(&pcontact->Name,pname);
-				}
-			}
-			delete pname;
-			t = (TelLabel_t)reader.getint(2);
-			LPWSTR pn = 0;
-			C::newstrcpy(&pn,reader.getstring16(0).c_str());
-			switch(t){
-				case MOBILETEL:
-					pcontact->MobileTels.push_back(pn);
-					break;
-				case WORKTEL:
-					pcontact->WorkTels.push_back(pn);
-					break;
-				case HOMETEL:
-					pcontact->HomeTels.push_back(pn);
-					break;
-				case HOMETEL2:
-					pcontact->HomeTel2s.push_back(pn);
-					break;
-				default:
-					break;
-			}
-			if(!samecontact){
-				query_contact_list.push_back(pcontact);
-			}
-		}
+        bRet = contact_queryexec(cmd);
 	}CATCH(exception &ex){
 		db_out(ex.what());
 		bRet = false;
@@ -749,60 +704,55 @@ UINT LocalDataBase::GetSmsByDate(WORD year, WORD month, WORD day,SmsSimpleData_p
 }
 
 UINT LocalDataBase::GetSmsByContact(LPWSTR pname,SmsSimpleData_ptr plist){
-    if(pname == NULL) return 0; //姓名错误
-	UINT nSize = 0;
-	TRY{	//获取总数
-		sqlite3_command cmd(this->sqlconn,
-			L"select count(*) from '"
-			TABLE_SMS
-			L"' where name=?");
-
-		cmd.bind(1,pname,lstrlen(pname)*2);
-		nSize = cmd.executeint();
-	}CATCH(exception &ex){
-		db_out(ex.what());
-	}
-
-    if(nSize == 0 || plist == NULL) return nSize;
-
-	TRY{	//获取总数
-		sqlite3_command cmd(this->sqlconn,
-			L"select name,phonenumber,content,strftime('%Y-%m-%d %H:%M:%S',timestamps),sendreceive from '"
-			TABLE_SMS
-			L"' where name=? order by timestamps DESC;");
-
-		cmd.bind(1,pname,lstrlen(pname)*2);
-
-		sqlite3_reader reader=cmd.executereader();
-	    SmsSimpleData_ptr pi = plist;
-		while(reader.read()){
-			C::newstrcpy(&pi->ContactName,reader.getstring16(0).c_str());
-            C::newstrcpy(&pi->MobileNumber,reader.getstring16(1).c_str());
-            C::newstrcpy(&pi->Content,reader.getstring16(2).c_str());
-            C::newstrcpy(&pi->TimeStamp,reader.getstring16(3).c_str());
-			pi->SendReceiveFlag = reader.getint(4);
-            pi++;
-		}
-	}CATCH(exception &ex){
-		db_out(ex.what());
-	}
-
-    return nSize;
+    return sms_query(pname,NULL,plist);
 }
 
 UINT LocalDataBase::GetSmsByContent(LPWSTR pcontent,SmsSimpleData_ptr plist){
-    if(pcontent == NULL) return 0; //内容错误
+    return sms_query(NULL,pcontent,plist);
+}
+
+UINT LocalDataBase::sms_query(LPCTSTR pname,LPCTSTR pcontent,SmsSimpleData_ptr plist, bool bwildcard){
+    if(pcontent == NULL && pname == NULL) return 0; //内容错误
 
 	UINT nSize = 0;
-	TRY{	//获取总数
-		sqlite3_command cmd(this->sqlconn,
-			L"select count(*) from '"
-			TABLE_SMS
-			L"' where content like ?");
-		std::wstring likestr = L"%%";
-		likestr = likestr + pcontent + L"%%";
 
-		cmd.bind(1,likestr.c_str(),likestr.length()*2);
+    TRY{	//获取总数
+        wstring s = L"select count(*) from '"
+            TABLE_SMS
+            L"' where 1 ";
+        if(pname != NULL){
+            if(bwildcard){
+                s += L"and (name like ? or phonenumber like ?) ";
+            }else{
+                s += L"and (name=? or phonenumber=?) ";
+            }
+        }
+        if(pcontent != NULL){
+            s += L"and content like ? ";
+        }
+
+        sqlite3_command cmd(this->sqlconn, s);
+
+	    wstring likestr;
+        int bindidx = 1;
+        if(pname != NULL){
+            if(bwildcard){
+                likestr = L"%%";
+                likestr += pname;
+                likestr += L"%%";
+                cmd.bind(bindidx++,likestr);
+                cmd.bind(bindidx++,likestr);
+            }else{
+                likestr = pname;
+                cmd.bind(bindidx++,likestr);
+            }
+        }
+        if(pcontent != NULL){
+            likestr = L"%%";
+            likestr = pcontent;
+            likestr += L"%%";
+            cmd.bind(bindidx++,likestr);
+        }
 		nSize = cmd.executeint();
 	}CATCH(exception &ex){
 		db_out(ex.what());
@@ -810,15 +760,45 @@ UINT LocalDataBase::GetSmsByContent(LPWSTR pcontent,SmsSimpleData_ptr plist){
 
     if(nSize == 0 || plist == NULL) return nSize;
 
-	TRY{	//获取总数
-		sqlite3_command cmd(this->sqlconn,
-			L"select name,phonenumber,content,strftime('%Y-%m-%d %H:%M:%S',timestamps),sendreceive from '"
-			TABLE_SMS
-			L"' where content like ? order by timestamps DESC;");
+	TRY{	//获取详情
+        wstring s = 
+            L"select name,phonenumber,content,strftime('%Y-%m-%d %H:%M:%S',timestamps),sendreceive from '"
+            TABLE_SMS
+            L"' where 1 ";
+        if(pname != NULL){
+            if(bwildcard){
+                s += L"and (name like ? or phonenumber like ?) ";
+            }else{
+                s += L"and name=? ";
+            }
+        }
+        if(pcontent != NULL){
+            s += L"and content like ? ";
+        }
+        s += L"order by timestamps DESC;";
 
-		std::wstring likestr = L"%%";
-		likestr = likestr + pcontent + L"%%";
-		cmd.bind(1,likestr.c_str(),likestr.length()*2);
+        sqlite3_command cmd(this->sqlconn, s);
+
+	    wstring likestr;
+        int bindidx = 1;
+        if(pname != NULL){
+            if(bwildcard){
+                likestr = L"%%";
+                likestr += pname;
+                likestr += L"%%";
+                cmd.bind(bindidx++,likestr);
+                cmd.bind(bindidx++,likestr);
+            }else{
+                likestr = pname;
+                cmd.bind(bindidx++,likestr);
+            }
+        }
+        if(pcontent != NULL){
+            likestr = L"%%";
+            likestr = pcontent;
+            likestr += L"%%";
+            cmd.bind(bindidx++,likestr);
+        }
 
 		sqlite3_reader reader=cmd.executereader();
 	    SmsSimpleData_ptr pi = plist;
@@ -836,7 +816,6 @@ UINT LocalDataBase::GetSmsByContent(LPWSTR pcontent,SmsSimpleData_ptr plist){
 
     return nSize;
 }
-
 ///////////////////////////////////////
 bool LocalDataBase::RemoveSmsRecord(SmsSimpleData_ptr psms){
 	bool bRet = true;
@@ -1014,6 +993,95 @@ bool LocalDataBase::query_sms(){
 			pi->SendReceiveFlag = reader.getint(4);
 			query_sms_list.push_back(pi);
 		}
+	}CATCH(exception &ex){
+		db_out(ex.what());
+		bRet = false;
+	}
+
+    return bRet;
+}
+
+void LocalDataBase::ClearSmsTable(){
+	TRY{
+		sqlite3_command cmd(this->sqlconn,
+			L"delete from '"
+			TABLE_SMS
+			L"';");
+		cmd.executenonquery();
+	}CATCH(exception &ex){
+		db_out(ex.what());
+	}
+}
+
+bool LocalDataBase::contact_queryexec(sqlite3_command &cmd){
+    bool bRet = true;
+
+	query_clear();
+
+	TRY{
+		ContactData_ptr pcontact = 0;
+		sqlite3_reader reader=cmd.executereader();
+		TelLabel_t t;
+		while(reader.read()){
+			bool samecontact = false;
+			wchar_t* pname = 0;
+			//getstring后结果会销毁，所以必须保存
+			C::newstrcpy(&pname, reader.getstring16(1).c_str());	
+			if(pcontact == 0){
+				pcontact = new ContactData;
+				C::newstrcpy(&pcontact->Name,pname);
+			}else{
+				if(wcscmp(pcontact->Name,pname) == 0){
+					samecontact = true;
+				}else{
+					pcontact = new ContactData;
+					C::newstrcpy(&pcontact->Name,pname);
+				}
+			}
+			delete pname;
+			t = (TelLabel_t)reader.getint(2);
+			LPWSTR pn = 0;
+			C::newstrcpy(&pn,reader.getstring16(0).c_str());
+			switch(t){
+				case MOBILETEL:
+					pcontact->MobileTels.push_back(pn);
+					break;
+				case WORKTEL:
+					pcontact->WorkTels.push_back(pn);
+					break;
+				case HOMETEL:
+					pcontact->HomeTels.push_back(pn);
+					break;
+				case HOMETEL2:
+					pcontact->HomeTel2s.push_back(pn);
+					break;
+				default:
+					break;
+			}
+			if(!samecontact){
+				query_contact_list.push_back(pcontact);
+			}
+		}
+	}CATCH(exception &ex){
+		db_out(ex.what());
+		bRet = false;
+	}
+
+    return bRet;
+}
+bool LocalDataBase::query_contact(LPCTSTR n){
+    bool bRet = true;
+
+	TRY{
+		sqlite3_command cmd(this->sqlconn,
+		L"select * from '"
+		TABLE_CONTACT
+		L"' where PhoneNumber like ? or Name like ? order by NAME collate pinyin;");
+        wstring s = n;
+        s += L"%%";
+        cmd.bind(1,s);
+        cmd.bind(2,s);
+        bRet = contact_queryexec(cmd);
 	}CATCH(exception &ex){
 		db_out(ex.what());
 		bRet = false;

@@ -230,6 +230,7 @@ public:
 	bool checkpwd(wchar_t* pwd,int len);	
 public:
 //sms相关操作
+    void ClearSmsTable();   //清空短信库
 	bool AppendSmsRecord(SmsData_ptr);
 	bool RemoveSmsRecord(SmsData_ptr);
 	bool RemoveSmsRecord(SmsSimpleData_ptr);
@@ -259,6 +260,8 @@ public:
     UINT GetSmsByContact(LPWSTR,SmsSimpleData_ptr = NULL);
     //根据短信内容搜索短信条目
     UINT GetSmsByContent(LPWSTR,SmsSimpleData_ptr = NULL);
+    //搜索短信
+    UINT sms_query(LPCTSTR,LPCTSTR,SmsSimpleData_ptr = NULL, bool bwildcard = false);
     //获取短信时间
     SYSTEMTIME GetSmsLatestDateTime();
 private:
@@ -277,6 +280,8 @@ public:
 	bool RemoveContactRecord(ContactData_ptr);
     void ClearContactTable();
 
+    bool contact_queryexec(sqlite3_command &cmd);
+    bool query_contact(LPCTSTR n);
 	void query_clear();
 	bool query_contacts();
 	int query_contact_size() { return query_contact_list.size(); }

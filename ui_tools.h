@@ -11,12 +11,15 @@ public:
 	Ui_ToolWnd(void);
 	~Ui_ToolWnd(void);
 public:
+    UiHeadingBar m_HeaderTitle;
     UiToolBarPro m_Toolbar;	//确定
 	UiButtonEx m_BtnBackup;	//备份数据库
 	UiButtonEx m_BtnOptimize;	//优化数据库，创建索引
-	UiButtonEx m_BtnClearContact;	//重新导入联系人
+	UiButtonEx m_BtnReloadContact;	//重新导入联系人
 	UiButtonEx m_BtnExpContact;	//导出联系人为文本
 	UiButtonEx m_BtnExpSms;	//导出短信为文本
+    UiHeadingBar m_HeaderDB;
+    UiButtonEx m_BtnClearData;
 protected:
     // Initialization of the window (dialog)
     virtual BOOL OnInitDialog();

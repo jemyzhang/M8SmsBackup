@@ -60,6 +60,7 @@
 #define IDS_STR_OPTIMIZE                156
 #define IDS_STR_OPTIMIZE_DTL            157
 #define IDS_STR_CONTACT_CLEAR           158
+#define IDS_STR_KEYCONTACT              158
 #define IDS_STR_CONTACT_CLEAR_DTL       159
 #define IDS_STR_EXPCON                  160
 #define IDS_STR_EXPCON_DTL              161
@@ -69,6 +70,10 @@
 #define IDS_STR_EXPSMS                  165
 #define IDS_STR_EXPSMS_TIP              166
 #define IDS_STR_EXPSMS_WARNING          167
+#define IDS_STR_CONTACT_RELOAD          168
+#define IDS_STR_CONTACT_RELOAD_DTL      169
+#define IDS_STR_CLEAR                   170
+#define IDS_STR_CLEAR_DTL               171
 #define IDB_PNG_BEGIN                   201
 #define IDB_PNG_SMS_SEND                201
 #define IDB_PNG_SMS_RECV                202

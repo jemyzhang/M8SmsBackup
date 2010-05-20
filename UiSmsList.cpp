@@ -32,6 +32,13 @@ void UiSmsList::SetupList() {
                 plist_size = pldb->GetSmsByContent(scontent,plist_record);
             }
             break;
+        case 3:
+            plist_size = pldb->sms_query(sname,scontent,0,true);
+            if(plist_size > 0){
+                plist_record = new SmsSimpleData_t[plist_size + 1];
+                plist_size = pldb->sms_query(sname,scontent,plist_record,true);
+            }
+            break;
         default:
             break;
     }

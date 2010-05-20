@@ -288,6 +288,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\UiContactFiltList.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\UiControlBackground.cpp"
 				>
 			</File>
@@ -399,6 +403,10 @@
 			</File>
 			<File
 				RelativePath=".\ui_view.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UiContactFiltList.h"
 				>
 			</File>
 			<File

@@ -2,7 +2,9 @@
 // include the MZFC library header file
 #include <mzfc_inc.h>
 #include "LocalDataBase.h"
-#include "UiSmsList.h"
+
+class UiContactFiltList;
+class UiSmsList;
 
 // Main window derived from CMzWndEx
 class Ui_SearchWnd : public CMzWndEx {
@@ -14,10 +16,13 @@ public:
 	Ui_SearchWnd();
 	~Ui_SearchWnd();
 public:
+    UiHeadingBar m_TitleBar;
     UiToolBarPro m_Toolbar;
 	UiSingleLineEdit m_SearchBox;
+	UiSingleLineEdit m_ContactBox;
 	UiButton_Image m_ButtonSearch;
-    UiSmsList m_SmsList;
+    UiSmsList *m_pSmsList;
+    UiContactFiltList *m_pContactList;
 	ImageContainer m_imgContainer;
 protected:
     //设置右边列表内容

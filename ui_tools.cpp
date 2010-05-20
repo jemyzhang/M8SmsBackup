@@ -23,9 +23,11 @@ MZ_IMPLEMENT_DYNAMIC(Ui_ToolWnd)
 
 #define MZ_IDC_BTN_SETUP_BACKUP     106
 #define MZ_IDC_BTN_SETUP_OPTIMIZE   107
-#define MZ_IDC_BTN_SETUP_CONTACT_CLEAR  108
+#define MZ_IDC_BTN_SETUP_CONTACT_RELOAD  108
 #define MZ_IDC_BTN_SETUP_CONTACT_EXPORT	109
 #define MZ_IDC_BTN_SETUP_SMS_EXPORT	110
+
+#define MZ_IDC_BTN_SETUP_CLEAR  111
 //////
 
 Ui_ToolWnd::Ui_ToolWnd(void)
@@ -44,8 +46,11 @@ BOOL Ui_ToolWnd::OnInitDialog() {
 
     // Then init the controls & other things in the window
     int y = 0;
-	SetWindowText(L"工具");
+    m_HeaderTitle.SetPos(0,y, GetWidth(), MZM_HEIGHT_HEADINGBAR);
+    m_HeaderTitle.SetText(L"工具");
+    AddUiWin(&m_HeaderTitle);
 
+    y += MZM_HEIGHT_HEADINGBAR;
 	m_BtnBackup.SetPos(0,y, GetWidth(), MZM_HEIGHT_BUTTONEX);
 	m_BtnBackup.SetText(LOADSTRING(IDS_STR_BACKUP).C_Str());
 	m_BtnBackup.SetText2(LOADSTRING(IDS_STR_BACKUP_RESTORE).C_Str());
@@ -64,13 +69,13 @@ BOOL Ui_ToolWnd::OnInitDialog() {
     AddUiWin(&m_BtnOptimize);
 
     y+=MZM_HEIGHT_BUTTONEX;
-	m_BtnClearContact.SetPos(0,y, GetWidth(), MZM_HEIGHT_BUTTONEX);
-	m_BtnClearContact.SetText(LOADSTRING(IDS_STR_CONTACT_CLEAR).C_Str());
-	m_BtnClearContact.SetText2(LOADSTRING(IDS_STR_CONTACT_CLEAR_DTL).C_Str());
-    m_BtnClearContact.SetButtonType(MZC_BUTTON_LINE_BOTTOM);
-	m_BtnClearContact.SetTextMaxLen(0);
-    m_BtnClearContact.SetID(MZ_IDC_BTN_SETUP_CONTACT_CLEAR);
-    AddUiWin(&m_BtnClearContact);
+	m_BtnReloadContact.SetPos(0,y, GetWidth(), MZM_HEIGHT_BUTTONEX);
+	m_BtnReloadContact.SetText(LOADSTRING(IDS_STR_CONTACT_RELOAD).C_Str());
+	m_BtnReloadContact.SetText2(LOADSTRING(IDS_STR_CONTACT_RELOAD_DTL).C_Str());
+    m_BtnReloadContact.SetButtonType(MZC_BUTTON_LINE_BOTTOM);
+	m_BtnReloadContact.SetTextMaxLen(0);
+    m_BtnReloadContact.SetID(MZ_IDC_BTN_SETUP_CONTACT_RELOAD);
+    AddUiWin(&m_BtnReloadContact);
 
     y+=MZM_HEIGHT_BUTTONEX;
 	m_BtnExpContact.SetPos(0,y, GetWidth(), MZM_HEIGHT_BUTTONEX);
@@ -90,7 +95,21 @@ BOOL Ui_ToolWnd::OnInitDialog() {
     m_BtnExpSms.SetID(MZ_IDC_BTN_SETUP_SMS_EXPORT);
     AddUiWin(&m_BtnExpSms);
 
-	m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TOOLBARPRO, GetWidth(), MZM_HEIGHT_TOOLBARPRO);
+    y+=MZM_HEIGHT_BUTTONEX;
+    m_HeaderDB.SetPos(0,y, GetWidth(), MZM_HEIGHT_HEADINGBAR);
+    m_HeaderDB.SetText(L"危险操作");
+    AddUiWin(&m_HeaderDB);
+
+    y+=MZM_HEIGHT_HEADINGBAR;
+	m_BtnClearData.SetPos(0,y, GetWidth(), MZM_HEIGHT_BUTTONEX);
+	m_BtnClearData.SetText(LOADSTRING(IDS_STR_CLEAR).C_Str());
+	m_BtnClearData.SetText2(LOADSTRING(IDS_STR_CLEAR_DTL).C_Str());
+    m_BtnClearData.SetButtonType(MZC_BUTTON_LINE_BOTTOM);
+	m_BtnClearData.SetTextMaxLen(0);
+    m_BtnClearData.SetID(MZ_IDC_BTN_SETUP_CLEAR);
+    AddUiWin(&m_BtnClearData);
+
+    m_Toolbar.SetPos(0, GetHeight() - MZM_HEIGHT_TOOLBARPRO, GetWidth(), MZM_HEIGHT_TOOLBARPRO);
     m_Toolbar.SetButton(TOOLBARPRO_LEFT_TEXTBUTTON, true, true, LOADSTRING(IDS_STR_RETURN).C_Str());
     m_Toolbar.SetID(MZ_IDC_TOOLBAR_CONFIG);
     AddUiWin(&m_Toolbar);
@@ -138,7 +157,7 @@ void Ui_ToolWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
             m_progress.EndWaitDialog();
             return;
         }
-        case MZ_IDC_BTN_SETUP_CONTACT_CLEAR:
+        case MZ_IDC_BTN_SETUP_CONTACT_RELOAD:
         {
             g_pldb->ClearContactTable();
             if(appconfig.IniUseSimPhoneBook.Get()){
@@ -147,6 +166,16 @@ void Ui_ToolWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
             }
             initUiCallbackRefreshContact();
             refreshContact(uiCallbackRefreshContact);
+            break;
+        }
+        case MZ_IDC_BTN_SETUP_CLEAR:
+        {
+			if(MzMessageBoxV2(m_hWnd,L"确实要清除所有数据?",MZV2_MB_YESNO,TRUE) != 1){
+				return;
+			}
+            g_pldb->ClearContactTable();
+            g_pldb->ClearSmsTable();
+            MzMessageAutoBoxV2(m_hWnd,L"数据清除成功",MZV2_MB_NONE,2000,TRUE);
             break;
         }
 		case MZ_IDC_BTN_SETUP_CONTACT_EXPORT:

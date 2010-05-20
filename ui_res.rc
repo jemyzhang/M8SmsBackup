@@ -87,7 +87,7 @@ BEGIN
     IDS_STR_IMPORTED        "已导入：%d"
     IDS_STR_PREVIOUS        "上一条"
     IDS_STR_NEXT            "下一条"
-    IDS_STR_KEYWORDS        "关键字"
+    IDS_STR_KEYWORDS        "关键字:"
     IDS_STR_SEARCH          "查找"
     IDS_STR_MENU_VIEW_TIP   "按联系人或日期查看短信"
     IDS_STR_MENU_SEARCH_TIP "根据内容查找短信"
@@ -135,8 +135,7 @@ BEGIN
     IDS_STR_RESTORE_S       "恢复成功"
     IDS_STR_OPTIMIZE        "优化数据库"
     IDS_STR_OPTIMIZE_DTL    "加快短信查看查找速度"
-    IDS_STR_CONTACT_CLEAR   "重新导入联系人"
-    IDS_STR_CONTACT_CLEAR_DTL "修复发信人姓名显示"
+    IDS_STR_KEYCONTACT      "联系人:"
 END
 
 STRINGTABLE 
@@ -149,6 +148,10 @@ BEGIN
     IDS_STR_EXPSMS          "导出短信"
     IDS_STR_EXPSMS_TIP      "导出短信为文本"
     IDS_STR_EXPSMS_WARNING  "当短信数量很多时，导出短信可能会比较久，是否继续？"
+    IDS_STR_CONTACT_RELOAD  "重新导入联系人"
+    IDS_STR_CONTACT_RELOAD_DTL "修复发信人姓名显示"
+    IDS_STR_CLEAR           "清除所有数据"
+    IDS_STR_CLEAR_DTL       "本操作不可恢复"
 END
 
 #endif    // 中文(中华人民共和国) resources
