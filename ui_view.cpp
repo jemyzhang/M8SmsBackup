@@ -1,10 +1,13 @@
 #include "ui_view.h"
+#include "UiNaviList.h"
+
 #include <cMzCommon.h>
 using namespace cMzCommon;
 #include "resource.h"
 
 extern HINSTANCE LangresHandle;
 #define MZ_IDC_TOOLBAR_MAIN 101
+#define MZ_IDC_BUTTON_NAVIBAR 102
 
 #define MZ_IDC_BUTTON_MAIN_VIEW 102
 #define MZ_IDC_BUTTON_VIEW_CONTACT 103
@@ -24,9 +27,11 @@ extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 Ui_ViewWnd::Ui_ViewWnd(){
 	viewStatusSavedBeforeView = 0;
 	viewStatus = 0;
+    m_pNavibar = NULL;
 }
 
 Ui_ViewWnd::~Ui_ViewWnd(){
+    if(m_pNavibar) delete m_pNavibar;
 }
 
 BOOL Ui_ViewWnd::OnInitDialog() {
@@ -37,18 +42,21 @@ BOOL Ui_ViewWnd::OnInitDialog() {
 
 	// Then init the controls & other things in the window
 	int y = 0;
-	m_Navibar.SetPos(0, y, 108, GetHeight() - MZM_HEIGHT_TOOLBARPRO);
-	m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_MAIN_VIEW,LOADSTRING(IDS_STR_VIEW_SMS).C_Str()));
-	AddUiWin(&m_Navibar);
+    m_pNavibar = new UiNaviList;
+	m_pNavibar->SetPos(0, y, GetWidth(), MZM_HEIGHT_BUTTONBAR);
+    m_pNavibar->SetID(MZ_IDC_BUTTON_NAVIBAR);
+	m_pNavibar->push(MZ_IDC_BUTTON_MAIN_VIEW,LOADSTRING(IDS_STR_VIEW_SMS).C_Str());
+	AddUiWin(m_pNavibar);
 
-	m_List.SetPos(108, y, GetWidth() - 108, GetHeight() - MZM_HEIGHT_TOOLBARPRO);
+    y += MZM_HEIGHT_BUTTONBAR;
+	m_List.SetPos(0, y, GetWidth(), GetHeight() - MZM_HEIGHT_TOOLBARPRO - y);
 	m_List.SetID(MZ_IDC_LIST);
 	m_List.SetupDB(g_pldb);
 	m_List.EnableNotifyMessage(true);
 	m_List.SetItemHeight(50);
 	AddUiWin(&m_List);
 
-	m_SmsList.SetPos(108, y, GetWidth() - 108, GetHeight() - MZM_HEIGHT_TOOLBARPRO);
+	m_SmsList.SetPos(0, y, GetWidth(), GetHeight() - MZM_HEIGHT_TOOLBARPRO - y);
 	m_SmsList.SetID(MZ_IDC_SMS_LIST);
 	m_SmsList.EnableNotifyMessage(true);
 	m_SmsList.SetVisible(false);
@@ -158,13 +166,13 @@ void Ui_ViewWnd::SetupList(){
 	SetupToolbar();
 }
 
-void Ui_ViewWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
-	UINT_PTR id = LOWORD(wParam);
-	switch (id) {
+void Ui_ViewWnd::ProcessNaviBar(){
+    UINT id = m_pNavibar->getid();
+    switch(id){
 		case MZ_IDC_BUTTON_MAIN_VIEW:
 			{
 				if(viewStatus != 0){
-					m_Navibar.popUntil(MZ_IDC_BUTTON_MAIN_VIEW);
+					m_pNavibar->popUntil(MZ_IDC_BUTTON_MAIN_VIEW);
 					viewStatus = 0;
 					SetupList();
 				}
@@ -173,7 +181,7 @@ void Ui_ViewWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 		case MZ_IDC_BUTTON_VIEW_CONTACT:
 			{
 				if(viewStatus != 1){
-					m_Navibar.popUntil(MZ_IDC_BUTTON_VIEW_CONTACT);
+					m_pNavibar->popUntil(MZ_IDC_BUTTON_VIEW_CONTACT);
 					viewStatus = 1;
 					SetupList();
 				}
@@ -194,7 +202,7 @@ void Ui_ViewWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 		case MZ_IDC_BUTTON_VIEW_DATE:
 			{
 				if(viewStatus != 0x10){
-					m_Navibar.popUntil(MZ_IDC_BUTTON_VIEW_DATE);
+					m_pNavibar->popUntil(MZ_IDC_BUTTON_VIEW_DATE);
 					viewStatus = 0x10;
 					SetupList();
 					selectedYear = 0;
@@ -215,7 +223,7 @@ void Ui_ViewWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 						break;;
 				}
 				if(viewStatus != 0x11){
-					m_Navibar.popUntil(MZ_IDC_BUTTON_VIEW_DATE_YEAR);
+					m_pNavibar->popUntil(MZ_IDC_BUTTON_VIEW_DATE_YEAR);
 					viewStatus = 0x11;
 					SetupList();
 					selectedMonth = 0;
@@ -235,7 +243,7 @@ void Ui_ViewWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 						break;;
 				}
 				if(viewStatus != 0x12){
-					m_Navibar.popUntil(MZ_IDC_BUTTON_VIEW_DATE_MONTH);
+					m_pNavibar->popUntil(MZ_IDC_BUTTON_VIEW_DATE_MONTH);
 					viewStatus = 0x12;
 					SetupList();
 					selectedDay = 0;
@@ -254,6 +262,17 @@ void Ui_ViewWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 				}
 			}
 			break;
+    }
+}
+
+void Ui_ViewWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
+	UINT_PTR id = LOWORD(wParam);
+	switch (id) {
+        case MZ_IDC_BUTTON_NAVIBAR:
+            {
+                ProcessNaviBar();
+                break;
+            }
 		case MZ_IDC_TOOLBAR_MAIN:
 			{
 				int nIndex = lParam;
@@ -333,24 +352,24 @@ LRESULT Ui_ViewWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 						    wsprintf(strcount,L"%d",total);
 
                             if(viewStatus == 0){
-                                m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_CONTACT + nIndex,pkey->key,strcount,strcount2));
+                                m_pNavibar->push(MZ_IDC_BUTTON_VIEW_CONTACT + nIndex,pkey->key);
 								viewStatus = nIndex == 0 ? 1 : 0x10;
 							}else if(viewStatus == 0x1){
-								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_CONTACT_NAME,pkey->key,strcount,strcount2));
+								m_pNavibar->push(MZ_IDC_BUTTON_VIEW_CONTACT_NAME,pkey->key);
 								viewStatus = 3;
 								m_SmsList.SetupMode(1);
 								m_SmsList.SetupListName(pkey->key);
 							}else if(viewStatus == 0x10){
 								selectedYear = _wtoi(pkey->key);
-								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_DATE_YEAR,pkey->key,strcount,strcount2));
+								m_pNavibar->push(MZ_IDC_BUTTON_VIEW_DATE_YEAR,pkey->key);
 								viewStatus += 1;
 							}else if(viewStatus == 0x11){
 								selectedMonth = _wtoi(pkey->key);
-								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_DATE_MONTH,pkey->key,strcount,strcount2));
+								m_pNavibar->push(MZ_IDC_BUTTON_VIEW_DATE_MONTH,pkey->key);
 								viewStatus += 1;
 							}else if(viewStatus == 0x12){
 								selectedDay = _wtoi(pkey->key);
-								m_Navibar.push(new UiNaviButton(MZ_IDC_BUTTON_VIEW_DATE_DAY,pkey->key,strcount,strcount2));
+								m_pNavibar->push(MZ_IDC_BUTTON_VIEW_DATE_DAY,pkey->key);
 								viewStatus += 1;
 								m_SmsList.SetupMode(0);
 								m_SmsList.SetupListDateTime(selectedYear,selectedMonth,selectedDay);

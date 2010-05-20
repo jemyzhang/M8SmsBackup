@@ -52,9 +52,6 @@ END
 // RCDATA
 //
 
-IDB_PNG_NAVI_BG         RCDATA                  "images\\NaviBar_bg.png"
-IDB_PNG_NAVI_BTN_BHL    RCDATA                  "images\\NaviBar_Button_BottomLine_HL.png"
-IDB_PNG_NAVI_BTN_BNR    RCDATA                  "images\\NaviBar_Button_BottomLine_Normal.png"
 IDB_PNG_SMS_SEND        RCDATA                  "images\\SendSms.png"
 IDB_PNG_SMS_RECV        RCDATA                  "images\\ReceiveSms.png"
 IDB_PNG_LOGO            RCDATA                  "images\\logo.png"

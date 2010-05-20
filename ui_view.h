@@ -1,7 +1,6 @@
 #pragma once
 // include the MZFC library header file
 #include <mzfc_inc.h>
-#include "UiNaviList.h"
 #include "LocalDataBase.h"
 #include "UiSmsList.h"
 
@@ -43,6 +42,7 @@ private:
 	LocalDataBase *pldb;
 };
 
+class UiNaviList;
 // Main window derived from CMzWndEx
 class Ui_ViewWnd : public CMzWndEx {
     MZ_DECLARE_DYNAMIC(Ui_ViewWnd);
@@ -61,7 +61,7 @@ public:
     void OnTimer(UINT nIDEvent);
 public:
     UiToolBarPro m_Toolbar;
-    UiNaviList m_Navibar;
+    UiNaviList *m_pNavibar;
     UiKeyList m_List;
     UiSmsList m_SmsList;
 protected:
@@ -69,6 +69,8 @@ protected:
     void SetupList();
 	//设置工具栏内容
 	void SetupToolbar();
+    //处理导航栏按键
+    void ProcessNaviBar();
 protected:
     // Initialization of the window (dialog)
     virtual BOOL OnInitDialog();

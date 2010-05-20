@@ -69,17 +69,14 @@
 #define IDS_STR_EXPSMS                  165
 #define IDS_STR_EXPSMS_TIP              166
 #define IDS_STR_EXPSMS_WARNING          167
-#define IDB_PNG_NAVI_BG                 201
 #define IDB_PNG_BEGIN                   201
-#define IDB_PNG_NAVI_BTN_BHL            202
-#define IDB_PNG_NAVI_BTN_BNR            203
-#define IDB_PNG_SMS_SEND                204
-#define IDB_PNG_SMS_RECV                205
-#define IDB_PNG_LOGO                    206
-#define IDB_PNG_REPORT_SMS              207
-#define IDB_PNG_REPLY_SMS               208
-#define IDB_PNG_FORWARD_SMS             209
-#define IDB_PNG_END                     209
+#define IDB_PNG_SMS_SEND                201
+#define IDB_PNG_SMS_RECV                202
+#define IDB_PNG_LOGO                    203
+#define IDB_PNG_REPORT_SMS              204
+#define IDB_PNG_REPLY_SMS               205
+#define IDB_PNG_FORWARD_SMS             206
+#define IDB_PNG_END                     206
 
 // Next default values for new objects
 // 

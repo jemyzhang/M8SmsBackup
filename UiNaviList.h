@@ -3,115 +3,105 @@
 #include <mzfc_inc.h>
 #include <cMzCommon.h>
 using namespace cMzCommon;
-
-//
-class UiNaviButton :
-    public UiButton
-{
-public:
-    UiNaviButton(int id, LPCTSTR text = NULL, LPCTSTR text1 = NULL, LPCTSTR text2 = NULL);
-    ~UiNaviButton();
-public:
-    virtual void PaintWin(HDC hdcDst, RECT* prcWin, RECT* prcUpdate);
-    virtual void SetText(LPCTSTR text){
-        if(text == NULL){
-            if(m_Text) delete [] m_Text;
-            m_Text = NULL;
-            return;
+#include <vector>
+using std::vector;
+typedef struct tagUiNaviButton{
+    UINT id;
+    LPTSTR name;
+    tagUiNaviButton(UINT id = 0, LPCTSTR name = NULL){
+        this->id = id;
+        this->name = NULL;
+        if(name != NULL){
+            C::newstrcpy(&this->name,name);
         }
-        C::newstrcpy(&m_Text,text);
     }
-    virtual void SetText1(LPCTSTR text){
-        if(text == NULL){
-            if(m_Text1) delete [] m_Text1;
-            m_Text1 = NULL;
-            return;
-        }
-        C::newstrcpy(&m_Text1,text);
+    ~tagUiNaviButton(){
+        if(name) delete name;
     }
-    virtual void SetText2(LPCTSTR text){
-        if(text == NULL){
-            if(m_Text2) delete [] m_Text2;
-            m_Text2 = NULL;
-            return;
-        }
-        C::newstrcpy(&m_Text2,text);
-    }
-    virtual int OnLButtonUp(UINT fwKeys, int xPos, int yPos){
-        SetState(MZCS_BUTTON_PRESSED);
-        Invalidate();
-        //Update();
-        return UiButton::OnLButtonUp(fwKeys,xPos,yPos);
-    }
-private:
-    LPWSTR m_Text;
-    LPWSTR m_Text1;
-    LPWSTR m_Text2;
-};
+}UiNaviButton,*lpUiNaviButton;
 
 class UiNaviList :
-    public UiScrollWin
+    public UiButtonBar
 {
 public:
     UiNaviList(void) {}
     ~UiNaviList(void) {
-        while(pop());
+        clear();
+    }
+private:
+    vector<lpUiNaviButton> m_buttons;
+    //检查是否重复
+    bool duplicated(UINT id){
+        bool bret = false;
+        for(int i = 0; i < m_buttons.size(); i++){
+            if(m_buttons.at(i)->id == id){
+                bret = true;
+                break;
+            }
+        }
+        return bret;
+    }
+    void clear(){
+        for(int i = 0; i < m_buttons.size(); i++){
+            delete m_buttons.at(i);
+        }
+        m_buttons.clear();
+    }
+protected:
+    void updatebutton(){
+        this->SetButtonCount(m_buttons.size());
+        for(int i = 0; i < m_buttons.size(); i++){
+            lpUiNaviButton btn = m_buttons.at(i);
+            this->SetButton(i,true,true,btn->name);
+        }
+        this->SetHighLightButton(m_buttons.size() - 1);
+        Invalidate();
     }
 public:
-    bool push(UiNaviButton *mButton){
-        if(mButton){
-            if(GetChildByID(mButton->GetID())){   //已经存在此id的按钮
-                delete mButton;
-                mButton = 0;
-                return false;
-            }
-            size_t nCount = GetChildrenCount();
-            for(size_t i = 0; i < nCount; i++){
-                UiNaviButton* mb = (UiNaviButton *)GetChild(i);
-                mb->SetState(MZCS_BUTTON_NORMAL);
-            }
-            mButton->SetPos(0,nCount * 106,GetWidth(),106);
-            mButton->SetState(MZCS_BUTTON_PRESSED);
-            AddChild(mButton);
-            Invalidate();
-            return true;
+    UINT getid(){
+        int index = this->GetHighLightButton();
+        if(index < m_buttons.size()){
+            return m_buttons.at(index)->id;
         }
-        return false;
+        return 0;
     }
-    bool pop(){
-        size_t nCount = GetChildrenCount();
-        if(nCount == 0) return false;
-        //设置按钮高亮
-        if(nCount > 1){
-            UiNaviButton* mprevButton = (UiNaviButton *)GetChild(nCount-2);
-            mprevButton->SetState(MZCS_BUTTON_PRESSED);
+    //增加按钮
+    bool push(lpUiNaviButton button){
+        if(button == NULL) return false;
+        if(button->name == NULL) return false;
+        if(duplicated(button->id)) return false;
+        m_buttons.push_back(button);
+        updatebutton();
+        return true;
+    }
+    bool push(UINT id, LPCTSTR name){
+        lpUiNaviButton button = new UiNaviButton(id,name);
+        bool bret = push(button);
+        if(bret == false){
+            delete button;
         }
-        //get the last child
-        UiNaviButton* mButton = (UiNaviButton *)GetChild(nCount-1);
-        RemoveChild(mButton);
-        Invalidate();
-        //Update();
-        delete mButton;
+        return bret;
+    }
+    //减少按钮
+    bool pop(){
+        if(m_buttons.size() == 0) return false;
+        lpUiNaviButton btn = m_buttons.back();
+        m_buttons.pop_back();
+        delete btn;
+        updatebutton();
         return true;
     }
     //pop the button until the specfic one
     void popUntil(int nID){
-        size_t nCount = GetChildrenCount();
-        if(nCount == 0) return;
-        UiNaviButton* mButton = (UiNaviButton *)GetChildByID(nID);
-        mButton->SetState(MZCS_BUTTON_PRESSED); //设置按钮高亮
-        if(mButton == NULL) return;
-        for(size_t i = nCount - 1; i >= 0; i--){
-            UiNaviButton* mb = (UiNaviButton *)GetChild(i);
-            if(mb == mButton){
+        int nsize = m_buttons.size();
+        for(int i = 0; i < nsize; i++){
+            lpUiNaviButton btn = m_buttons.back();
+            if(btn->id == nID){
                 break;
-            }else{
-                RemoveChild(mb);
-                delete mb;
             }
+            m_buttons.pop_back();
+            delete btn;
         }
-        Invalidate();
-        //Update();
+        updatebutton();
     }
-    virtual void PaintWin(HDC hdcDst, RECT* prcWin, RECT* prcUpdate);
 };
