@@ -1,7 +1,6 @@
 #pragma once
 // include the MZFC library header file
 #include <mzfc_inc.h>
-#include <list>
 #include <cMzCommon.h>
 using namespace cMzCommon;
 
@@ -55,14 +54,16 @@ class UiNaviList :
 {
 public:
     UiNaviList(void) {}
-    ~UiNaviList(void) {}
+    ~UiNaviList(void) {
+        while(pop());
+    }
 public:
-    void push(UiNaviButton *mButton){
+    bool push(UiNaviButton *mButton){
         if(mButton){
             if(GetChildByID(mButton->GetID())){   //已经存在此id的按钮
                 delete mButton;
                 mButton = 0;
-                return;
+                return false;
             }
             size_t nCount = GetChildrenCount();
             for(size_t i = 0; i < nCount; i++){
@@ -73,14 +74,15 @@ public:
             mButton->SetState(MZCS_BUTTON_PRESSED);
             AddChild(mButton);
             Invalidate();
-            //Update();
+            return true;
         }
+        return false;
     }
-    void pop(){
+    bool pop(){
         size_t nCount = GetChildrenCount();
-        if(nCount == 0) return;
+        if(nCount == 0) return false;
         //设置按钮高亮
-        if(nCount - 2 > 0){
+        if(nCount > 1){
             UiNaviButton* mprevButton = (UiNaviButton *)GetChild(nCount-2);
             mprevButton->SetState(MZCS_BUTTON_PRESSED);
         }
@@ -90,6 +92,7 @@ public:
         Invalidate();
         //Update();
         delete mButton;
+        return true;
     }
     //pop the button until the specfic one
     void popUntil(int nID){

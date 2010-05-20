@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|M8SDK (ARMV4I)"
-			OutputDirectory="$(SolutionDir)\$(SolutionName)\$(ConfigurationName)"
-			IntermediateDirectory="$(SolutionDir)\$(SolutionName)\$(ConfigurationName)\obj"
+			OutputDirectory="$(SolutionDir)\$(SolutionName)\bin\debug"
+			IntermediateDirectory="$(SolutionDir)\$(SolutionName)\obj\$(ProjectName)\debug\"
 			ConfigurationType="1"
 			CharacterSet="1"
 			>
@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="7"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\cMzCommon\include"
+				AdditionalIncludeDirectories="$(SolutionDir)\$(SolutionName)\include"
 				PreprocessorDefinitions="_DEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;DEBUG;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE"
 				MinimalRebuild="true"
 				RuntimeLibrary="1"
@@ -65,13 +65,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,6.00"
-				AdditionalDependencies="mzfc.lib PlatformApi.lib cMzCommond.lib"
+				AdditionalDependencies="mzfc.lib PlatformApi.lib"
 				OutputFile="$(OutDir)/SmsBackup.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\cMzCommon\libs"
+				AdditionalLibraryDirectories="$(SolutionDir)\$(SolutionName)\lib"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile="$(OutDir)/SmsBackup.pdb"
+				ProgramDatabaseFile="$(IntDir)/SmsBackup.pdb"
 				SubSystem="0"
 				StackReserveSize="65536"
 				StackCommitSize="4096"
@@ -107,8 +107,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|M8SDK (ARMV4I)"
-			OutputDirectory="$(SolutionDir)\$(SolutionName)\$(ConfigurationName)"
-			IntermediateDirectory="$(SolutionDir)\$(SolutionName)\$(ConfigurationName)\obj"
+			OutputDirectory="$(SolutionDir)\$(SolutionName)\bin"
+			IntermediateDirectory="$(SolutionDir)\$(SolutionName)\obj\$(ProjectName)\release"
 			ConfigurationType="1"
 			CharacterSet="1"
 			>
@@ -132,7 +132,7 @@
 				ExecutionBucket="7"
 				Optimization="2"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="..\cMzCommon\include"
+				AdditionalIncludeDirectories="$(SolutionDir)\$(SolutionName)\include"
 				PreprocessorDefinitions="NDEBUG;_WIN32_WCE=$(CEVER);UNDER_CE;WINCE;_WINDOWS;$(ARCHFAM);$(_ARCHFAM_);_UNICODE;UNICODE"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
@@ -155,13 +155,13 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=" /subsystem:windowsce,6.00"
-				AdditionalDependencies="mzfc.lib PlatformApi.lib cMzCommon.lib"
+				AdditionalDependencies="mzfc.lib PlatformApi.lib"
 				OutputFile="$(OutDir)/SmsBackup.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\cMzCommon\libs"
+				AdditionalLibraryDirectories="$(SolutionDir)\$(SolutionName)\lib"
 				DelayLoadDLLs="$(NOINHERIT)"
 				GenerateDebugInformation="false"
-				ProgramDatabaseFile="$(OutDir)/SmsBackup.pdb"
+				ProgramDatabaseFile="$(IntDir)/SmsBackup.pdb"
 				SubSystem="0"
 				StackReserveSize="65536"
 				StackCommitSize="4096"
@@ -187,7 +187,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="upx $(TargetPath)"
+				CommandLine="upx &quot;$(TargetPath)&quot;"
 			/>
 			<DeploymentTool
 				ForceDirty="-1"
