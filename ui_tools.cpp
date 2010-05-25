@@ -278,11 +278,11 @@ void Ui_ToolWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 				file.open(dlg.GetFullFileName(),  ios::out);
 				if (file.is_open())
 				{
-					DateTime::waitms(1);
+					DateTime::waitms(0);
 					MzBeginWaitDlg(m_hWnd);
 					bool bret = g_pldb->query_sms();
 					MzEndWaitDlg();
-					DateTime::waitms(1);
+					DateTime::waitms(0);
 
 					if(bret){
 						initProgressBar(L"导出短信中...",0,g_pldb->query_sms_size());

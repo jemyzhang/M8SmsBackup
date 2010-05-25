@@ -340,7 +340,7 @@ LRESULT Ui_ViewWnd::MzDefWndProc(UINT message, WPARAM wParam, LPARAM lParam) {
 						if(nIndex != -1){
                             m_List.SetSelectedIndex(nIndex);
                             m_List.Invalidate();
-                            DateTime::waitms(1);
+                            DateTime::waitms(0);
                             SmsViewListKey_ptr pkey = g_pldb->query_list_item(nIndex);
 							UINT received = 0;
 							UINT sent = 0;

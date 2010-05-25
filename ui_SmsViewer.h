@@ -28,11 +28,7 @@ public:
 	~Ui_SmsViewerWnd();
 public:
 	UiToolBarPro m_Toolbar;
-#ifdef USE_903SDK
-	UiMultiLineEdit m_Content;
-#else
 	UiEdit m_Content;
-#endif
 	UiButton_Image m_ReportSms;
 	UiButton_Image m_ReplySms;
 	UiButton_Image m_ForwardSms;

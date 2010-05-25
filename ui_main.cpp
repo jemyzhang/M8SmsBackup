@@ -22,7 +22,7 @@ using namespace cMzCommon;
 #define BUILD_METHOD
 #endif
 #define VER_STRING L"1.86"BUILD_METHOD
-#define BUILD_STRING L"20100520.079"BUILD_CONFIG
+#define BUILD_STRING L"20100525.080"BUILD_CONFIG
 
 extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 extern HINSTANCE LangresHandle;

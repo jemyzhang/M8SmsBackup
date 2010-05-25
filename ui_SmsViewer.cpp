@@ -83,9 +83,7 @@ BOOL Ui_SmsViewerWnd::OnInitDialog() {
 	y+=65;
 	m_Content.SetPos(10, y, GetWidth() - 20 - 48, GetHeight() - y - MZM_HEIGHT_TOOLBARPRO);
 	m_Content.SetReadOnly(true);
-#ifdef USE_903SDK
-	m_Content.SetInsideScroll(true);
-#endif
+    m_Content.EnableZoomIn(false);
 	m_Content.SetTextColor( RGB(255,255,255));
 	m_Background.AddChild(&m_Content);
 
