@@ -161,10 +161,10 @@ void Ui_ToolWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
         {
             g_pldb->ClearContactTable();
             if(appconfig.IniUseSimPhoneBook.Get()){
-                initUiCallbackRefreshContact();
+                initUiCallbackRefreshContact(m_hWnd);
                 refreshSIMContact(uiCallbackRefreshSIMContact);
             }
-            initUiCallbackRefreshContact();
+            initUiCallbackRefreshContact(m_hWnd);
             refreshContact(uiCallbackRefreshContact);
             break;
         }
@@ -193,9 +193,11 @@ void Ui_ToolWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 				file.open(dlg.GetFullFileName(),  ios::out);
 				if (file.is_open())
 				{
+                    DateTime::waitms(0);
 					if(g_pldb->query_contacts()){
-						initProgressBar(L"导出联系人中...",0,g_pldb->query_contact_size());
-						for(int i = 0; i < g_pldb->query_contact_size(); i++){
+						initUiCallbackExportContact(m_hWnd);
+                        int size = g_pldb->query_contact_size();
+						for(int i = 0; i < size; i++){
 							ContactData_ptr c = g_pldb->query_contact_at(i);
 							file << c->Name << endl;
 							int pnsz = c->MobileTels.size();
@@ -249,13 +251,14 @@ void Ui_ToolWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 								}
 							}
 							file << endl;
-							if(!updateProgressBar(i+1)){
+							if(!uiCallbackExportContact(c,i+1,size)){
 								break;
 							}
 						}
 					}
 				}
 				file.close();
+                uiCallbackExportContact(NULL,0,0);//隐藏进度条
 				MzMessageAutoBoxV2(m_hWnd,LOADSTRING(IDS_STR_EXP_FINISHED).C_Str(),MZV2_MB_NONE,2000,TRUE);
 			}
 			break;
@@ -285,15 +288,16 @@ void Ui_ToolWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 					DateTime::waitms(0);
 
 					if(bret){
-						initProgressBar(L"导出短信中...",0,g_pldb->query_sms_size());
+						initUiCallbackExportSms(m_hWnd);
 						LPWSTR sname = 0;	//前一个姓名，对比归纳用
-						for(int i = 0; i < g_pldb->query_sms_size(); i++){
+                        int size = g_pldb->query_sms_size();
+						for(int i = 0; i < size; i++){
 							SmsSimpleData_ptr c = g_pldb->query_sms_at(i);
 							if(sname == 0 ||
 								wcscmp(sname,c->ContactName) != 0){
 								if(sname != 0) file << endl;
 								file << L"[==========" << c->ContactName << L"==========]" << endl;
-								sname = c->ContactName;
+                                C::newstrcpy(&sname, c->ContactName);
 							}
 							if(c->SendReceiveFlag){
                                 file << L">我 ";
@@ -302,13 +306,15 @@ void Ui_ToolWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 							}
 							file << c->TimeStamp << L" " << c->MobileNumber << endl;
 							file << c->Content << endl;
-							if(!updateProgressBar(i+1)){
+							if(!uiCallbackExportSms(c,i,size)){
 								break;
 							}
 						}
+                        if(sname) delete sname;
 					}
 				}
 				file.close();
+                uiCallbackExportSms(NULL,0,0);
 				MzMessageAutoBoxV2(m_hWnd,LOADSTRING(IDS_STR_EXP_FINISHED).C_Str(),MZV2_MB_NONE,2000,TRUE);
 			}
 			break;

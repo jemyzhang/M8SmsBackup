@@ -10,6 +10,15 @@ extern HINSTANCE LangresHandle;
 
 LocalDataBase *g_pldb = 0;
 
+bool DestroyDbConnection(){ //销毁数据库连接
+    if(g_pldb != NULL){
+        delete g_pldb;
+        g_pldb = NULL;
+        return true;
+    }
+    return false;
+}
+
 //仅在数据库连接未创建的时候检查
 bool CheckPassword(HWND m_hWnd){
     bool nRet = false;
@@ -55,7 +64,7 @@ bool CheckPassword(HWND m_hWnd){
         }
         if(nRet){
 	        //检查是否要升级数据库
-	        initUiCallbackUpdateDatabase();
+	        initUiCallbackUpdateDatabase(m_hWnd);
 	        g_pldb->updateV2(uiCallBackUpdateDatabase);
         }
 	}else{

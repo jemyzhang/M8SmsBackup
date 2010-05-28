@@ -22,6 +22,8 @@ LocalDataBase::LocalDataBase() {
 
 LocalDataBase::~LocalDataBase() {
     disconnect();
+    query_clear();
+    query_sms_clear();
 }
 
 bool LocalDataBase::connect(){

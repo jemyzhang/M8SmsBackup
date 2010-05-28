@@ -22,7 +22,7 @@ using namespace cMzCommon;
 #define BUILD_METHOD
 #endif
 #define VER_STRING L"1.86"BUILD_METHOD
-#define BUILD_STRING L"20100525.080"BUILD_CONFIG
+#define BUILD_STRING L"20100528.081"BUILD_CONFIG
 
 extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 extern HINSTANCE LangresHandle;
@@ -170,12 +170,12 @@ void Ui_MainWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 			{
 				WORD n;
 				if(appconfig.IniUseSimPhoneBook.Get()){
-					initUiCallbackRefreshContact();
+					initUiCallbackRefreshContact(m_hWnd);
 					n = refreshSIMContact(uiCallbackRefreshSIMContact);
 				}
-				initUiCallbackRefreshContact();
+				initUiCallbackRefreshContact(m_hWnd);
 				n = refreshContact(uiCallbackRefreshContact);
-				initUiCallbackRefreshSms();
+				initUiCallbackRefreshSms(m_hWnd);
 				n = refreshSms(uiCallbackRefreshSms);
 				break;
 			}

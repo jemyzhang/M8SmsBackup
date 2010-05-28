@@ -10,6 +10,7 @@ extern SmsBackupConfig appconfig;
 static bool brangeSet = false;
 static bool bdlgshown = false;
 static MzPopupProgress m_Progressdlg;
+static HWND pwnd = 0;
 
 void SetProgressBarTitle(LPWSTR t){
 	if(t == NULL){
@@ -31,21 +32,23 @@ void SetProgressBarRange(WORD rmin, WORD rmax){
 }
 void ShowProgressBar(){
 	if(!bdlgshown){
-		m_Progressdlg.StartProgress(0,FALSE,FALSE,TRUE);
+		m_Progressdlg.StartProgress(pwnd,FALSE,FALSE,TRUE);
 		bdlgshown = true;
 	}
 }
 void HideProgressBar(){
 	m_Progressdlg.KillProgress();
+    brangeSet = false;
 	bdlgshown = false;
 }
 
-void initProgressBar(LPWSTR title = NULL, WORD rmin = 0, WORD rmax = 100){
+void initProgressBar(HWND parent = 0, LPWSTR title = NULL, WORD rmin = 0, WORD rmax = 100){
 	SetProgressBarTitle(title);
 	SetProgressBarRange(rmin,rmax);
 	//m_Progressdlg.SetShowInfo(true);
 	brangeSet = false;
 	bdlgshown = false;
+    pwnd = parent;
 }
 
 bool updateProgressBar(int nCount){
@@ -59,16 +62,28 @@ bool updateProgressBar(int nCount){
 	return true;
 }
 
-void initUiCallbackRefreshContact(){
-	initProgressBar(LOADSTRING(IDS_STR_UPDATE_CONTACT).C_Str());//L"更新联系人记录...");
+void initUiCallbackRefreshContact(HWND parent){
+	initProgressBar(parent, LOADSTRING(IDS_STR_UPDATE_CONTACT).C_Str());//L"更新联系人记录...");
 }
 
-void initUiCallbackRefreshSms(){
-	initProgressBar(LOADSTRING(IDS_STR_UPDATE_SMS).C_Str());//L"更新短信记录...");
+void initUiCallbackRefreshSms(HWND parent){
+	initProgressBar(parent, LOADSTRING(IDS_STR_UPDATE_SMS).C_Str());//L"更新短信记录...");
 }
 
-void initUiCallbackDeleteSms(){
-	initProgressBar(LOADSTRING(IDS_STR_DELETE_SMS).C_Str());//L"更新短信记录...");
+void initUiCallbackDeleteSms(HWND parent){
+	initProgressBar(parent, LOADSTRING(IDS_STR_DELETE_SMS).C_Str());//L"更新短信记录...");
+}
+
+void initUiCallbackUpdateDatabase(HWND parent){
+	initProgressBar(parent, L"数据库升级中...");
+}
+
+void initUiCallbackExportSms(HWND parent){
+	initProgressBar(parent, L"导出短信中...");//L"更新短信记录...");
+}
+
+void initUiCallbackExportContact(HWND parent){
+	initProgressBar(parent, L"导出联系人中...");//L"更新短信记录...");
 }
 
 bool uiCallbackRefreshContact(ContactData_ptr pcontact,WORD nCount,WORD nSize,WORD nSuccess){
@@ -158,9 +173,6 @@ bool uiCallbackDeleteSms(SmsSimpleData_ptr psms,WORD nCount,WORD nSize,WORD nSuc
 	return true;
 }
 
-void initUiCallbackUpdateDatabase(){
-	initProgressBar(L"数据库升级中...");
-}
 void uiCallBackUpdateDatabase(LPWSTR title = NULL,LPWSTR msg = NULL, UINT progress = 0){
 	if(progress == 0){
 		HideProgressBar();
@@ -177,4 +189,36 @@ void uiCallBackUpdateDatabase(LPWSTR title = NULL,LPWSTR msg = NULL, UINT progre
 	m_Progressdlg.SetCurrentValue(progress);
 	m_Progressdlg.UpdateProgress();
 	return;
+}
+
+//导出联系人时显示信息
+bool uiCallbackExportSms(SmsSimpleData_ptr psms,WORD nCount,WORD nSize){
+	if(psms == NULL){   //最后可以设置psms = NULL，让progressbar消失
+		HideProgressBar();
+		return false;
+	}
+	ShowProgressBar();
+	SetProgressBarRange(0,nSize-1);
+	wchar_t infotext[256];
+    wsprintf(infotext,L"%s(%d/%d)",psms->ContactName,nCount + 1,nSize);
+	m_Progressdlg.SetNoteText(infotext);
+	m_Progressdlg.SetCurrentValue(nCount);
+	m_Progressdlg.UpdateProgress();
+    return true;
+}
+
+bool uiCallbackExportContact(ContactData_ptr pcontact,WORD nCount,WORD nSize){
+	if(pcontact == NULL){
+		HideProgressBar();
+		return false;
+	}
+	ShowProgressBar();
+	SetProgressBarRange(0,nSize-1);
+	wchar_t infotext[256];
+	wsprintf(infotext,L"%s(%d/%d)",pcontact->Name,nCount + 1,nSize);
+	m_Progressdlg.SetNoteText(infotext);
+	m_Progressdlg.SetCurrentValue(nCount);
+	m_Progressdlg.UpdateProgress();
+	//DateTime::waitms(0);
+	return true;
 }

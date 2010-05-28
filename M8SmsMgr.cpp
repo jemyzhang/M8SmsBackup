@@ -85,7 +85,9 @@ BOOL M8SmsMgr::Init() {
     return TRUE;
 }
 
+extern bool DestroyDbConnection();
 int M8SmsMgr::Done(){
+    DestroyDbConnection();
     FreeMzResModule();
     if(isExternLangres) FreeLibrary(LangresHandle);
     return CMzApp::Done();

@@ -149,7 +149,7 @@ void UiSmsList::SetSelectedIndex(int nIndex){
 }
 
 void UiSmsList::DeleteSelectedItems(){
-	initUiCallbackDeleteSms();
+    initUiCallbackDeleteSms(GetParentWnd());
 	UINT nDeleting = GetSelectedCount();
 	UINT nDeleted = 0;
 	UINT nCount = 0;
