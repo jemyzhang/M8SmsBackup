@@ -21,8 +21,8 @@ using namespace cMzCommon;
 #else
 #define BUILD_METHOD
 #endif
-#define VER_STRING L"1.86"BUILD_METHOD
-#define BUILD_STRING L"20100528.081"BUILD_CONFIG
+#define VER_STRING L"1.87"BUILD_METHOD
+#define BUILD_STRING L"20100714.082"BUILD_CONFIG
 
 extern ImagingHelper *pimg[IDB_PNG_END - IDB_PNG_BEGIN + 1];
 extern HINSTANCE LangresHandle;

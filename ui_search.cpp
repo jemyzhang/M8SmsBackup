@@ -152,8 +152,16 @@ void Ui_SearchWnd::OnMzCommand(WPARAM wParam, LPARAM lParam) {
 					m_SearchBox.Invalidate();
                     m_ContactBox.Invalidate();
 					//m_SearchBox.Update();
-					m_pSmsList->SetupListContent(key.C_Str());
-                    m_pSmsList->SetupListName(contact.C_Str());
+                    if(!key.IsEmpty()){
+					    m_pSmsList->SetupListContent(key.C_Str());
+                    }else{
+                        m_pSmsList->SetupListContent(NULL);
+                    }
+                    if(!contact.IsEmpty()){
+                        m_pSmsList->SetupListName(contact.C_Str());
+                    }else{
+                        m_pSmsList->SetupListName(NULL);
+                    }
 					SetupList();
 				}
 				break;

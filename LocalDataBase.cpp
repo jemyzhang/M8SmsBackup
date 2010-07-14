@@ -637,12 +637,27 @@ bool LocalDataBase::GetSmsDayList(WORD year, WORD month){
 UINT LocalDataBase::GetSmsByDate(WORD year, WORD month, WORD day,SmsSimpleData_ptr plist){
     if(year == 0) return 0; //年份错误
 	UINT nSize = 0;
-	TRY{	//获取总数
-		std::wstring sql = L"select count(*) from '"
+
+    TRY{
+        std::wstring sql;
+        if(plist == NULL){ //获取总数
+            sql = L"select count(*)";
+        }else{ //获取详情
+            sql = L"select name,phonenumber,content,strftime('%Y-%m-%d %H:%M:%S',timestamps),sendreceive";
+        }
+		sql += L" from '"
 			TABLE_SMS
 			L"' where year=?";
+
 		if(month != 0) sql = sql + L" and month=?";
 		if(day != 0) sql = sql + L" and day=?";
+
+        if(plist != NULL){
+            sql += L" order by timestamps DESC;";
+        }else{
+            sql += L";";
+        }
+
 		sqlite3_command cmd(this->sqlconn,sql);
 
 		wchar_t sYear[8];
@@ -658,46 +673,20 @@ UINT LocalDataBase::GetSmsByDate(WORD year, WORD month, WORD day,SmsSimpleData_p
 			wsprintf(sDay,L"%02d",day);
 			cmd.bind(3,sDay,lstrlen(sDay)*2);
 		}
-		nSize = cmd.executeint();
-	}CATCH(exception &ex){
-		db_out(ex.what());
-	}
-
-    if(nSize == 0 || plist == NULL) return nSize;
-
-	TRY{	//获取总数
-		std::wstring sql = L"select name,phonenumber,content,strftime('%Y-%m-%d %H:%M:%S',timestamps),sendreceive from '"
-			TABLE_SMS
-			L"' where year=?";
-		if(month != 0) sql = sql + L" and month=?";
-		if(day != 0) sql = sql + L" and day=?";
-
-		sql = sql + L" order by timestamps DESC;";
-		sqlite3_command cmd(this->sqlconn,sql);
-
-		wchar_t sYear[8];
-		wsprintf(sYear,L"%04d",year);
-		cmd.bind(1,sYear,lstrlen(sYear)*2);
-		if(month != 0){
-			wchar_t sMonth[6];
-			wsprintf(sMonth,L"%02d",month);
-			cmd.bind(2,sMonth,lstrlen(sMonth)*2);
-		}
-		if(day != 0){
-			wchar_t sDay[6];
-			wsprintf(sDay,L"%02d",day);
-			cmd.bind(3,sDay,lstrlen(sDay)*2);
-		}
-		sqlite3_reader reader=cmd.executereader();
-	    SmsSimpleData_ptr pi = plist;
-		while(reader.read()){
-			C::newstrcpy(&pi->ContactName,reader.getstring16(0).c_str());
-            C::newstrcpy(&pi->MobileNumber,reader.getstring16(1).c_str());
-            C::newstrcpy(&pi->Content,reader.getstring16(2).c_str());
-            C::newstrcpy(&pi->TimeStamp,reader.getstring16(3).c_str());
-			pi->SendReceiveFlag = reader.getint(4);
-            pi++;
-		}
+        if(plist == NULL){
+            nSize = cmd.executeint();
+        }else{
+		    sqlite3_reader reader=cmd.executereader();
+	        SmsSimpleData_ptr pi = plist;
+		    while(reader.read()){
+			    C::newstrcpy(&pi->ContactName,reader.getstring16(0).c_str());
+                C::newstrcpy(&pi->MobileNumber,reader.getstring16(1).c_str());
+                C::newstrcpy(&pi->Content,reader.getstring16(2).c_str());
+                C::newstrcpy(&pi->TimeStamp,reader.getstring16(3).c_str());
+			    pi->SendReceiveFlag = reader.getint(4);
+                pi++; nSize++;
+		    }
+        }
 	}CATCH(exception &ex){
 		db_out(ex.what());
 	}
@@ -718,55 +707,18 @@ UINT LocalDataBase::sms_query(LPCTSTR pname,LPCTSTR pcontent,SmsSimpleData_ptr p
 
 	UINT nSize = 0;
 
-    TRY{	//获取总数
-        wstring s = L"select count(*) from '"
+	TRY{
+        wstring s;
+        if(plist == NULL){	//获取总数
+            s = L"select count(*)";
+        }else{	//获取详情
+            s = L"select name,phonenumber,content,strftime('%Y-%m-%d %H:%M:%S',timestamps),sendreceive";
+        }
+
+        s += L" from '"
             TABLE_SMS
             L"' where 1 ";
-        if(pname != NULL){
-            if(bwildcard){
-                s += L"and (name like ? or phonenumber like ?) ";
-            }else{
-                s += L"and (name=? or phonenumber=?) ";
-            }
-        }
-        if(pcontent != NULL){
-            s += L"and content like ? ";
-        }
 
-        sqlite3_command cmd(this->sqlconn, s);
-
-	    wstring likestr;
-        int bindidx = 1;
-        if(pname != NULL){
-            if(bwildcard){
-                likestr = L"%%";
-                likestr += pname;
-                likestr += L"%%";
-                cmd.bind(bindidx++,likestr);
-                cmd.bind(bindidx++,likestr);
-            }else{
-                likestr = pname;
-                cmd.bind(bindidx++,likestr);
-            }
-        }
-        if(pcontent != NULL){
-            likestr = L"%%";
-            likestr = pcontent;
-            likestr += L"%%";
-            cmd.bind(bindidx++,likestr);
-        }
-		nSize = cmd.executeint();
-	}CATCH(exception &ex){
-		db_out(ex.what());
-	}
-
-    if(nSize == 0 || plist == NULL) return nSize;
-
-	TRY{	//获取详情
-        wstring s = 
-            L"select name,phonenumber,content,strftime('%Y-%m-%d %H:%M:%S',timestamps),sendreceive from '"
-            TABLE_SMS
-            L"' where 1 ";
         if(pname != NULL){
             if(bwildcard){
                 s += L"and (name like ? or phonenumber like ?) ";
@@ -775,9 +727,18 @@ UINT LocalDataBase::sms_query(LPCTSTR pname,LPCTSTR pcontent,SmsSimpleData_ptr p
             }
         }
         if(pcontent != NULL){
-            s += L"and content like ? ";
+            if(bwildcard){
+                s += L"and content like ? ";
+            }else{
+                s += L"and content=? ";
+            }
         }
-        s += L"order by timestamps DESC;";
+
+        if(plist != NULL){
+            s += L"order by timestamps DESC;";
+        }else{
+            s += L";";
+        }
 
         sqlite3_command cmd(this->sqlconn, s);
 
@@ -796,22 +757,31 @@ UINT LocalDataBase::sms_query(LPCTSTR pname,LPCTSTR pcontent,SmsSimpleData_ptr p
             }
         }
         if(pcontent != NULL){
-            likestr = L"%%";
-            likestr = pcontent;
-            likestr += L"%%";
-            cmd.bind(bindidx++,likestr);
+            if(bwildcard){
+                likestr = L"%%";
+                likestr += pcontent;
+                likestr += L"%%";
+                cmd.bind(bindidx++,likestr);
+            }else{
+                likestr = pcontent;
+                cmd.bind(bindidx++,likestr);
+            }
         }
 
-		sqlite3_reader reader=cmd.executereader();
-	    SmsSimpleData_ptr pi = plist;
-		while(reader.read()){
-			C::newstrcpy(&pi->ContactName,reader.getstring16(0).c_str());
-            C::newstrcpy(&pi->MobileNumber,reader.getstring16(1).c_str());
-            C::newstrcpy(&pi->Content,reader.getstring16(2).c_str());
-            C::newstrcpy(&pi->TimeStamp,reader.getstring16(3).c_str());
-			pi->SendReceiveFlag = reader.getint(4);
-            pi++;
-		}
+        if(plist == NULL){	//获取总数
+            nSize = cmd.executeint();
+        }else{	//获取详情
+		    sqlite3_reader reader=cmd.executereader();
+	        SmsSimpleData_ptr pi = plist;
+		    while(reader.read()){
+			    C::newstrcpy(&pi->ContactName,reader.getstring16(0).c_str());
+                C::newstrcpy(&pi->MobileNumber,reader.getstring16(1).c_str());
+                C::newstrcpy(&pi->Content,reader.getstring16(2).c_str());
+                C::newstrcpy(&pi->TimeStamp,reader.getstring16(3).c_str());
+			    pi->SendReceiveFlag = reader.getint(4);
+                pi++; nSize++;
+		    }
+        }
 	}CATCH(exception &ex){
 		db_out(ex.what());
 	}
